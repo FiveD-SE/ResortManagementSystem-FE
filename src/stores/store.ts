@@ -1,21 +1,10 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
-
-const exampleSlice = createSlice({
-  name: 'example',
-  initialState: {
-    value: 0,
-  },
-  reducers: {
-    increment: (state) => {
-      state.value += 1;
-    },
-  },
-});
+import userSlice from './slices/userSlice';
 
 const store = configureStore({
   reducer: {
-    exampleSlice: exampleSlice.reducer,
+    user: userSlice,
   },
 });
 
