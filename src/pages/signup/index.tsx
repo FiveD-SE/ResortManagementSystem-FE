@@ -1,24 +1,31 @@
 import { Box } from "@mui/material";
 import SignUpCard from "./components/SignUpCard";
-import assets from "../../assets";
 
 const SignUp = () => {
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            {/* SignUp Card */}
-            <SignUpCard />
-            {/* Image */}
+        <Box
+            padding={4}
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            minHeight={'100vh'}
+        >
+            {/* Logo */}
             <Box
-                component="img"
-                src={assets.wallpaper}
-                alt="wallpaper"
+                position={'absolute'}
+                top={24}
+                left={24}
                 sx={{
-                    flex: 1,
-                    display: { xs: 'none', sm: 'block' },
-                    height: '100%',
-                    objectFit: 'cover',
+                    borderRadius: '50%',
+                    width: 50,
+                    height: 50,
+                    bgcolor: 'primary.500',
                 }}
+                onClick={() => window.location.href = '/'}
+                display={{ xs: 'none', md: 'block' }}
             />
+            {/* Sign up Card */}
+            <SignUpCard />
         </Box>
     )
 }

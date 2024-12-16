@@ -20,7 +20,7 @@ const ForgotPasswordModal = ({ open, onClose }: ForgotPasswordModalProps) => {
             <Box
                 sx={{
                     position: 'absolute',
-                    width: '60vw',
+                    width: { xs: '90vw', sm: '60vw' },
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
@@ -66,7 +66,7 @@ const ForgotPasswordModal = ({ open, onClose }: ForgotPasswordModalProps) => {
                     sx={{
                         display: 'flex',
                         width: '100%',
-                        height: 56,
+                        height: 50,
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderRadius: '12px',

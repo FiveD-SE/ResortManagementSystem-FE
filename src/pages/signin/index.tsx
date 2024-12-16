@@ -1,23 +1,29 @@
 import { Box } from "@mui/material";
 import SignInCard from "./components/SignInCard";
-import assets from "../../assets";
 
 const SignIn = () => {
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            {/* Image */}
+        <Box
+            padding={4}
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            minHeight={'100vh'}
+        >
             <Box
-                component="img"
-                src={assets.wallpaper}
-                alt="wallpaper"
+                position={'absolute'}
+                top={24}
+                left={24}
                 sx={{
-                    flex: 1,
-                    display: { xs: 'none', sm: 'block' },
-                    height: '100%',
-                    objectFit: 'cover',
+                    borderRadius: '50%',
+                    width: 50,
+                    height: 50,
+                    bgcolor: 'primary.500',
                 }}
+                onClick={() => window.location.href = '/'}
+                display={{ xs: 'none', md: 'block' }}
             />
-            {/* SignIn Card */}
+            {/* Sign in Card */}
             <SignInCard />
         </Box>
     );

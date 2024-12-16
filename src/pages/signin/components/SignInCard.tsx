@@ -12,13 +12,15 @@ const SignInCard = () => {
     return (
         <Box
             sx={{
-                flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'flex-start',
-                padding: 10,
-                gap: 4,
+                width: { xs: '90vw', sm: '50vw' },
+                boxShadow: '0px 0px 12px rgba(0, 0, 0, 0.2)',
+                borderRadius: 6,
+                padding: 4,
+                gap: 2,
             }}
         >
             <Box
@@ -35,96 +37,27 @@ const SignInCard = () => {
                         color: 'black.900'
                     }}
                 >
-                    Sign In <br />
+                    Sign in
+                </Typography>
+                <Typography
+                    sx={{
+                        fontSize: 40,
+                        fontWeight: 600,
+                        color: 'red.500'
+                    }}
+                >
+                    Brand
                     <Typography
+                        component={'span'}
                         sx={{
-                            fontSize: 48,
+                            fontSize: 40,
                             fontWeight: 600,
                             color: 'black.900'
                         }}
                     >
-                        Brand
-                        <Typography
-                            component={'span'}
-                            sx={{
-                                fontSize: 48,
-                                fontWeight: 600,
-                                color: 'primary.500'
-                            }}
-                        >
-                            Name
-                        </Typography>
+                        name
                     </Typography>
                 </Typography>
-            </Box>
-
-            {/* Google Login Button */}
-            <Button
-                sx={{
-                    display: 'flex',
-                    width: '100%',
-                    height: 56,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: 12,
-                    textTransform: 'none',
-                    fontSize: 22,
-                    fontWeight: 600,
-                    color: 'black.900',
-                    bgcolor: 'white.50',
-                    border: '1px solid',
-                    borderColor: 'gray.200',
-                    gap: 1,
-                    '&:hover': {
-                        borderColor: 'gray.500'
-                    }
-                }}
-            >
-                <Google sx={{ fontSize: 24 }} />
-                <Typography
-                    sx={{
-                        fontSize: 16,
-                        fontWeight: 400,
-                        color: 'black.900'
-                    }}
-                >
-                    Continue with Google
-                </Typography>
-            </Button>
-
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    gap: 2
-                }}
-            >
-                <Divider
-                    sx={{
-                        flex: 1,
-                        display: 'flex',
-                        height: 1,
-                        bgcolor: 'gray.200'
-                    }}
-                />
-                <Typography
-                    sx={{
-                        fontWeight: 400,
-                        fontSize: 16,
-                        color: 'black.900'
-                    }}
-                >
-                    OR
-                </Typography>
-                <Divider
-                    sx={{
-                        flex: 1,
-                        display: 'flex',
-                        height: 1,
-                        bgcolor: 'gray.200'
-                    }}
-                />
             </Box>
 
             <CustomTextField
@@ -148,17 +81,19 @@ const SignInCard = () => {
                     display: 'flex',
                     width: '100%',
                     justifyContent: 'flex-end',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    gap: 1
                 }}
             >
                 <Link
                     sx={{
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: 400,
-                        color: 'black.900',
+                        color: 'gray.300',
                         textDecoration: 'none',
                         '&:hover': {
-                            textDecoration: 'underline'
+                            textDecoration: 'underline',
+                            color: 'black.900'
                         }
                     }}
                     onClick={() => setOpen(true)}
@@ -181,13 +116,13 @@ const SignInCard = () => {
                 <Button
                     sx={{
                         display: 'flex',
-                        width: 306,
-                        height: 56,
+                        width: '100%',
+                        height: 50,
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderRadius: 12,
                         textTransform: 'none',
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: 600,
                         color: 'white.50',
                         bgcolor: 'primary.500',
@@ -200,31 +135,107 @@ const SignInCard = () => {
                         }
                     }}
                 >
-                    Sign In
+                    Sign in
                 </Button>
-
-                <Typography
+                <Box
                     sx={{
-                        fontSize: 16,
-                        fontWeight: 400,
-                        color: 'gray.300'
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '100%',
+                        gap: 2
                     }}
                 >
-                    Don’t have an account? {' '}
-                    <Link
-                        href={'/signup'}
+                    <Divider
                         sx={{
-                            color: 'black.900',
-                            fontWeight: 600,
-                            textDecoration: 'none',
-                            '&:hover': {
-                                textDecoration: 'underline'
-                            }
+                            flex: 1,
+                            display: 'flex',
+                            height: '1px',
+                            bgcolor: 'gray.200'
+                        }}
+                    />
+                    <Typography
+                        sx={{
+                            fontWeight: 400,
+                            fontSize: 16,
+                            color: 'black.900'
                         }}
                     >
-                        Sign up
-                    </Link>
-                </Typography>
+                        OR
+                    </Typography>
+                    <Divider
+                        sx={{
+                            flex: 1,
+                            display: 'flex',
+                            height: '1px',
+                            bgcolor: 'gray.200'
+                        }}
+                    />
+                </Box>
+                {/* Google Login Button */}
+                <Button
+                    sx={{
+                        display: 'flex',
+                        width: '100%',
+                        height: 50,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 12,
+                        textTransform: 'none',
+                        fontSize: 22,
+                        fontWeight: 600,
+                        color: 'black.900',
+                        bgcolor: 'white.50',
+                        border: '1px solid',
+                        borderColor: 'gray.200',
+                        gap: 1,
+                        '&:hover': {
+                            borderColor: 'gray.500'
+                        }
+                    }}
+                >
+                    <Google sx={{ fontSize: 24 }} />
+                    <Typography
+                        sx={{
+                            fontSize: 16,
+                            fontWeight: 400,
+                            color: 'black.900'
+                        }}
+                    >
+                        Continue with Google
+                    </Typography>
+                </Button>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        width: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 1
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            fontSize: 14,
+                            fontWeight: 400,
+                            color: 'gray.300'
+                        }}
+                    >
+                        Don’t have an account? {' '}
+                        <Link
+                            href={'/signup'}
+                            sx={{
+                                color: 'black.900',
+                                fontWeight: 600,
+                                textDecoration: 'none',
+                                '&:hover': {
+                                    textDecoration: 'underline'
+                                }
+                            }}
+                        >
+                            Sign up
+                        </Link>
+                    </Typography>
+                </Box>
             </Box>
             <ForgotPasswordModal
                 open={open}

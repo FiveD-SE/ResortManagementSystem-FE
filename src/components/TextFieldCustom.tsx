@@ -63,7 +63,7 @@ const TextFieldCustom = ({ title, placeholder, value, onChange, type = 'text' }:
                 sx={{
                     '& .MuiOutlinedInput-root': {
                         borderRadius: '12px',
-                        height: '56px'
+                        height: '50px'
                     },
                     '& .MuiOutlinedInput-input': {
                         padding: '12px 16px'

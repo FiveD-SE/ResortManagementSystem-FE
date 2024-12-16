@@ -1,15 +1,7 @@
 import { useState } from "react"
 import { Box, Button, Link, Typography } from "@mui/material"
 import CustomTextField from "../../../components/TextFieldCustom"
-import { CheckBox, CheckBoxOutlineBlank, FiberManualRecord } from "@mui/icons-material";
-
-const recommendations = [
-    'Use 8 or more characters',
-    'One Uppercase character',
-    'One lowercase character',
-    'One special character',
-    'One number'
-];
+import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
 const SignUpCard = () => {
     const [userName, setUserName] = useState('');
@@ -21,13 +13,15 @@ const SignUpCard = () => {
     return (
         <Box
             sx={{
-                flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'flex-start',
-                padding: 10,
-                gap: 4,
+                width: { xs: '90vw', sm: '50vw' },
+                boxShadow: '0px 0px 12px rgba(0, 0, 0, 0.2)',
+                borderRadius: 6,
+                padding: 4,
+                gap: 2,
             }}
         >
             <Box
@@ -35,7 +29,8 @@ const SignUpCard = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'flex-start',
-                    gap: '2px'
+                    gap: '2px',
+                    marginBottom: 2
                 }}
             >
                 <Typography
@@ -120,30 +115,6 @@ const SignUpCard = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     type={"password"}
                 />
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        flexWrap: 'wrap',
-                        gap: 2
-                    }}
-                >
-                    {recommendations.map((recommendation, index) => (
-                        <Typography
-                            key={index}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                fontSize: 12,
-                                fontWeight: 400,
-                                color: 'gray.400',
-                            }}
-                        >
-                            <FiberManualRecord sx={{ height: 8, width: 8, marginRight: 1 }} />
-                            {recommendation}
-                        </Typography>
-                    ))}
-                </Box>
             </Box>
 
             {/* Confirm Information Selection */}
@@ -153,7 +124,8 @@ const SignUpCard = () => {
                     flexDirection: 'row',
                     alignItems: 'flex-start',
                     cursor: 'pointer',
-                    gap: 1
+                    gap: 1,
+                    marginTop: 2
                 }}
                 onClick={() => setIsChecked(!isChecked)}
             >
@@ -193,13 +165,13 @@ const SignUpCard = () => {
                 <Button
                     sx={{
                         display: 'flex',
-                        width: 306,
-                        height: 64,
+                        width: '100%',
+                        height: 50,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        borderRadius: 12,
+                        borderRadius: '12px',
                         textTransform: 'none',
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: 600,
                         color: 'white.50',
                         bgcolor: 'primary.500',
@@ -212,7 +184,7 @@ const SignUpCard = () => {
                         }
                     }}
                 >
-                    Sign Up
+                    Sign up
                 </Button>
             </Box>
         </Box>
