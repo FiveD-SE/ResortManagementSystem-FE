@@ -2,13 +2,36 @@ import { useState } from "react"
 import { Box, Button, Link, Typography } from "@mui/material"
 import CustomTextField from "../../../components/TextFieldCustom"
 import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import authApi from "../../../apis/authApi";
 
 const SignUpCard = () => {
-    const [userName, setUserName] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isChecked, setIsChecked] = useState(false);
+    const disabled = name === '' || email === '' || password === '' || confirmPassword === '' || !isChecked;
+
+    const handleRegister = async () => {
+        if (password === '' || confirmPassword === '') {
+            alert('Please enter your password');
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+        try {
+            const response = await authApi.register(name, email, password);
+            if (response && response.status === 201) {
+                alert('Successfully registered');
+            } else {
+                alert('Failed to register');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <Box
@@ -17,7 +40,7 @@ const SignUpCard = () => {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'flex-start',
-                width: { xs: '90vw', sm: '50vw' },
+                width: { xs: '90vw', sm: '50vw', md: '40vw' },
                 boxShadow: '0px 0px 12px rgba(0, 0, 0, 0.2)',
                 borderRadius: 6,
                 padding: 4,
@@ -49,7 +72,7 @@ const SignUpCard = () => {
                             color: 'black.900'
                         }}
                     >
-                        Brand Name
+                        Brandname
                     </Typography>
                 </Typography>
                 <Typography
@@ -87,8 +110,8 @@ const SignUpCard = () => {
             <CustomTextField
                 title={"Username"}
                 placeholder={"Enter your username"}
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 type={"text"}
             />
 
@@ -183,6 +206,8 @@ const SignUpCard = () => {
                             color: 'gray.200'
                         }
                     }}
+                    disabled={disabled}
+                    onClick={() => handleRegister()}
                 >
                     Sign up
                 </Button>

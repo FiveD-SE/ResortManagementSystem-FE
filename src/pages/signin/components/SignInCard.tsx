@@ -16,7 +16,7 @@ const SignInCard = () => {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'flex-start',
-                width: { xs: '90vw', sm: '50vw' },
+                width: { xs: '90vw', sm: '50vw', md: '40vw' },
                 boxShadow: '0px 0px 12px rgba(0, 0, 0, 0.2)',
                 borderRadius: 6,
                 padding: 4,
