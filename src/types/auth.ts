@@ -1,8 +1,8 @@
 import { Role } from './enums';
 
 export interface IAccount {
-  accountId: string;
-  username: string;
+  id: string;
+  name: string;
   password: string;
   email: string;
   role: Role;

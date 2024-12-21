@@ -1,3 +1,27 @@
-export const BOOKING_SUCCESS_MESSAGE = 'Your booking has been confirmed!';
-export const BOOKING_ERROR_MESSAGE = 'There was an error processing your booking.';
-export const LOGIN_ERROR_MESSAGE = 'Invalid username or password.';
+export const LOGIN_SUCCESS_MESSAGE = 'Login successful.';
+export const LOGIN_ERROR_MESSAGE = {
+  INVALID_CREDENTIALS: 'Invalid email or password.',
+  ACCOUNT_NOT_VERIFIED: 'Account not verified.',
+  ACCOUNT_DISABLED: 'Account disabled.',
+};
+
+export const REGISTER_SUCCESS_MESSAGE = 'Registration successful.';
+export const REGISTER_ERROR_MESSAGE = {
+  EMAIL_TAKEN: 'Email already taken.',
+  INVALID_CREDENTIALS: 'Invalid email or password.',
+};
+
+export const LOGOUT_SUCCESS_MESSAGE = 'Logout successful.';
+export const LOGOUT_ERROR_MESSAGE = 'Logout failed.';
+
+export const REFRESH_TOKENS_SUCCESS_MESSAGE = 'Tokens refreshed successfully.';
+export const REFRESH_TOKENS_ERROR_MESSAGE = 'Failed to refresh tokens.';
+
+export const FORGOT_PASSWORD_SUCCESS_MESSAGE = 'Password reset link sent to your email.';
+export const FORGOT_PASSWORD_ERROR_MESSAGE = 'Failed to send password reset link.';
+
+export const RESET_PASSWORD_SUCCESS_MESSAGE = 'Password reset successful.';
+export const RESET_PASSWORD_ERROR_MESSAGE = 'Failed to reset password.';
+
+export const UPDATE_PROFILE_SUCCESS_MESSAGE = 'Profile updated successfully.';
+export const UPDATE_PROFILE_ERROR_MESSAGE = 'Failed to update profile.';

@@ -15,16 +15,16 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    login(state, action: PayloadAction<Role>) {
+    loginSuccess(state, action: PayloadAction<Role>) {
       state.isAuthenticated = true;
       state.role = action.payload;
     },
-    logout(state) {
+    logoutSuccess(state) {
       state.isAuthenticated = false;
       state.role = '';
     },
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { loginSuccess, logoutSuccess } = userSlice.actions;
 export default userSlice.reducer;
