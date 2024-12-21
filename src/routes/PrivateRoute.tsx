@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { RootState, useAppSelector } from '../stores/store';
+import { ROUTES } from '../constants/routes';
 
 interface PrivateRouteProps {
   allowedRoles: string[];
@@ -18,13 +19,13 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   }
 
   if (role === 'user') {
-    return <Navigate to="/user" replace />;
+    return <Navigate to={ROUTES.HOME} replace />;
   } else if (role === 'admin') {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to={ROUTES.ADMIN.HOME} replace />;
   } else if (role === 'receptionist') {
-    return <Navigate to="/receptionist" replace />;
+    return <Navigate to={ROUTES.RECEPTIONIST.HOME} replace />;
   } else if (role === 'serviceStaff') {
-    return <Navigate to="/serviceStaff" replace />;
+    return <Navigate to={ROUTES.SERVICE_STAFF.HOME} replace />;
   }
 
   return <Navigate to="/signin" />;

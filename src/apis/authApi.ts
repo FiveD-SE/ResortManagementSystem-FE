@@ -1,51 +1,34 @@
-import { loginSuccess, logoutSuccess } from "../stores/slices/userSlice";
-import axios from "axios";
-import { VITE_API_URL } from "./config";
-import { AppDispatch } from "../stores/store";
+import { IAccount } from './../types/auth';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { AUTH_ENDPOINT } from '../constants/endpoints';
 
-const AUTH_ENDPOINT = `${VITE_API_URL}/auth`;
+export const authApi = createApi({
+  reducerPath: 'authApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: AUTH_ENDPOINT,
+  }),
+  endpoints: (builder) => ({
+    register: builder.mutation<IAccount, Omit<IAccount, 'id' | 'role' | 'createdAt' | 'updatedAt' | 'status'>>({
+      query: (body) => ({
+        url: '/register',
+        method: 'POST',
+        body,
+      }),
+    }),
+    login: builder.mutation<IAccount, Omit<IAccount, 'id' | 'name' | 'role' | 'createdAt' | 'updatedAt' | 'status'>>({
+      query: (body) => ({
+        url: '/login',
+        method: 'POST',
+        body,
+      }),
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: '/logout',
+        method: 'POST',
+      }),
+    }),
+  }),
+});
 
-const register = async (name: string, email: string, password: string) => {
-    try {
-        const response = await axios.post(`${AUTH_ENDPOINT}/register`, {
-            name,
-            email,
-            password,
-        });
-
-        return response;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-const login = async (email: string, password: string) => async (dispatch: AppDispatch) => {
-    try {
-        const response = await axios.post(`${AUTH_ENDPOINT}/login`, {
-            email,
-            password,
-        });
-        dispatch(loginSuccess(response.data.user.role));
-        return response;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-const logout = async () => async (dispatch: AppDispatch) => {
-    try {
-        const response = await axios.post(`${AUTH_ENDPOINT}/logout`);
-        dispatch(logoutSuccess());
-        return response;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-const authApi = {
-    register,
-    login,
-    logout,
-}
-
-export default authApi;
+export const { useRegisterMutation, useLoginMutation, useLogoutMutation } = authApi;

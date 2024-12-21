@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { Fragment, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../stores/store';
+import { ROUTES } from '../constants/routes';
 
 interface PublicRouteProps {
   children: ReactNode;
@@ -12,17 +13,17 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 
   if (isAuthenticated) {
     if (role === 'user') {
-      return <Navigate to="/user" replace />;
+      return <Navigate to={ROUTES.HOME} replace />;
     } else if (role === 'admin') {
-      return <Navigate to="/admin" replace />;
+      return <Navigate to={ROUTES.ADMIN.HOME} replace />;
     } else if (role === 'receptionist') {
-      return <Navigate to="/receptionist" replace />;
+      return <Navigate to={ROUTES.RECEPTIONIST.HOME} replace />;
     } else if (role === 'serviceStaff') {
-      return <Navigate to="/serviceStaff" replace />;
+      return <Navigate to={ROUTES.SERVICE_STAFF.HOME} replace />;
     }
   }
 
-  return <>{children}</>;
+  return <Fragment>{children}</Fragment>;
 };
 
 export default PublicRoute;

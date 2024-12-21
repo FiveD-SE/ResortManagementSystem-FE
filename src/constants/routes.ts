@@ -1,12 +1,22 @@
 export const ROUTES = {
-  home: '/',
-  bookings: '/bookings',
-  upcomingBookings: '/bookings/upcoming',
-  pastBookings: '/bookings/past',
-  profile: '/profile',
-  admin: {
-    dashboard: '/admin/dashboard',
-    staffManagement: '/admin/staff',
+  AUTH: {
+    REGISTER: '/register',
+    LOGIN: '/login',
+    LOGOUT: '/logout',
+    REFRESH_TOKENS: '/refresh-tokens',
+    FORGOT_PASSWORD: '/forgot-password',
+    RESET_PASSWORD: '/reset-password',
   },
-  notFound: '*',
+  HOME: '/',
+  ADMIN: {
+    HOME: '/admin',
+  },
+  RECEPTIONIST: {
+    HOME: '/receptionist',
+  },
+  SERVICE_STAFF: {
+    HOME: '/service-staff',
+  },
+  PROFILE: '/profile',
+  NOT_FOUND: '*',
 };

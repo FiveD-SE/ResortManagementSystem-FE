@@ -1,7 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, Fragment } from 'react';
 import { Avatar, Box, Divider, Menu, MenuItem } from '@mui/material';
 import { MenuRounded } from '@mui/icons-material';
-import { User } from '../types';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../constants/routes';
+import { IAccount } from '../types';
 
 const menuStyles = {
   display: { xs: 'none', sm: 'flex' },
@@ -18,8 +20,9 @@ const menuStyles = {
   transition: 'box-shadow 0.3s',
 };
 
-export const UserMenu = ({ currentUser }: { currentUser?: User | null }) => {
+export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
 
   const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -29,22 +32,34 @@ export const UserMenu = ({ currentUser }: { currentUser?: User | null }) => {
     setAnchorEl(null);
   }, []);
 
+  const goToSignIn = useCallback(() => {
+    navigate(ROUTES.AUTH.LOGIN);
+  }, [navigate]);
+
+  const goToSignUp = useCallback(() => {
+    navigate(ROUTES.AUTH.REGISTER);
+  }, [navigate]);
+
   const avatarSrc = currentUser?.image || '/assets/avatar.png';
 
   const menuItems = currentUser ? (
-    <>
+    <Fragment>
       <MenuItem onClick={() => console.log('Go to My Trips')}>My Trips</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Favorites')}>My Favorites</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Reservations')}>My Reservations</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Properties')}>My Properties</MenuItem>
       <Divider />
       <MenuItem onClick={() => console.log('Logout')}>Logout</MenuItem>
-    </>
+    </Fragment>
   ) : (
-    <>
-      <MenuItem sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Login</MenuItem>
-      <MenuItem sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Sign Up</MenuItem>
-    </>
+    <Fragment>
+      <MenuItem sx={{ fontSize: '0.875rem', fontWeight: 500 }} onClick={goToSignIn}>
+        Login
+      </MenuItem>
+      <MenuItem sx={{ fontSize: '0.875rem', fontWeight: 500 }} onClick={goToSignUp}>
+        Sign Up
+      </MenuItem>
+    </Fragment>
   );
 
   return (
