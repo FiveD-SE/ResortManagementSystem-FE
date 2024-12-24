@@ -6,6 +6,7 @@ import { ROUTES } from '../constants/routes';
 const Home = lazy(() => import('../pages/home'));
 const SignUp = lazy(() => import('../pages/signup'));
 const SignIn = lazy(() => import('../pages/signin'));
+const Trips = lazy(() => import('../pages/trips'));
 
 const Routing = () => {
   return (
@@ -33,6 +34,14 @@ const Routing = () => {
             <SignIn />
           </PublicRoute>
         }
+      />
+      <Route
+        element={
+          <PublicRoute>
+            <Trips />
+          </PublicRoute>
+        }
+        path={ROUTES.TRIPS.HOME}
       />
     </Routes>
   );
