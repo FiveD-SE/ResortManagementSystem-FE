@@ -1,83 +1,76 @@
 import { AccountCircleRounded, DiscountRounded, FactCheck, GridView, HailRounded, KeyboardDoubleArrowLeft, KeyboardDoubleArrowRight, Logout, RoomPreferences, RoomServiceRounded, SupervisorAccountRounded } from "@mui/icons-material";
 import { Box, Divider, Drawer, IconButton, List, Typography } from "@mui/material"
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import SidebarItem from "./SidebarItem";
 import { useNavigate } from "react-router-dom";
+import PopupModal from "./PopupModal";
 
 const MENUS = {
     LOGOUT: 'logout',
     PROFILE: 'profile',
 };
 
-const Sidebar = () => {
-    const [openSideBar, setOpenSideBar] = useState(true);
-    const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
+const SidebarItems = [
+    {
+        name: 'dashboard',
+        icon: <GridView />,
+        title: 'Dashboard',
+        href: '/admin-dashboard',
+    },
+    {
+        name: 'staff-management',
+        icon: <HailRounded />,
+        title: 'Staff Management',
+        href: '/staff-management',
+    },
+    {
+        name: 'customer-management',
+        icon: <SupervisorAccountRounded />,
+        title: 'Customer Management',
+        href: '/customer-management',
+    },
+    {
+        name: 'room-management',
+        icon: <RoomPreferences />,
+        title: 'Room Management',
+        href: '/room-management',
+    },
+    {
+        name: 'service-management',
+        icon: <RoomServiceRounded />,
+        title: 'Service Management',
+        href: '/service-management',
+    },
+    {
+        name: 'promotion-management',
+        icon: <DiscountRounded />,
+        title: 'Promotion Management',
+        href: '/promotion-management',
+    },
+    {
+        name: 'booking-management',
+        icon: <FactCheck />,
+        title: 'Booking Management',
+        href: '/booking-management',
+    },
+];
 
-    const role = 'admin';
+const Sidebar = () => {
+    const [openSideBar, setOpenSideBar] = useState<boolean>(true);
+    const [selectedMenu, setSelectedMenu] = useState<string>('dashboard');
+    const [openPopupModal, setOpenPopupModal] = useState<boolean>(false);
     const drawerWidth = openSideBar ? '20rem' : '5rem';
     const drawerTransition = '0.2s ease';
     const navigate = useNavigate();
 
     const handleSelectMenu = (menu: { name: string; href?: string }) => {
         if (menu.name === MENUS.LOGOUT) {
-            setSelectedMenu(menu.name);
+            setOpenPopupModal(true);
         } else {
             setSelectedMenu(menu.name);
             if (menu.href) navigate(menu.href);
         }
     };
-
-    const renderSidebarItems = useCallback(() => {
-        const items = [];
-
-        if (role === 'admin') {
-            items.push(
-                {
-                    name: 'dashboard',
-                    icon: <GridView />,
-                    title: 'Dashboard',
-                    href: '/admin-dashboard',
-                },
-                {
-                    name: 'staff-management',
-                    icon: <HailRounded />,
-                    title: 'Staff Management',
-                    href: '/staff-management',
-                },
-                {
-                    name: 'customer-management',
-                    icon: <SupervisorAccountRounded />,
-                    title: 'Customer Management',
-                    href: '/customer-management',
-                },
-                {
-                    name: 'room-management',
-                    icon: <RoomPreferences />,
-                    title: 'Room Management',
-                    href: '/room-management',
-                },
-                {
-                    name: 'service-management',
-                    icon: <RoomServiceRounded />,
-                    title: 'Service Management',
-                    href: '/service-management',
-                },
-                {
-                    name: 'promotion-management',
-                    icon: <DiscountRounded />,
-                    title: 'Promotion Management',
-                    href: '/promotion-management',
-                },
-                {
-                    name: 'booking-management',
-                    icon: <FactCheck />,
-                    title: 'Booking Management',
-                    href: '/booking-management',
-                }
-            );
-        }
-        return items;
-    }, [role]);
 
     return (
         <Drawer
@@ -151,7 +144,7 @@ const Sidebar = () => {
                 </Box>
 
                 <Box flex={1}>
-                    {renderSidebarItems().map((item) =>
+                    {SidebarItems.map((item) =>
                         <SidebarItem
                             key={item.name}
                             name={item.name}
@@ -180,13 +173,22 @@ const Sidebar = () => {
                     <SidebarItem
                         icon={<AccountCircleRounded />}
                         name={MENUS.PROFILE}
-                        title={'Nguyen Quoc Thang'}
+                        title={'Profile'}
                         selectedMenu={selectedMenu}
                         openSideBar={openSideBar}
                         onClick={() => handleSelectMenu({ name: MENUS.PROFILE, href: '/profile' })}
                     />
                 </List>
             </Box>
+
+            <PopupModal
+                type={'confirm'}
+                open={openPopupModal}
+                title={'Logout'}
+                message={'Are you sure you want to logout?'}
+                onClose={() => (setOpenPopupModal(false))}
+                onConfirm={() => (setOpenPopupModal(false))}
+            />
         </Drawer>
     )
 }
