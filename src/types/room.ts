@@ -11,9 +11,14 @@ export interface IRoom {
 }
 
 export interface IRoomType {
-  roomTypeId: string;
+  id: string;
   typeName: string;
   description?: string;
   basePrice: number;
   guestAmount: number;
+  bedAmount: number;
+  bedroomAmount: number;
+  sharedBathAmount: number;
+  amenities: string[];
+  keyFeatures: string[];
 }

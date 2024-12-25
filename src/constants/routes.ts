@@ -19,4 +19,5 @@ export const ROUTES = {
   },
   PROFILE: '/profile',
   NOT_FOUND: '*',
+  ROOMS: '/rooms',
 };
