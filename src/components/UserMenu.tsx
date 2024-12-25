@@ -40,7 +40,7 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
     navigate(ROUTES.AUTH.REGISTER);
   }, [navigate]);
 
-  const avatarSrc = currentUser?.image || '/assets/avatar.png';
+  const avatarSrc = '/assets/avatar.png';
 
   const menuItems = currentUser ? (
     <Fragment>
