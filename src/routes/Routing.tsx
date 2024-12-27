@@ -14,14 +14,7 @@ const Profile = lazy(() => import('../pages/profile'));
 const Routing = () => {
   return (
     <Routes>
-      <Route
-        path={ROUTES.HOME}
-        element={
-          <PublicRoute>
-            <Home />
-          </PublicRoute>
-        }
-      />
+      <Route path={ROUTES.HOME} element={<Home />} />
       <Route
         path={ROUTES.AUTH.REGISTER}
         element={
@@ -46,7 +39,7 @@ const Routing = () => {
           </PublicRoute>
         }
       />
-      <Route element={<PrivateRoute allowedRoles={[Role.Customer]} />}>
+      <Route element={<PrivateRoute allowedRoles={[Role.User]} />}>
         <Route path={ROUTES.PROFILE} element={<Profile />} />
       </Route>
     </Routes>

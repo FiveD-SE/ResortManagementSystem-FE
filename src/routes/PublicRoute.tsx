@@ -13,8 +13,8 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
   const { isAuthenticated, user } = useSelector((state: RootState) => state.user);
   const role = user?.role;
   if (isAuthenticated) {
-    if (role === Role.Customer) {
-      return <Navigate to={ROUTES.HOME} replace />;
+    if (role === Role.User) {
+      return <Navigate to={ROUTES.HOME} />;
     } else if (role === Role.Admin) {
       return <Navigate to={ROUTES.ADMIN.HOME} replace />;
     } else if (role === Role.Receptionist) {
