@@ -9,6 +9,8 @@ export const REGISTER_SUCCESS_MESSAGE = 'Registration successful.';
 export const REGISTER_ERROR_MESSAGE = {
   EMAIL_TAKEN: 'Email already taken.',
   INVALID_CREDENTIALS: 'Invalid email or password.',
+  PLEASE_FILL_ALL_FIELDS: 'Please fill all fields.',
+  PASSWORD_DOES_NOT_MATCH: 'Passwords do not match.',
 };
 
 export const LOGOUT_SUCCESS_MESSAGE = 'Logout successful.';

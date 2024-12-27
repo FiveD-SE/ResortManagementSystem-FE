@@ -2,11 +2,14 @@ import { Routes, Route } from 'react-router-dom';
 import PublicRoute from './PublicRoute';
 import { lazy } from 'react';
 import { ROUTES } from '../constants/routes';
+import PrivateRoute from './PrivateRoute';
+import { Role } from '../types';
 
 const Home = lazy(() => import('../pages/home'));
 const SignUp = lazy(() => import('../pages/signup'));
 const SignIn = lazy(() => import('../pages/signin'));
 const Trips = lazy(() => import('../pages/trips'));
+const Profile = lazy(() => import('../pages/profile'));
 
 const Routing = () => {
   return (
@@ -43,6 +46,9 @@ const Routing = () => {
         }
         path={ROUTES.TRIPS.HOME}
       />
+      <Route element={<PrivateRoute allowedRoles={[Role.Customer]} />}>
+        <Route path={ROUTES.PROFILE} element={<Profile />} />
+      </Route>
     </Routes>
   );
 };

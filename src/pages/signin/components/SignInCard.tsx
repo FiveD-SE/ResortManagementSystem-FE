@@ -4,20 +4,27 @@ import CustomTextField from '../../../components/TextFieldCustom';
 import { Google } from '@mui/icons-material';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import { useLoginMutation } from '../../../apis/authApi';
+import toast from 'react-hot-toast';
+import { LOGIN_ERROR_MESSAGE } from '../../../constants/messages';
+import { API_BASE_URL } from '../../../constants/endpoints';
 
 const SignInCard = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);
 
-  const [login] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
 
   const handleLogin = async () => {
     if (email === '' || password === '') {
-      alert('Please enter your email and password');
+      toast.error(LOGIN_ERROR_MESSAGE.INVALID_CREDENTIALS);
       return;
     }
     login({ email, password });
+  };
+
+  const handleGoogleLogin = () => {
+    window.open(`${API_BASE_URL}/auth/google`, '_self');
   };
 
   return (
@@ -145,6 +152,7 @@ const SignInCard = () => {
               color: 'gray.200',
             },
           }}
+          disabled={isLoading}
           onClick={handleLogin}
         >
           Sign in
@@ -204,6 +212,7 @@ const SignInCard = () => {
               borderColor: 'gray.500',
             },
           }}
+          onClick={handleGoogleLogin}
         >
           <Google sx={{ fontSize: 24 }} />
           <Typography
@@ -234,7 +243,7 @@ const SignInCard = () => {
           >
             Don’t have an account?{' '}
             <Link
-              href={'/signup'}
+              href={'/register'}
               sx={{
                 color: 'black.900',
                 fontWeight: 600,
