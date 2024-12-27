@@ -40,14 +40,17 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
     navigate(ROUTES.AUTH.REGISTER);
   }, [navigate]);
 
-  const avatarSrc = '/assets/avatar.png';
+  const goToMyProfile = useCallback(() => {
+    navigate(ROUTES.PROFILE);
+  }, [navigate]);
+
+  const avatarSrc = currentUser?.avatar || '/assets/avatar.png';
 
   const menuItems = currentUser ? (
     <Fragment>
-      <MenuItem onClick={() => console.log('Go to My Trips')}>My Trips</MenuItem>
+      <MenuItem onClick={goToMyProfile}>My Profile</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Favorites')}>My Favorites</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Reservations')}>My Reservations</MenuItem>
-      <MenuItem onClick={() => console.log('Go to My Properties')}>My Properties</MenuItem>
       <Divider />
       <MenuItem onClick={() => console.log('Logout')}>Logout</MenuItem>
     </Fragment>
