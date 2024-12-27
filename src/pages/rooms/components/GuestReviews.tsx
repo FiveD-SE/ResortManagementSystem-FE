@@ -1,50 +1,69 @@
-import { StarRounded } from '@mui/icons-material';
+import { StarRounded, SvgIconComponent } from '@mui/icons-material';
 import { Avatar, Box, Button, Grid, Typography } from '@mui/material';
+import GuestReviewsDialog from './GuestReviewsDialog';
+import { useState } from 'react';
 
-const reviews = [
+const reviews: { avatar?: string; name: string; location: string; stars: number; date: string; review: string }[] = [
   {
-    name: 'Hanna',
-    date: 'January 2023',
+    name: 'Tamara',
+    location: 'Skopje, North Macedonia',
+    date: 'November 2024',
     stars: 5,
-    timeAgo: '2 days ago',
+    avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
     review:
-      'This place was amazing! I loved the location and the amenities. The host was very responsive and helpful. I would definitely stay here again.',
+      'The hosts were very helpful and friendly. They gave us recommendations for local food, rented scooters to us and arranged our transport from Hue to Hoi An. The house is really cozy with a a very nice, green yard. Their 2 little dogs are cute and friendly.',
   },
   {
-    name: 'Hanna',
-    date: 'January 2023',
-    stars: 5,
-    timeAgo: '2 days ago',
-    review:
-      'This place was amazing! I loved the location and the amenities. The host was very responsive and helpful. I would definitely stay here again.',
+    name: 'Monir',
+    location: '9 years on Airbnb',
+    date: 'May 2024',
+    stars: 4,
+    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+    review: 'Great location and host. Very helpful, very nice space and environment.',
   },
   {
-    name: 'Hanna',
-    date: 'January 2023',
-    stars: 5,
-    timeAgo: '2 days ago',
-    review:
-      'This place was amazing! I loved the location and the amenities. The host was very responsive and helpful. I would definitely stay here again.',
+    name: '怡宁',
+    location: '8 years on Airbnb',
+    date: 'May 2024',
+    stars: 4,
+    avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+    review: 'Very great place to stay well into Hue culture \n Translated from Chinese (Simplified) Show original', // Consider handling translation in your component
   },
   {
-    name: 'Hanna',
-    date: 'January 2023',
+    name: 'Belén',
+    location: '6 years on Airbnb',
+    date: 'April 2024',
     stars: 5,
-    timeAgo: '2 days ago',
-    review:
-      'This place was amazing! I loved the location and the amenities. The host was very responsive and helpful. I would definitely stay here again.',
+    avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
+    review: 'The room was quite nice and clean. Linh was very kind',
   },
   {
-    name: 'Hanna',
-    date: 'January 2023',
-    stars: 5,
-    timeAgo: '2 days ago',
-    review:
-      'This place was amazing! I loved the location and the amenities. The host was very responsive and helpful. I would definitely stay here again.',
+    name: 'Ashley',
+    location: '3 years on Airbnb',
+    date: 'April 2024',
+    stars: 3,
+    avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
+    review: 'This is placeholder review from Ashley',
   },
 ];
 
-const GuestReviews = () => {
+interface GuestReviewsProps {
+  overallRatings: { label: string; value: number }[];
+  detailedRatings: { label: string; value: number; icon: SvgIconComponent }[];
+  averageRating: number;
+  totalReviews: number;
+}
+
+const GuestReviews = ({ overallRatings, detailedRatings, averageRating, totalReviews }: GuestReviewsProps) => {
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
   return (
     <Box sx={{ borderTop: 1, borderColor: 'black.50', py: 5 }}>
       <Grid container spacing={6}>
@@ -70,7 +89,7 @@ const GuestReviews = () => {
                   •
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'black.500' }}>
-                  {review.timeAgo}
+                  {review.date}
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: 'black.500' }}>
@@ -95,10 +114,22 @@ const GuestReviews = () => {
               backgroundColor: 'gray.50',
             },
           }}
+          onClick={handleOpenDialog}
         >
-          <Typography sx={{ fontSize: 14, textTransform: 'none', fontWeight: 500 }}>Show all 20 reviews</Typography>
+          <Typography sx={{ fontSize: 14, textTransform: 'none', fontWeight: 500 }}>
+            Show all {reviews.length} reviews
+          </Typography>
         </Button>
       </Box>
+      <GuestReviewsDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        reviews={reviews}
+        overallRatings={overallRatings}
+        detailedRatings={detailedRatings}
+        averageRating={averageRating}
+        totalReviews={totalReviews}
+      />
     </Box>
   );
 };

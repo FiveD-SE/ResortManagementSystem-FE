@@ -16,14 +16,14 @@ import {
   PoolRounded,
   SmokeFreeRounded,
   SmokingRoomsRounded,
+  SvgIconComponent,
   WaterRounded,
   WifiRounded,
 } from '@mui/icons-material';
-import React from 'react';
 
 interface Amenity {
   title: string;
-  icon: React.ElementType;
+  icon: SvgIconComponent;
   category: string;
 }
 

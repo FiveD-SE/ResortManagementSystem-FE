@@ -4,6 +4,14 @@ import RoomDetails from './components/RoomDetails';
 import Ratings from './components/Ratings';
 import GuestReviews from './components/GuestReviews';
 import ThingsToKnow from './components/ThingsToKnow';
+import {
+  ChatBubbleOutlineRounded,
+  CheckCircleOutline,
+  CleaningServicesOutlined,
+  LocalOfferOutlined,
+  MapOutlined,
+  VpnKeyOutlined,
+} from '@mui/icons-material';
 
 const imageData = [
   {
@@ -30,12 +38,37 @@ const imageData = [
 ];
 
 const Rooms = () => {
+  const detailedRatings = [
+    { label: 'Cleanliness', value: 4.8, icon: CleaningServicesOutlined },
+    { label: 'Accuracy', value: 4.9, icon: CheckCircleOutline },
+    { label: 'Check-in', value: 4.7, icon: VpnKeyOutlined },
+    { label: 'Communication', value: 5.0, icon: ChatBubbleOutlineRounded },
+    { label: 'Location', value: 4.6, icon: MapOutlined },
+    { label: 'Value', value: 4.9, icon: LocalOfferOutlined },
+  ];
+  const averageRating = 4.82;
+
+  const totalReviews = 134;
+
+  const overallRatings = [
+    { label: '5', value: 4.9 },
+    { label: '4', value: 4.5 },
+    { label: '3', value: 3.2 },
+    { label: '2', value: 2.1 },
+    { label: '1', value: 1.5 },
+  ];
+
   return (
     <Container>
       <PhotoGallery images={imageData} />
       <RoomDetails />
-      <Ratings />
-      <GuestReviews />
+      <Ratings detailedRatings={detailedRatings} />
+      <GuestReviews
+        detailedRatings={detailedRatings}
+        averageRating={averageRating}
+        totalReviews={totalReviews}
+        overallRatings={overallRatings}
+      />
       <ThingsToKnow />
     </Container>
   );
