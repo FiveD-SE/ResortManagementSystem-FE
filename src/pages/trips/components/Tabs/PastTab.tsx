@@ -1,6 +1,6 @@
 import { Box, Paper, Typography } from '@mui/material';
-import { NO_BOOKING_URL } from '../../constant';
 import { useState } from 'react';
+import { NO_BOOKING_URL } from '../../constant';
 
 const PastTab = () => {
   const [trips, setTrips] = useState<[]>([]);

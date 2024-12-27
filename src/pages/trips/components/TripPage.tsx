@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import UpcomingTab from './Tabs/UpcomingTab';
 import PastTab from './Tabs/PastTab';
 import CancelTab from './Tabs/CancelTab';
+import Header from './Header';
 
 function a11yProps(index: number) {
   return {
@@ -13,7 +14,7 @@ function a11yProps(index: number) {
   };
 }
 
-const TripTabs = () => {
+const TripPage = () => {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -21,7 +22,8 @@ const TripTabs = () => {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', paddingX: 8 }}>
+      <Header haveBackNav={false} />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={value}
@@ -50,4 +52,4 @@ const TripTabs = () => {
   );
 };
 
-export default TripTabs;
+export default TripPage;

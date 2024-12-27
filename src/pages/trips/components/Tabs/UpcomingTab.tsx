@@ -1,10 +1,8 @@
-import { Image } from '@mui/icons-material';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { useState } from 'react';
-import { NO_BOOKING_URL } from '../../constant';
-import BookingCard from '../Cards/BookingCard';
 import { Trip } from '../../types';
 import BookingList from './components/BookingList';
+import { NO_BOOKING_URL } from '../../constant';
 
 const fakeData: Trip[] = [
   {

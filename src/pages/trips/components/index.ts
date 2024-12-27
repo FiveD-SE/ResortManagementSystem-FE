@@ -1,2 +1,2 @@
-export * from '../components/Header';
-export * from './TripTabs';
+export * from './TripPage';
+export * from './Header';

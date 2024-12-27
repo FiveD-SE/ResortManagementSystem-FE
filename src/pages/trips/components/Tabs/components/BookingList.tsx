@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { Trip } from '../../../types';
-import BookingCard from '../../Cards/BookingCard';
+import BookingCard from './BookingCard';
 import SearchButton from './SearchButton';
 
 interface IProps {

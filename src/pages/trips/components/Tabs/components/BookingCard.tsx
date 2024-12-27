@@ -1,11 +1,14 @@
-import { Box, Card, CardActionArea, IconButton, Paper, Typography } from '@mui/material';
-import { Trip } from '../../types';
+import { Box, Card, CardActionArea, Paper, Typography } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Trip } from '../../../types';
 
 const BookingCard = ({ trip }: { trip: Trip }) => {
   return (
     <Card variant="outlined" sx={{ marginY: 2 }}>
-      <CardActionArea sx={{ display: 'flex', padding: 2, flexDirection: 'row', justifyContent: 'space-between' }}>
+      <CardActionArea
+        sx={{ display: 'flex', padding: 2, flexDirection: 'row', justifyContent: 'space-between' }}
+        onClick={() => (window.location.href = `/trips/detail/${trip.id}`)}
+      >
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
           <Paper sx={{ display: 'flex' }}>
             <img src="https://placehold.co/100/png" />

@@ -21,5 +21,6 @@ export const ROUTES = {
   NOT_FOUND: '*',
   TRIPS: {
     HOME: '/trips',
+    DETAIL: '/trips/detail/:id',
   },
 };
