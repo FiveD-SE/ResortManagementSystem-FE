@@ -23,7 +23,12 @@ axiosInstance.interceptors.request.use(
   },
 );
 
-let refreshTokenPromise: Promise<AxiosResponse<{ access: { token: string }; refresh: { token: string } }>> | null = null;
+let refreshTokenPromise: Promise<
+  AxiosResponse<{
+    accessToken: string;
+    refreshToken: string;
+  }>
+> | null = null;
 
 axiosInstance.interceptors.response.use(
   (response) => {

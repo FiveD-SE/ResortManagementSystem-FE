@@ -23,4 +23,5 @@ export const ROUTES = {
     HOME: '/trips',
     DETAIL: '/trips/detail/:id',
   },
+  ROOMS: '/rooms',
 };
