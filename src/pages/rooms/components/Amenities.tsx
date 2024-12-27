@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import AmenityItem from './AmenitiyItem';
 
-const Amenities = () => {
+const Amenities = ({ amenities }) => {
   return (
     <Box
       sx={{
@@ -42,7 +42,9 @@ const Amenities = () => {
             },
           }}
         >
-          <Typography sx={{ fontSize: 14, textTransform: 'none', fontWeight: 500 }}>Show all 20 amenities</Typography>
+          <Typography sx={{ fontSize: 14, textTransform: 'none', fontWeight: 500 }}>
+            Show all {amenities.length} amenities
+          </Typography>
         </Button>
       </Box>
     </Box>

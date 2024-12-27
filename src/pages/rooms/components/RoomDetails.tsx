@@ -5,6 +5,7 @@ import Amenities from './Amenities';
 import ReservationCard from './ReservationCard';
 import { faker } from '@faker-js/faker';
 import { CalendarTodayRounded, VpnKeyRounded, WorkRounded } from '@mui/icons-material';
+import { mappingAmenities } from '../../../utils/amenitiesUtils';
 
 const generateFakeReviews = (count = 10) => {
   return Array.from({ length: count }, () => ({
@@ -40,12 +41,26 @@ const RoomDetails = () => {
   const reviews = generateFakeReviews(10);
   const roomType = generateFakeRoomType();
   const keyFeatures = generateFakeKeyFeatures(3);
+  const amenitiesFromBackend = [
+    'wifi',
+    'parking',
+    'kitchen',
+    'breakfast',
+    'pool',
+    'gym',
+    'balcony',
+    'beach',
+    'dryer',
+    'waterfront',
+  ];
+  const amenities = mappingAmenities(amenitiesFromBackend);
+
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
       <Grid item xs={8}>
         <RoomOverview roomType={roomType} reviews={reviews} />
         <KeyFeatures keyFeatures={keyFeatures} />
-        <Amenities />
+        <Amenities amenities={amenities} />
       </Grid>
       <Grid item xs={4}>
         <ReservationCard />

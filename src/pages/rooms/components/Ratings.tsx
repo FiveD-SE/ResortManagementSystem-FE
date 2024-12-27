@@ -1,15 +1,14 @@
-import {
-  ChatBubbleOutlineRounded,
-  CheckCircleOutline,
-  CleaningServicesOutlined,
-  LocalOfferOutlined,
-  MapOutlined,
-  StarRounded,
-  VpnKeyOutlined,
-} from '@mui/icons-material';
 import { Box, Divider, Typography } from '@mui/material';
+import RatingProgress from './RatingProgress';
+import RatingItem from './RatingItem';
+import { Fragment } from 'react/jsx-runtime';
+import { StarRounded, SvgIconComponent } from '@mui/icons-material';
 
-const Ratings = () => {
+interface RatingsProps {
+  detailedRatings: { label: string; value: number; icon: SvgIconComponent }[];
+}
+
+const Ratings = ({ detailedRatings }: RatingsProps) => {
   return (
     <Box
       sx={{
@@ -34,55 +33,20 @@ const Ratings = () => {
       <Box sx={{ width: '100%', display: 'flex', gap: 3 }}>
         <Box sx={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Typography variant="h6">Overall rating</Typography>
+          <RatingProgress value={4.8} label={'5'} />
+          <RatingProgress value={4.8} label={'4'} />
+          <RatingProgress value={4.8} label={'3'} />
+          <RatingProgress value={4.8} label={'2'} />
+          <RatingProgress value={4.8} label={'1'} />
         </Box>
 
-        <Divider orientation="vertical" flexItem />
-
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6">Cleanliness</Typography>
-          <Typography variant="h5">4.8</Typography>
-          <CleaningServicesOutlined />
-        </Box>
-
-        <Divider orientation="vertical" flexItem />
-
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6">Accuracy</Typography>
-          <Typography variant="h5">4.8</Typography>
-          <CheckCircleOutline />
-        </Box>
-
-        <Divider orientation="vertical" flexItem />
-
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6">Check-in</Typography>
-          <Typography variant="h5">4.9</Typography>
-          <VpnKeyOutlined />
-        </Box>
-
-        <Divider orientation="vertical" flexItem />
-
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6">Communication</Typography>
-          <Typography variant="h5">5</Typography>
-          <ChatBubbleOutlineRounded />
-        </Box>
-
-        <Divider orientation="vertical" flexItem />
-
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6">Location</Typography>
-          <Typography variant="h5">4.8</Typography>
-          <MapOutlined />
-        </Box>
-
-        <Divider orientation="vertical" flexItem />
-
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Typography variant="h6">Value</Typography>
-          <Typography variant="h5">4.9</Typography>
-          <LocalOfferOutlined />
-        </Box>
+        {detailedRatings.map((rating, index) => (
+          <Fragment>
+            {index === 0 && <Divider orientation="vertical" flexItem />}
+            <RatingItem key={index} label={rating.label} value={rating.value} icon={rating.icon} />
+            {index < detailedRatings.length - 1 && <Divider orientation="vertical" flexItem />}
+          </Fragment>
+        ))}
       </Box>
     </Box>
   );

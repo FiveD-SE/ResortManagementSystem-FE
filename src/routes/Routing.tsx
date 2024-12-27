@@ -31,14 +31,7 @@ const Routing = () => {
           </PublicRoute>
         }
       />
-      <Route
-        path={ROUTES.ROOMS}
-        element={
-          <PublicRoute>
-            <Rooms />
-          </PublicRoute>
-        }
-      />
+      <Route path={ROUTES.ROOMS} element={<Rooms />} />
       <Route element={<PrivateRoute allowedRoles={[Role.User]} />}>
         <Route path={ROUTES.PROFILE} element={<Profile />} />
       </Route>
