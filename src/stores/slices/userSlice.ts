@@ -1,30 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Role } from '../../types';
-
+import { IAccount } from '../../types';
+import Cookies from 'js-cookie';
 interface UserState {
   isAuthenticated: boolean;
-  role: string;
+  user: IAccount | null;
 }
+const accessToken = Cookies.get('accessToken');
+const user: IAccount | null = Cookies.get('user') ? (JSON.parse(Cookies.get('user') as string) as IAccount) : null;
 
 const initialState: UserState = {
-  isAuthenticated: false,
-  role: '',
+  isAuthenticated: !!accessToken,
+  user: user || null,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    loginSuccess(state, action: PayloadAction<Role>) {
+    loginSuccess(state, action: PayloadAction<IAccount>) {
       state.isAuthenticated = true;
-      state.role = action.payload;
-    },
-    logoutSuccess(state) {
-      state.isAuthenticated = false;
-      state.role = '';
+      state.user = action.payload;
     },
   },
 });
 
-export const { loginSuccess, logoutSuccess } = userSlice.actions;
+export const { loginSuccess } = userSlice.actions;
 export default userSlice.reducer;

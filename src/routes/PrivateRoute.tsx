@@ -2,29 +2,31 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { RootState, useAppSelector } from '../stores/store';
 import { ROUTES } from '../constants/routes';
+import { Role } from '../types';
 
 interface PrivateRouteProps {
-  allowedRoles: string[];
+  allowedRoles: Role[];
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
-  const { isAuthenticated, role } = useAppSelector((state: RootState) => state.user);
+  const { isAuthenticated, user } = useAppSelector((state: RootState) => state.user);
+  const role = user?.role;
 
   if (!isAuthenticated) {
-    return <Navigate to="/signin" />;
+    return <Navigate to="/login" />;
   }
 
-  if (allowedRoles.includes(role)) {
+  if (role && allowedRoles.includes(role)) {
     return <Outlet />;
   }
 
-  if (role === 'user') {
+  if (role === Role.Customer) {
     return <Navigate to={ROUTES.HOME} replace />;
-  } else if (role === 'admin') {
+  } else if (role === Role.Admin) {
     return <Navigate to={ROUTES.ADMIN.HOME} replace />;
-  } else if (role === 'receptionist') {
+  } else if (role === Role.Receptionist) {
     return <Navigate to={ROUTES.RECEPTIONIST.HOME} replace />;
-  } else if (role === 'serviceStaff') {
+  } else if (role === Role.ServiceStaff) {
     return <Navigate to={ROUTES.SERVICE_STAFF.HOME} replace />;
   }
 
