@@ -23,7 +23,7 @@ export enum ReportType {
 }
 
 export enum Role {
-  Customer = 'customer',
+  Customer = 'user',
   Admin = 'admin',
   Staff = 'staff',
   Receptionist = 'receptionist',

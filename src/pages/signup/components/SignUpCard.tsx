@@ -3,6 +3,8 @@ import { Box, Button, Link, Typography } from '@mui/material';
 import CustomTextField from '../../../components/TextFieldCustom';
 import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
 import { useRegisterMutation } from '../../../apis/authApi';
+import { REGISTER_ERROR_MESSAGE } from '../../../constants/messages';
+import toast from 'react-hot-toast';
 
 const SignUpCard = () => {
   const [name, setName] = useState('');
@@ -15,15 +17,19 @@ const SignUpCard = () => {
   const [register] = useRegisterMutation();
 
   const handleRegister = async () => {
-    if (password === '' || confirmPassword === '') {
-      alert('Please enter your password');
+    if (email === '' || name === '' || password === '' || confirmPassword === '') {
+      toast.error(REGISTER_ERROR_MESSAGE.PLEASE_FILL_ALL_FIELDS);
       return;
     }
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      toast.error(REGISTER_ERROR_MESSAGE.PASSWORD_DOES_NOT_MATCH);
       return;
     }
-    register({ name, email, password });
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || '';
+    console.log({ email, password, firstName, lastName });
+    register({ email, password, firstName, lastName });
   };
 
   return (
@@ -77,7 +83,7 @@ const SignUpCard = () => {
         >
           Already have an account?{' '}
           <Link
-            href={'/signin'}
+            href={'/login'}
             sx={{
               color: 'black.900',
               fontWeight: 600,
