@@ -28,7 +28,9 @@ const generateFakeData = (count: number): AccommodationData[] => {
 const fakeData = generateFakeData(12);
 
 const AccommodationList = () => {
-  const handleCardClick = () => {};
+  const handleCardClick = () => {
+    window.open('/rooms', '_blank');
+  };
   return (
     <Box sx={{ pt: 2, px: 5 }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 1, md: 2 }}>

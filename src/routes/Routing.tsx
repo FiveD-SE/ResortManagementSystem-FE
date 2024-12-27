@@ -8,6 +8,7 @@ import { Role } from '../types';
 const Home = lazy(() => import('../pages/home'));
 const SignUp = lazy(() => import('../pages/signup'));
 const SignIn = lazy(() => import('../pages/signin'));
+const Rooms = lazy(() => import('../pages/rooms'));
 const Profile = lazy(() => import('../pages/profile'));
 
 const Routing = () => {
@@ -30,6 +31,7 @@ const Routing = () => {
           </PublicRoute>
         }
       />
+      <Route path={ROUTES.ROOMS} element={<Rooms />} />
       <Route element={<PrivateRoute allowedRoles={[Role.User]} />}>
         <Route path={ROUTES.PROFILE} element={<Profile />} />
       </Route>
