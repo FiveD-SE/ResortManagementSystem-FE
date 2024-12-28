@@ -26,5 +26,10 @@ export const ROUTES = {
   },
   PROFILE: '/profile',
   NOT_FOUND: '*',
+  TRIPS: {
+    HOME: '/trips',
+    DETAIL: '/trips/detail/:id',
+    REVIEW: '/trips/review/:id',
+  },
   ROOMS: '/rooms',
 };

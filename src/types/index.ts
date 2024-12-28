@@ -12,3 +12,4 @@ export * from './room';
 export * from './service';
 export * from './serviceStaff';
 export * from './verificationCode';
+export * from './trip';
