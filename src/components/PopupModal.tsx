@@ -40,7 +40,7 @@ const PopupModal = ({ type, open, title, message, onClose, onConfirm }: PopupMod
             <Box
                 sx={{
                     position: 'absolute',
-                    width: { xs: '90%', sm: '50%', md: '500px', lg: '450px' },
+                    width: { xs: '90%', sm: '50%', md: '500px', lg: '450px', xl: '400px' },
                     bgcolor: 'white.50',
                     boxShadow: 24,
                     top: '50%',

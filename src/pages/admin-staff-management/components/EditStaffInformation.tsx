@@ -26,7 +26,7 @@ const EditStaffInformation = ({ open, onClose }: EditStaffInformationProps) => {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: { xs: '90%', sm: '90%', md: '70%', lg: '60%' },
+                    width: { xs: '90%', sm: '90%', md: '70%', lg: '60%', xl: '50%' },
                     bgcolor: 'white.50',
                     boxShadow: 24,
                     padding: 2,
@@ -57,8 +57,8 @@ const EditStaffInformation = ({ open, onClose }: EditStaffInformationProps) => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             type="email"
-                            error={!/^\S+@\S+\.\S+$/.test(email)}
-                            helperText={!/^\S+@\S+\.\S+$/.test(email) ? 'Invalid email address' : ''}
+                            error={!!email && !/^\S+@\S+\.\S+$/.test(email)}
+                            helperText={email && !/^\S+@\S+\.\S+$/.test(email) ? 'Invalid email address' : ''}
                         />
                     </Box>
 
@@ -81,7 +81,7 @@ const EditStaffInformation = ({ open, onClose }: EditStaffInformationProps) => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4, gap: 2 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
+                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
                         Cancel
                     </Button>
                     <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>

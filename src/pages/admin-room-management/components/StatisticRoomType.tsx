@@ -1,23 +1,40 @@
 import { Circle, Settings } from '@mui/icons-material'
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { PieChart } from '@mui/x-charts/PieChart';
-
-const data = [
-    { label: 'Single Room', value: 400, color: '#FF385C' },
-    { label: 'Double Room', value: 300, color: '#324155' },
-    { label: 'Triple Room', value: 300, color: '#43B75D' },
-    { label: 'Quad Room', value: 200, color: '#EE443F' },
-    { label: 'Queen Room', value: 200, color: '#FFAA00' },
-    { label: 'King Room', value: 100, color: '#0095FF' },
-];
-
-const colors = ['#FF385C', '#324155', '#43B75D', '#EE443F', '#FFAA00', '#0095FF'];
+import { IRoomApiResponse, IRoomTypeApi } from '../../../types';
 
 interface StatisticRoomTypeProps {
     onManageRoomType: () => void;
+    roomsData: IRoomApiResponse | undefined;
+    roomTypesData: IRoomTypeApi | undefined;
 }
 
-const StatisticRoomType = ({ onManageRoomType }: StatisticRoomTypeProps) => {
+
+const StatisticRoomType = ({ onManageRoomType, roomsData, roomTypesData }: StatisticRoomTypeProps) => {
+    const colors = ['#FF385C', '#324155', '#43B75D', '#EE443F', '#FFAA00', '#0095FF'];
+
+    const roomTypeMap = roomTypesData?.docs.reduce((acc, curr, index) => {
+        acc[curr.id] = {
+            label: curr.typeName,
+            color: colors[index % colors.length],
+        };
+        return acc;
+    }, {} as { [key: string]: { label: string; color: string } });
+
+    const roomCounts = roomsData?.docs.reduce((acc, room) => {
+        if (roomTypeMap && roomTypeMap[room.roomTypeId]) {
+            const typeName = roomTypeMap[room.roomTypeId].label;
+            acc[typeName] = (acc[typeName] || 0) + 1;
+        }
+        return acc;
+    }, {} as { [key: string]: number });
+
+    const data = roomCounts ? Object.entries(roomCounts).map(([label, value]) => ({
+        label,
+        value,
+        color: roomTypeMap ? roomTypeMap[Object.keys(roomTypeMap).find(key => roomTypeMap[key].label === label)!].color : '',
+    })) : [];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -50,7 +67,7 @@ const StatisticRoomType = ({ onManageRoomType }: StatisticRoomTypeProps) => {
                             }}
                         />
                     </Box>
-                    <Box sx={{ flex: 1, height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Box sx={{ flex: 1, height: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
                         <TableContainer>
                             <Table>
                                 <TableHead>
@@ -64,7 +81,7 @@ const StatisticRoomType = ({ onManageRoomType }: StatisticRoomTypeProps) => {
                                     {data.map((row, index) => (
                                         <TableRow key={index}>
                                             <TableCell sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
-                                                <Circle sx={{ color: colors[index], height: 15, width: 15 }} />
+                                                <Circle sx={{ color: row.color, height: 15, width: 15 }} />
                                                 {row.label}
                                             </TableCell>
                                             <TableCell>{row.value}</TableCell>
