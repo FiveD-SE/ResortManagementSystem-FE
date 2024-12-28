@@ -12,22 +12,22 @@ const App = () => {
   const { user } = useAppSelector((state) => state.user);
   return (
     <>
-      <Box>
-        <Navbar currentUser={user} />
-        <Routing />
-        <Footer />
-        <ScrollToTopButton />
-        <SpeedDialMenu />
-      </Box>
-
-      {user?.role === Role.Admin && (
+      {user?.role === Role.Admin ? (
         <Box display="flex">
           <Sidebar />
           <Box flex={1}>
             <Routing />
           </Box>
         </Box>
-      )}
+      ) : (
+        <Box>
+          <Navbar currentUser={user} />
+          <Routing />
+          <Footer currentUser={user} />
+          <ScrollToTopButton />
+          <SpeedDialMenu />
+        </Box>
+      )};
     </>
   );
 };
