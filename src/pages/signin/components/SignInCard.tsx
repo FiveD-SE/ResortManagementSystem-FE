@@ -3,26 +3,16 @@ import { Box, Button, Divider, Link, Typography } from '@mui/material';
 import CustomTextField from '../../../components/TextFieldCustom';
 import { Google } from '@mui/icons-material';
 import ForgotPasswordModal from './ForgotPasswordModal';
-import { useLoginMutation, useMeQuery } from '../../../apis/authApi';
+import { useLoginMutation } from '../../../apis/authApi';
 import toast from 'react-hot-toast';
 import { LOGIN_ERROR_MESSAGE } from '../../../constants/messages';
 import { API_BASE_URL } from '../../../constants/endpoints';
-import Cookies from 'js-cookie';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../../stores/slices/userSlice';
-import { getAccessToken } from '../../../utils/tokenUtils';
 const SignInCard = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);
 
   const [login, { isLoading }] = useLoginMutation();
-  const { data: userData, refetch } = useMeQuery({
-    skip: !getAccessToken(),
-  });
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleLogin = async () => {
     if (email === '' || password === '') {
@@ -34,14 +24,6 @@ const SignInCard = () => {
       toast.error(LOGIN_ERROR_MESSAGE.INVALID_CREDENTIALS);
       return;
     }
-    Cookies.set('accessToken', response.data.accessToken);
-    Cookies.set('refreshToken', response.data.refreshToken);
-    refetch();
-    console.log(userData);
-    Cookies.set('user', JSON.stringify(userData));
-    toast.success('Login successful!');
-    dispatch(loginSuccess(userData));
-    navigate('/');
   };
 
   const handleGoogleLogin = () => {
