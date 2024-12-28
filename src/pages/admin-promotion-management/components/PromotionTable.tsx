@@ -13,6 +13,8 @@ import {
     Tabs,
     Tab,
     Button,
+    Menu,
+    MenuItem,
 } from "@mui/material";
 import {
     MoreHoriz,
@@ -23,7 +25,11 @@ import {
     Add,
 } from "@mui/icons-material";
 import AddPromotionModal from "./AddPromotionModal";
-import EditPromotionModal from "./EditPromotionModal";
+import ViewDetailPromotionModal from "./ViewDetailPromotionModal";
+import { IPromotion, IPromotionApiResponse } from "../../../types";
+import PopupModal from "../../../components/PopupModal";
+import { useDeletePromotionMutation } from "../../../apis/promotionApi";
+import toast from "react-hot-toast";
 
 const tabTextStyle = {
     color: "gray.200",
@@ -39,30 +45,26 @@ const tabIconStyle = {
     fontSize: "18px",
 };
 
-interface DataRow {
-    id: number;
-    name: string;
-    description: string;
-    discount: number;
-    startDate: string;
-    endDate: string;
+interface PromotionTableProps {
+    promotionData: IPromotionApiResponse | undefined;
+    onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void;
 }
-
-const rows: DataRow[] = [
-    { id: 1, name: "Promotion 1", description: "Description 1", discount: 10, startDate: "2024-12-15", endDate: "2024-12-30" },
-    { id: 2, name: "Promotion 2", description: "Description 2", discount: 20, startDate: "2024-12-01", endDate: "2024-09-15" },
-    { id: 3, name: "Promotion 3", description: "Description 3", discount: 30, startDate: "2025-01-01", endDate: "2024-01-30" },
-    { id: 4, name: "Promotion 4", description: "Description 4", discount: 40, startDate: "2024-09-01", endDate: "2024-09-30" },
-    { id: 5, name: "Promotion 5", description: "Description 5", discount: 50, startDate: "2024-12-01", endDate: "2024-12-30" },
-];
-
-const PromotionTable = () => {
+const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) => {
     const [openAddPromotionModal, setOpenAddPromotionModal] = React.useState<boolean>(false);
-    const [openEditPromotionModal, setOpenEditPromotionModal] = React.useState<boolean>(false);
+    const [openViewDetailPromotionModal, setOpenViewDetailPromotionModal] = React.useState<boolean>(false);
     const [tabSelected, setTabSelected] = React.useState<number>(0);
     const [search, setSearch] = React.useState<string>("");
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [selectedPromotion, setSelectedPromotion] = React.useState<IPromotion>();
+    const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
 
-    const filteredRows = rows.filter((row) => {
+    const [deletePromotionMutation, { isLoading }] = useDeletePromotionMutation();
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const filteredRows = promotionData?.docs.filter((row) => {
         const currentDate = new Date();
         const startDate = new Date(row.startDate);
         const endDate = new Date(row.endDate);
@@ -73,7 +75,10 @@ const PromotionTable = () => {
             (tabSelected === 2 && startDate > currentDate) ||
             (tabSelected === 3 && endDate < currentDate);
 
-        const matchSearch = row.name.toLowerCase().includes(search.toLowerCase());
+        const matchSearch =
+            row.promotionName.toLowerCase().includes(search.toLowerCase()) ||
+            (row.description ?? "").toLowerCase().includes(search.toLowerCase()) ||
+            row.discount.toString().includes(search);
         return matchTab && matchSearch;
     });
 
@@ -84,6 +89,19 @@ const PromotionTable = () => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
     };
+
+    const handleDeletePromotion = async () => {
+        if (selectedPromotion) {
+            await deletePromotionMutation(selectedPromotion.id).unwrap();
+            try {
+                toast.success("Promotion deleted successfully");
+            } catch (error) {
+                toast.error("Failed to delete promotion");
+            } finally {
+                setOpenDeleteModal(false);
+            }
+        }
+    }
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -181,40 +199,104 @@ const PromotionTable = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredRows.length === 0 ? (
+                            {(filteredRows ?? []).length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} align="center">
                                         {search ? `No results found for "${search}".` : "No promotions available."}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredRows.map((row) => (
-                                    <TableRow key={row.id}>
-                                        <TableCell>{row.id}</TableCell>
-                                        <TableCell>{row.name}</TableCell>
+                                (filteredRows ?? []).map((row, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{index}</TableCell>
+                                        <TableCell>{row.promotionName}</TableCell>
                                         <TableCell>{row.description}</TableCell>
                                         <TableCell>{row.discount}</TableCell>
-                                        <TableCell>{row.startDate}</TableCell>
-                                        <TableCell>{row.endDate}</TableCell>
+                                        <TableCell>{new Date(row.startDate).toLocaleDateString()}</TableCell>
+                                        <TableCell>{new Date(row.startDate).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => setOpenEditPromotionModal(true)}>
+                                            <IconButton onClick={(event) => {
+                                                setAnchorEl(event.currentTarget);
+                                                setSelectedPromotion(row);
+                                            }}>
                                                 <MoreHoriz />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             )}
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                sx={{
+                                    '& .MuiPaper-root': {
+                                        borderRadius: '8px',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        padding: '4px',
+                                        minWidth: '100px',
+                                    },
+                                    '& .MuiMenuItem-root': {
+                                        padding: '4px 16px',
+                                        borderRadius: '4px',
+                                        '&:hover': {
+                                            backgroundColor: 'gray.50',
+                                        },
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: 'black.300',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={() => {
+                                    setOpenViewDetailPromotionModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    View Detail
+                                </MenuItem>
+                                <MenuItem onClick={() => {
+                                    setOpenDeleteModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Delete
+                                </MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
 
             {/* Pagination */}
-            <Pagination count={10} variant="outlined" shape="rounded" sx={{ marginTop: 2, alignSelf: "flex-end" }} />
+            <Pagination
+                count={promotionData?.totalPages ?? 0}
+                variant="outlined"
+                shape="rounded"
+                sx={{ marginTop: 2, alignSelf: "flex-end" }}
+                onChange={onPageChange}
+            />
 
             {/* Modals */}
             <AddPromotionModal open={openAddPromotionModal} onClose={() => setOpenAddPromotionModal(false)} />
-            <EditPromotionModal open={openEditPromotionModal} onClose={() => setOpenEditPromotionModal(false)} />
+            <ViewDetailPromotionModal open={openViewDetailPromotionModal} onClose={() => setOpenViewDetailPromotionModal(false)} selectedPromotion={selectedPromotion} />
+
+            {/* Popup Modal */}
+            <PopupModal
+                type="delete"
+                open={openDeleteModal}
+                onClose={() => setOpenDeleteModal(false)}
+                title="Delete Promotion"
+                message="Are you sure you want to delete this promotion?"
+                onConfirm={handleDeletePromotion}
+                isLoading={isLoading}
+            />
         </Box>
     );
 };

@@ -2,13 +2,15 @@ import { Box, Modal, Typography, IconButton, TextField, Button } from '@mui/mate
 import { Close } from '@mui/icons-material';
 import React from 'react'
 import CustomInputForm from '../../../components/CustomInputForm';
+import { IPromotion } from '../../../types';
 
-interface EditPromotionModalProps {
+interface ViewDetailPromotionModalProps {
+    selectedPromotion: IPromotion | undefined;
     open: boolean;
     onClose: () => void;
 }
 
-const EditPromotionModal = ({ open, onClose }: EditPromotionModalProps) => {
+const ViewDetailPromotionModal = ({ open, onClose }: ViewDetailPromotionModalProps) => {
     const [name, setName] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [discount, setDiscount] = React.useState('');
@@ -127,4 +129,4 @@ const EditPromotionModal = ({ open, onClose }: EditPromotionModalProps) => {
     )
 }
 
-export default EditPromotionModal
+export default ViewDetailPromotionModal
