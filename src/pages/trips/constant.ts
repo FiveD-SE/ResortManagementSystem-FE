@@ -11,4 +11,8 @@ export const TRIPS_FORM = {
     SUBCONTENT_2: 'Treat your Host’s home like your own',
   },
   START_TO_REVIEW: 'Start to review',
+  COMMENT: {
+    TITLE: 'Leave your comment',
+    CONTENT: 'Before you can continue, let us know a little about your opinion after using our services.',
+  },
 };

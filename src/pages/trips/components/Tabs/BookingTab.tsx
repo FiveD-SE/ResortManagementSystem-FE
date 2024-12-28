@@ -1,10 +1,9 @@
 import { Box, Paper } from '@mui/material';
-import { useState } from 'react';
-import { Trip } from '../../types';
 import BookingList from './components/BookingList';
 import { NO_BOOKING_URL } from '../../constant';
+import { ITrip } from '../../../../types';
 
-const fakeData: Trip[] = [
+const fakeData: ITrip[] = [
   {
     id: 1,
     name: 'Trip 1',
@@ -39,19 +38,23 @@ const fakeData: Trip[] = [
   },
 ];
 
-const UpcomingTab = () => {
-  const [trips, setTrips] = useState<Trip[]>(fakeData);
+interface IProps {
+  trips: ITrip[];
+  type: string;
+}
+
+const BookingTab = (props: IProps) => {
   return (
     <Box sx={{ paddingX: 6, paddingY: 3 }}>
-      {trips.length === 0 ? (
+      {props.trips.length === 0 ? (
         <Paper sx={{ display: 'flex' }} elevation={0}>
           <img src={NO_BOOKING_URL} />
         </Paper>
       ) : (
-        <BookingList trips={trips} />
+        <BookingList trips={props.trips} />
       )}
     </Box>
   );
 };
 
-export default UpcomingTab;
+export default BookingTab;

@@ -1,8 +1,8 @@
 import { Box, Card, CardActionArea, Paper, Typography } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Trip } from '../../../types';
+import { ITrip } from '../../../../../types';
 
-const BookingCard = ({ trip }: { trip: Trip }) => {
+const BookingCard = ({ trip }: { trip: ITrip }) => {
   return (
     <Card variant="outlined" sx={{ marginY: 2 }}>
       <CardActionArea

@@ -22,6 +22,7 @@ export const ROUTES = {
   TRIPS: {
     HOME: '/trips',
     DETAIL: '/trips/detail/:id',
+    REVIEW: '/trips/review/:id',
   },
   ROOMS: '/rooms',
 };

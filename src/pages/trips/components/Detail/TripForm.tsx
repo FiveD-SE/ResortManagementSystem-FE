@@ -3,7 +3,11 @@ import { Box, Button, Divider, Input, Stack, TextField, Typography } from '@mui/
 import PaymentIcon from '@mui/icons-material/Payment';
 import { TRIPS_FORM } from '../../constant';
 
+import { useParams } from 'react-router-dom';
+
 const TripForm = () => {
+  const { id } = useParams();
+  console.log(id);
   return (
     <Stack gap={4}>
       <Typography variant="h1" sx={{ fontFamily: 'Be Vietnam Pro', mb: 2 }}>
@@ -90,9 +94,13 @@ const TripForm = () => {
       </Stack>
       <Button
         variant="contained"
-        sx={{ p: 2, textTransform: 'none', width: '30%', borderRadius: 3, backgroundColor: '#C72D65' }}
+        sx={{ p: 2, textTransform: 'none', width: '40%', borderRadius: 3, backgroundColor: '#C72D65' }}
       >
-        <Typography variant="h3" sx={{ fontFamily: 'Be Vietnam Pro' }}>
+        <Typography
+          variant="h3"
+          sx={{ fontFamily: 'Be Vietnam Pro' }}
+          onClick={() => (window.location.href = `/trips/review/${id}`)}
+        >
           {TRIPS_FORM.START_TO_REVIEW}
         </Typography>
       </Button>

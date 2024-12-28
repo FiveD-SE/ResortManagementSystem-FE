@@ -1,16 +1,16 @@
 import { Box } from '@mui/material';
-import { Trip } from '../../../types';
 import BookingCard from './BookingCard';
 import SearchButton from './SearchButton';
+import { ITrip } from '../../../../../types';
 
 interface IProps {
-  trips: Trip[];
+  trips: ITrip[];
 }
 
 const BookingList = (props: IProps) => {
   return (
     <Box>
-      {props.trips.map((trip: Trip) => (
+      {props.trips.map((trip: ITrip) => (
         <BookingCard trip={trip} />
       ))}
       <SearchButton />

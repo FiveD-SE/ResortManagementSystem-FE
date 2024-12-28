@@ -1,1 +1,1 @@
-export * from './CancelTab';
+export * from './BookingTab';
