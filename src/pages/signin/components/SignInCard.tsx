@@ -7,10 +7,12 @@ import { useLoginMutation } from '../../../apis/authApi';
 import toast from 'react-hot-toast';
 import { LOGIN_ERROR_MESSAGE } from '../../../constants/messages';
 import { API_BASE_URL } from '../../../constants/endpoints';
+import { useNavigate } from 'react-router-dom';
 const SignInCard = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const [login, { isLoading }] = useLoginMutation();
 
@@ -65,7 +67,9 @@ const SignInCard = () => {
             fontSize: 40,
             fontWeight: 600,
             color: 'red.500',
+            cursor: 'pointer',
           }}
+          onClick={() => navigate('/')}
         >
           Brand
           <Typography
