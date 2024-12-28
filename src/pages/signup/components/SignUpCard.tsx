@@ -5,6 +5,7 @@ import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
 import { useRegisterMutation } from '../../../apis/authApi';
 import { REGISTER_ERROR_MESSAGE } from '../../../constants/messages';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpCard = () => {
   const [name, setName] = useState('');
@@ -12,6 +13,7 @@ const SignUpCard = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const navigate = useNavigate();
   const disabled = name === '' || email === '' || password === '' || confirmPassword === '' || !isChecked;
 
   const [register] = useRegisterMutation();
@@ -53,7 +55,9 @@ const SignUpCard = () => {
           alignItems: 'flex-start',
           gap: '2px',
           marginBottom: 2,
+          cursor: 'pointer',
         }}
+        onClick={() => navigate('/')}
       >
         <Typography
           sx={{

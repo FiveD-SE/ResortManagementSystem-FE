@@ -9,7 +9,14 @@ export const ROUTES = {
   },
   HOME: '/',
   ADMIN: {
-    HOME: '/admin',
+    HOME: '/admin/dashboard',
+    STAFF_MANAGEMENT: '/admin/staff-management',
+    CUSTOMER_MANAGEMENT: '/admin/customer-management',
+    ROOM_MANAGEMENT: '/admin/room-management',
+    SERVICE_MANAGEMENT: '/admin/service-management',
+    PROMOTION_MANAGEMENT: '/admin/promotion-management',
+    BOOKING_MANAGEMENT: '/admin/booking-management',
+    PROFILE: '/admin/profile',
   },
   RECEPTIONIST: {
     HOME: '/receptionist',

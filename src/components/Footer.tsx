@@ -1,12 +1,13 @@
 import { FacebookRounded, GitHub } from '@mui/icons-material';
 import { Box, IconButton, Link, Typography } from '@mui/material';
+import { IAccount, Role } from '../types';
 
-const Footer = () => {
+const Footer = ({ currentUser }: { currentUser?: IAccount | null }) => {
   return (
     <Box
       sx={{
         position: 'relative',
-        display: 'flex',
+        display: currentUser?.role === Role.Admin ? 'none' : 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',

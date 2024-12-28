@@ -4,9 +4,17 @@ import StatisticRoomType from "./components/StatisticRoomType"
 import RoomTable from "./components/RoomTable"
 import React from "react"
 import RoomTypeManagement from "./components/RoomTypeManagement"
+import EditRoomType from "./components/EditRoomType"
+import AddNewRoomType from "./components/AddNewRoomType"
+import { useGetRoomsQuery } from "../../apis/roomApi"
+import { useGetRoomTypesQuery } from "../../apis/roomTypeApi"
+import { IRoomType } from "../../types"
 
 const RoomManagement = () => {
-    const [disable, setDisable] = React.useState(false);
+    const [viewMode, setViewMode] = React.useState<'default' | 'roomManagement' | 'addRoomType' | 'editRoomType'>('default');
+    const [selectedRoomType, setSelectedRoomType] = React.useState<IRoomType>();
+    const { data: roomsData } = useGetRoomsQuery();
+    const { data: roomTypesData } = useGetRoomTypesQuery();
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 4 }}>
@@ -17,16 +25,39 @@ const RoomManagement = () => {
                 </IconButton>
             </Box>
 
-            {!disable ? (
-                <Box>
-                    <StatisticRoomType onManageRoomType={() => setDisable(!disable)} />
-                    <RoomTable />
-                </Box>
-            ) : (
-                <RoomTypeManagement onManageRoomType={() => setDisable(!disable)} />
+            {viewMode === 'default' && (
+                <>
+                    <StatisticRoomType onManageRoomType={() => setViewMode('roomManagement')} roomsData={roomsData} roomTypesData={roomTypesData} />
+                    <RoomTable roomsData={roomsData} roomTypesData={roomTypesData} />
+                </>
+            )}
+
+            {viewMode === 'roomManagement' && (
+                <RoomTypeManagement
+                    onManageRoomType={() => setViewMode('default')}
+                    onAddNewRoomType={() => setViewMode('addRoomType')}
+                    onEditRoomType={(roomType) => {
+                        setSelectedRoomType(roomType);
+                        setViewMode('editRoomType');
+                    }}
+                    roomTypesData={roomTypesData}
+                />
+            )}
+
+            {viewMode === 'editRoomType' && (
+                <EditRoomType
+                    roomType={selectedRoomType}
+                    onEditRoomType={() => setViewMode('roomManagement')}
+                />
+            )}
+
+
+            {viewMode === 'addRoomType' && (
+                <AddNewRoomType onAddNewRoomType={() => setViewMode('roomManagement')} />
             )}
         </Box>
-    )
+    );
 }
+
 
 export default RoomManagement

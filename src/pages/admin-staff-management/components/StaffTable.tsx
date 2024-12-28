@@ -27,32 +27,36 @@ interface DataRow {
 }
 
 const rows: DataRow[] = [
-    {
-        id: 1,
-        name: 'John Doe',
-        email: 'johndoe@gmail.com',
-        role: 'Receptionist',
-        status: 'Active',
-    },
-    {
-        id: 2,
-        name: 'Jane Doe',
-        email: 'janedoe@gmail.com',
-        role: 'Manager',
-        status: 'Active',
-    },
-    {
-        id: 3,
-        name: 'Alice',
-        email: 'alice@gmail.com',
-        role: 'Receptionist',
-        status: 'Inactive',
-    }
+    { id: 1, name: 'John Doe', email: 'johndoe@gmail.com', role: 'Receptionist', status: 'Active' },
+    { id: 2, name: 'Jane Doe', email: 'janedoe@gmail.com', role: 'Manager', status: 'Active' },
+    { id: 3, name: 'Alice', email: 'alice@gmail.com', role: 'Receptionist', status: 'Inactive' },
 ];
 
 const StaffTable = () => {
-    const [openAddStaffModal, setOpenAddStaffModal] = React.useState(false);
-    const [openEditStaffModal, setOpenEditStaffModal] = React.useState(false);
+    const [openAddStaffModal, setOpenAddStaffModal] = React.useState<boolean>(false);
+    const [openEditStaffModal, setOpenEditStaffModal] = React.useState<boolean>(false);
+    const [tabSelected, setTabSelected] = React.useState<number>(0);
+    const [search, setSearch] = React.useState<string>('');
+
+    const getFilteredRows = React.useCallback(() => {
+        const tabFilter = tabSelected === 0
+            ? rows
+            : rows.filter((row) =>
+                tabSelected === 1 ? row.role.toLowerCase() === "receptionist"
+                    : row.role.toLowerCase() === "manager"
+            );
+        return tabFilter.filter((row) => row.name.toLowerCase().includes(search.toLowerCase()));
+    }, [tabSelected, search]);
+
+    const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
+
+    const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+        setTabSelected(newValue);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(event.target.value);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -74,32 +78,33 @@ const StaffTable = () => {
                             zIndex: -1,
                         },
                     }}
-                    value={0}
+                    value={tabSelected}
+                    onChange={handleTabChange}
                 >
                     <Tab
                         label="All staff"
                         sx={tabTextStyle}
                         icon={<Apps sx={tabIconStyle} />}
-                        iconPosition='start'
+                        iconPosition="start"
                         disableRipple
                     />
                     <Tab
                         label="Receptionists"
                         sx={tabTextStyle}
                         icon={<SupportAgent sx={tabIconStyle} />}
-                        iconPosition='start'
+                        iconPosition="start"
                         disableRipple
                     />
                     <Tab
                         label="Managers"
                         sx={tabTextStyle}
                         icon={<EmojiPeople sx={tabIconStyle} />}
-                        iconPosition='start'
+                        iconPosition="start"
                         disableRipple
                     />
                 </Tabs>
 
-                {/* Search and Button */}
+                {/* Search and Add Button */}
                 <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
                     {/* Search */}
                     <TextField
@@ -129,8 +134,10 @@ const StaffTable = () => {
                                 },
                             },
                         }}
+                        value={search}
+                        onChange={handleSearchChange}
                     />
-                    {/* Button */}
+                    {/* Add Staff Button */}
                     <Button
                         sx={{
                             bgcolor: 'primary.500',
@@ -147,11 +154,12 @@ const StaffTable = () => {
                     </Button>
                 </Box>
             </Box>
-            <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
+
+            <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)', marginTop: 2 }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Email</TableCell>
@@ -161,32 +169,43 @@ const StaffTable = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.email}</TableCell>
-                                    <TableCell>{row.role}</TableCell>
-                                    <TableCell>
-                                        {row.status.toLowerCase() === "active" ? (
-                                            <Typography sx={{ color: 'black.900', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <FiberManualRecord color="success" sx={{ height: 15, width: 15, padding: 0, margin: 0 }} />
-                                                {row.status}
-                                            </Typography>
-                                        ) : (
-                                            <Typography sx={{ color: 'black.900', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <FiberManualRecord sx={{ color: 'gray.200', height: 15, width: 15, padding: 0, margin: 0 }} />
-                                                {row.status}
-                                            </Typography>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => setOpenEditStaffModal(true)}>
-                                            <MoreHoriz />
-                                        </IconButton>
+                            {filteredRows.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center">
+                                        No staff found.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                filteredRows.map((row) => (
+                                    <TableRow key={row.id}>
+                                        <TableCell>{row.id}</TableCell>
+                                        <TableCell>{row.name}</TableCell>
+                                        <TableCell>{row.email}</TableCell>
+                                        <TableCell>{row.role}</TableCell>
+                                        <TableCell>
+                                            <Typography
+                                                sx={{
+                                                    color: 'black.900',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                }}
+                                            >
+                                                <FiberManualRecord
+                                                    color={row.status.toLowerCase() === "active" ? "success" : "disabled"}
+                                                    sx={{ height: 15, width: 15 }}
+                                                />
+                                                {row.status}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => setOpenEditStaffModal(true)}>
+                                                <MoreHoriz />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>

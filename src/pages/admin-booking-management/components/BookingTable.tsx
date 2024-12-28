@@ -4,8 +4,11 @@ import { Apps, PaidRounded, PendingActionsRounded } from '@mui/icons-material'
 import BookingInformationModal from './BookingInformationModal';
 import React from 'react';
 import dayjs from 'dayjs';
-import { DateCalendar, MonthCalendar } from '@mui/x-date-pickers';
+import { MonthCalendar } from '@mui/x-date-pickers';
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
 import { SelectChangeEvent } from '@mui/material';
+import { DateRange } from 'react-date-range';
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -47,30 +50,90 @@ interface DataRow {
 }
 
 const rows: DataRow[] = [
-    { id: 1, roomType: 'Single', roomNumber: 101, customerId: 1, checkInDate: '2021/10/10', checkOutDate: '2021/10/12', totalAmount: 100, status: 'Pending' },
-    { id: 2, roomType: 'Double', roomNumber: 102, customerId: 2, checkInDate: '2021/10/10', checkOutDate: '2021/10/12', totalAmount: 200, status: 'Pending' },
-    { id: 3, roomType: 'Single', roomNumber: 103, customerId: 3, checkInDate: '2021/10/10', checkOutDate: '2021/10/12', totalAmount: 300, status: 'Pending' }
+    { id: 1, roomType: 'Single', roomNumber: 101, customerId: 1, checkInDate: '2024/12/10', checkOutDate: '2024/12/30', totalAmount: 100, status: 'Pending' },
+    { id: 2, roomType: 'Double', roomNumber: 102, customerId: 2, checkInDate: '2024/11/10', checkOutDate: '2024/11/15', totalAmount: 200, status: 'Pending' },
+    { id: 3, roomType: 'Single', roomNumber: 103, customerId: 3, checkInDate: '2024/12/10', checkOutDate: '2024/12/30', totalAmount: 300, status: 'Paid' },
+    { id: 4, roomType: 'Double', roomNumber: 104, customerId: 4, checkInDate: '2024/10/10', checkOutDate: '2024/10/25', totalAmount: 400, status: 'Paid' },
+    { id: 5, roomType: 'Single', roomNumber: 105, customerId: 5, checkInDate: '2024/09/10', checkOutDate: '2024/09/15', totalAmount: 500, status: 'Pending' },
 ];
 
 const BookingTable = () => {
-    const [bookingDate, setBookingDate] = React.useState('daily');
+    const [bookingDate, setBookingDate] = React.useState('monthly');
     const [open, setOpen] = React.useState(false);
     const [openCalendar, setOpenCalendar] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-    const [selectedDate, setSelectedDate] = React.useState(dayjs());
+    const [selectedDateRange, setSelectedDateRange] = React.useState({ startDate: new Date(), endDate: new Date(), key: 'selection' });
     const [selectedMonth, setSelectedMonth] = React.useState(dayjs());
     const [selectedSearch, setSelectedSearch] = React.useState('Room Type');
+    const [tabSelected, setTabSelected] = React.useState(0);
+    const [search, setSearch] = React.useState('');
+
+    const getFilteredRows = React.useCallback(() => {
+        const tabFilter = tabSelected === 0
+            ? rows
+            : tabSelected === 1
+                ? rows.filter((row) => row.status === 'Pending')
+                : rows.filter((row) => row.status === 'Paid');
+
+        const dateFilter = tabFilter.filter((row) => {
+            const checkInDate = dayjs(row.checkInDate);
+            const checkOutDate = dayjs(row.checkOutDate);
+
+            if (bookingDate === 'daily') {
+                const startDate = dayjs(selectedDateRange.startDate);
+                const endDate = dayjs(selectedDateRange.endDate);
+
+                return (
+                    (checkInDate.isBetween(startDate, endDate, 'day', '[]') ||
+                        checkOutDate.isBetween(startDate, endDate, 'day', '[]')) ||
+                    (checkInDate.isBefore(startDate) && checkOutDate.isAfter(endDate))
+                );
+            }
+
+            if (bookingDate === 'monthly') {
+                const monthStart = selectedMonth.startOf('month');
+                const monthEnd = selectedMonth.endOf('month');
+
+                return (
+                    (checkInDate.isBetween(monthStart, monthEnd, 'day', '[]') ||
+                        checkOutDate.isBetween(monthStart, monthEnd, 'day', '[]')) ||
+                    (checkInDate.isBefore(monthStart) && checkOutDate.isAfter(monthEnd))
+                );
+            }
+
+            return true;
+        });
+
+        return dateFilter.filter((row) => {
+            if (selectedSearch === 'Room Type') {
+                return row.roomType.toLowerCase().includes(search.toLowerCase());
+            } else if (selectedSearch === 'Room Number') {
+                return row.roomNumber.toString().includes(search);
+            } else if (selectedSearch === 'Check In Date') {
+                return row.checkInDate.includes(search);
+            } else if (selectedSearch === 'Check Out Date') {
+                return row.checkOutDate.includes(search);
+            } else {
+                return row.status.toLowerCase().includes(search.toLowerCase());
+            }
+        });
+    }, [tabSelected, search, bookingDate, selectedDateRange, selectedMonth, selectedSearch]);
+
+
+    const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
+
+    const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+        setTabSelected(newValue);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(event.target.value);
+    };
 
     const handleCalendarOpen = (type: string, event: React.MouseEvent<HTMLElement>) => {
         setBookingDate(type);
         setAnchorEl(event.currentTarget);
         setOpenCalendar(true);
-    };
-
-
-    const handleDateChange = (newDate: dayjs.Dayjs) => {
-        setSelectedDate(newDate);
-        setOpenCalendar(false);
     };
 
     const handleMonthChange = (newMonth: dayjs.Dayjs) => {
@@ -83,10 +146,6 @@ const BookingTable = () => {
         setOpenCalendar(false);
     };
 
-    const handleSearchChange = (event: SelectChangeEvent<string>) => {
-        setSelectedSearch(event.target.value);
-    };
-
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', paddingX: 2, gap: 2 }}>
@@ -96,8 +155,8 @@ const BookingTable = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography sx={{ color: 'primary.500', fontSize: 32, fontWeight: 600 }}>
                         {bookingDate === 'daily'
-                            ? selectedDate.format('YYYY/MM/DD')
-                            : selectedMonth.format('YYYY/MM')}
+                            ? dayjs(selectedDateRange.startDate).format('DD/MM/YYYY') + ' - ' + dayjs(selectedDateRange.endDate).format('DD/MM/YYYY')
+                            : selectedMonth.format('MM/YYYY')}
                     </Typography>
 
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
@@ -137,7 +196,8 @@ const BookingTable = () => {
                             zIndex: -1,
                         },
                     }}
-                    value={0}
+                    value={tabSelected}
+                    onChange={handleTabChange}
                 >
                     <Tab
                         label="All booking"
@@ -191,7 +251,7 @@ const BookingTable = () => {
                     >
                         <Select
                             value={selectedSearch}
-                            onChange={handleSearchChange}
+                            onChange={(event: SelectChangeEvent) => setSelectedSearch(event.target.value)}
                             IconComponent={ArrowDropDown}
                             startAdornment={
                                 <InputAdornment position="start">
@@ -233,6 +293,8 @@ const BookingTable = () => {
                                 },
                             },
                         }}
+                        value={search}
+                        onChange={handleSearchChange}
                     />
                 </Box>
             </Box>
@@ -241,7 +303,7 @@ const BookingTable = () => {
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Room Type</TableCell>
                                 <TableCell>Room Number</TableCell>
@@ -254,23 +316,31 @@ const BookingTable = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.roomType}</TableCell>
-                                    <TableCell>{row.roomNumber}</TableCell>
-                                    <TableCell>{row.customerId}</TableCell>
-                                    <TableCell>{row.checkInDate}</TableCell>
-                                    <TableCell>{row.checkOutDate}</TableCell>
-                                    <TableCell>{row.totalAmount}</TableCell>
-                                    <TableCell>{row.status}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => setOpen(true)}>
-                                            <MoreHoriz />
-                                        </IconButton>
+                            {filteredRows.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center">
+                                        No booking found.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                filteredRows.map((row, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{row.id}</TableCell>
+                                        <TableCell>{row.roomType}</TableCell>
+                                        <TableCell>{row.roomNumber}</TableCell>
+                                        <TableCell>{row.customerId}</TableCell>
+                                        <TableCell>{row.checkInDate}</TableCell>
+                                        <TableCell>{row.checkOutDate}</TableCell>
+                                        <TableCell>{row.totalAmount}</TableCell>
+                                        <TableCell>{row.status}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => setOpen(true)}>
+                                                <MoreHoriz />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
@@ -303,9 +373,13 @@ const BookingTable = () => {
                 }}
             >
                 {bookingDate === 'daily' ? (
-                    <DateCalendar
-                        value={selectedDate}
-                        onChange={(newDate) => handleDateChange(newDate)}
+                    <DateRange
+                        ranges={[selectedDateRange]}
+                        onChange={(ranges) => setSelectedDateRange(ranges.selection)}
+                        displayMode="dateRange"
+                        editableDateInputs={false}
+                        moveRangeOnFirstSelection={false}
+                        rangeColors={['#FF385C']}
                     />
                 ) : (
                     <MonthCalendar

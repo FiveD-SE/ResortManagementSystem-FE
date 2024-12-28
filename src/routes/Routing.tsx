@@ -13,6 +13,14 @@ const SignIn = lazy(() => import('../pages/signin'));
 const Trips = lazy(() => import('../pages/trips/Trips'));
 const Rooms = lazy(() => import('../pages/rooms'));
 const Profile = lazy(() => import('../pages/profile'));
+const AdminHome = lazy(() => import('../pages/admin-dashboard'));
+const StaffManagement = lazy(() => import('../pages/admin-staff-management'));
+const CustomerManagement = lazy(() => import('../pages/admin-customer-management'));
+const RoomManagement = lazy(() => import('../pages/admin-room-management'));
+const ServiceManagement = lazy(() => import('../pages/admin-service-management'));
+const PromotionManagement = lazy(() => import('../pages/admin-promotion-management'));
+const BookingManagement = lazy(() => import('../pages/admin-booking-management'));
+const AdminProfile = lazy(() => import('../pages/admin-profile'));
 
 const Routing = () => {
   return (
@@ -41,6 +49,16 @@ const Routing = () => {
         <Route element={<TripDetail />} path={ROUTES.TRIPS.DETAIL} />
         <Route element={<TripReview />} path={ROUTES.TRIPS.REVIEW} />
         <Route path={ROUTES.PROFILE} element={<Profile />} />
+      </Route>
+      <Route element={<PrivateRoute allowedRoles={[Role.Admin]} />}>
+        <Route path={ROUTES.ADMIN.HOME} element={<AdminHome />} />
+        <Route path={ROUTES.ADMIN.STAFF_MANAGEMENT} element={<StaffManagement />} />
+        <Route path={ROUTES.ADMIN.CUSTOMER_MANAGEMENT} element={<CustomerManagement />} />
+        <Route path={ROUTES.ADMIN.ROOM_MANAGEMENT} element={<RoomManagement />} />
+        <Route path={ROUTES.ADMIN.SERVICE_MANAGEMENT} element={<ServiceManagement />} />
+        <Route path={ROUTES.ADMIN.PROMOTION_MANAGEMENT} element={<PromotionManagement />} />
+        <Route path={ROUTES.ADMIN.BOOKING_MANAGEMENT} element={<BookingManagement />} />
+        <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfile />} />
       </Route>
     </Routes>
   );

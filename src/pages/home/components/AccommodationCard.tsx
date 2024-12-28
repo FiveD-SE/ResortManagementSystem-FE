@@ -5,30 +5,28 @@ import {
   FavoriteRounded,
   StarRounded,
 } from '@mui/icons-material';
-import { Card, CardContent, CardMedia, Chip, IconButton, Typography, Box } from '@mui/material';
+import { Card, CardContent, CardMedia, IconButton, Typography, Box } from '@mui/material';
 import { useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { formatDateRange, formatPrice } from '../../../utils';
+import { IRoom } from '../../../types';
 
-interface AccommodationCardProps {
-  images: string[];
-  location: string;
-  rating: number;
+interface AccommodationCardProps extends Omit<IRoom, 'id' | 'createdAt' | 'updatedAt' | 'status'> {
+  roomTypeName: string;
+  averageRating: number;
   startDate: string;
   endDate: string;
-  price: number;
-  isSuperhost?: boolean;
   onCardClick?: () => void;
 }
 
 const AccommodationCard = ({
   images,
-  location,
-  rating,
+  roomNumber,
+  roomTypeName,
+  averageRating,
   startDate,
   endDate,
-  price,
-  isSuperhost = false,
+  pricePerNight,
   onCardClick = () => {},
 }: AccommodationCardProps) => {
   const [isHover, setIsHover] = useState<boolean>(false);
@@ -39,11 +37,7 @@ const AccommodationCard = ({
   };
 
   return (
-    <Card
-      component="a"
-      onClick={onCardClick}
-      sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}
-    >
+    <Card component="a" sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}>
       <Carousel
         autoPlay={false}
         animation="slide"
@@ -100,20 +94,6 @@ const AccommodationCard = ({
           </div>
         ))}
       </Carousel>
-      {isSuperhost && (
-        <Chip
-          label="Superhost"
-          sx={{
-            position: 'absolute',
-            top: 16,
-            left: 16,
-            backgroundColor: 'white.50',
-            color: 'black.500',
-            fontWeight: 600,
-            zIndex: 2,
-          }}
-        />
-      )}
       <IconButton
         onClick={toggleFavorite}
         sx={{
@@ -128,16 +108,16 @@ const AccommodationCard = ({
       >
         {isFavorite ? <FavoriteRounded /> : <FavoriteBorderRounded />}
       </IconButton>
-      <CardContent sx={{ px: 0 }}>
+      <CardContent sx={{ px: 0, cursor: 'pointer' }} onClick={onCardClick}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.900' }}>
-              {location}
+              {roomTypeName + ' - ' + roomNumber}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <StarRounded sx={{ fontSize: 16, color: 'yellow.500', mb: 0.1 }} />
               <Typography variant="body2" sx={{ color: 'black.900' }}>
-                {rating.toFixed(1)}
+                {averageRating?.toFixed(1)}
               </Typography>
             </Box>
           </Box>
@@ -145,7 +125,7 @@ const AccommodationCard = ({
             {formatDateRange(startDate, endDate)}
           </Typography>
           <Typography variant="body2">
-            <strong>{formatPrice(price)}</strong> / night
+            <strong>{formatPrice(pricePerNight)}</strong> / night
           </Typography>
         </Box>
       </CardContent>

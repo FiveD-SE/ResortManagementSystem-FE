@@ -147,7 +147,7 @@ const Revenue: React.FC = () => {
                                                     width: 12,
                                                     height: 12,
                                                     borderRadius: 1,
-                                                    backgroundColor: '#000000',
+                                                    backgroundColor: '#FF385C',
                                                 }}
                                             />
 
@@ -182,7 +182,7 @@ const Revenue: React.FC = () => {
                                                     width: 12,
                                                     height: 12,
                                                     borderRadius: 1,
-                                                    backgroundColor: '#FF385C',
+                                                    backgroundColor: '#000000',
                                                 }}
                                             />
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>

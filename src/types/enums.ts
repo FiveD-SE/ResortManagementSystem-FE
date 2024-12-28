@@ -1,8 +1,7 @@
 export enum RoomStatus {
   Available = 'Available',
-  Booked = 'Booked',
-  Maintenance = 'Maintenance',
-  UnderRepair = 'UnderRepair',
+  Occupied = 'Occupied',
+  Under_Maintenance = 'Under Maintenance',
 }
 
 export enum PaymentStatus {

@@ -4,15 +4,19 @@ import userSlice from './slices/userSlice';
 import { authApi } from '../apis/authApi';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { userApi } from '../apis/userApi';
+import { roomApi } from '../apis/roomApi';
+import { roomTypeApi } from '../apis/roomTypeApi';
 
 const store = configureStore({
   reducer: {
     user: userSlice,
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [roomApi.reducerPath]: roomApi.reducer,
+    [roomTypeApi.reducerPath]: roomTypeApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(authApi.middleware, userApi.middleware);
+    return getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, roomApi.middleware, roomTypeApi.middleware);
   },
 });
 

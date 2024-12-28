@@ -24,7 +24,7 @@ export const AddNewServiceTypeModal = ({ open, onClose }: AddNewServiceTypeModal
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: { xs: '90%', sm: '90%', md: '70%', lg: '70%' },
+                    width: { xs: '90%', sm: '90%', md: '70%', lg: '70%', xl: '50%' },
                     bgcolor: 'white.50',
                     boxShadow: 24,
                     padding: 2,
@@ -91,7 +91,7 @@ export const AddNewServiceTypeModal = ({ open, onClose }: AddNewServiceTypeModal
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
+                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
                         Cancel
                     </Button>
 
