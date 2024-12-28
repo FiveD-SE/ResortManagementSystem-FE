@@ -88,7 +88,7 @@ const ServiceTable = () => {
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Service Type</TableCell>

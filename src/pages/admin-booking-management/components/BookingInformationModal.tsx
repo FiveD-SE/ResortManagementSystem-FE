@@ -36,9 +36,9 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                     </IconButton>
                 </Box>
 
-                <Box sx={{ display: 'flex', flexDirection: 'row', height: '80vh', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', height: '80vh', gap: 2, mt: 1, p: 1 }}>
                     {/* Room Image Section */}
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 2, padding: 1, border: '1px solid', borderColor: 'gray.100' }}>
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 2, padding: 1, boxShadow: 4 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.100', height: '50%', borderRadius: 1 }} />
 
                         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, height: '50%' }}>
@@ -49,7 +49,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                         </Box>
                     </Box>
                     {/* Customer Information */}
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, borderRadius: 2 }}>
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, borderRadius: 2, p: 2 }}>
                         <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
                             Customer name
                         </Typography>
@@ -149,7 +149,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                         </Box>
                     </Box>
                     {/* Booking Summary */}
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, bgcolor: '#F7F7F7', borderRadius: 2 }}>
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, borderRadius: 2, p: 2, bgcolor: '#F7F7F7' }}>
                         <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
                             Booking Summary
                         </Typography>

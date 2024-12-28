@@ -15,49 +15,49 @@ const SidebarItems = [
         name: 'dashboard',
         icon: <GridView />,
         title: 'Dashboard',
-        href: '/admin-dashboard',
+        href: '/admin/dashboard',
     },
     {
         name: 'staff-management',
         icon: <HailRounded />,
         title: 'Staff Management',
-        href: '/staff-management',
+        href: '/admin/staff-management',
     },
     {
         name: 'customer-management',
         icon: <SupervisorAccountRounded />,
         title: 'Customer Management',
-        href: '/customer-management',
+        href: '/admin/customer-management',
     },
     {
         name: 'room-management',
         icon: <RoomPreferences />,
         title: 'Room Management',
-        href: '/room-management',
+        href: '/admin/room-management',
     },
     {
         name: 'service-management',
         icon: <RoomServiceRounded />,
         title: 'Service Management',
-        href: '/service-management',
+        href: '/admin/service-management',
     },
     {
         name: 'promotion-management',
         icon: <DiscountRounded />,
         title: 'Promotion Management',
-        href: '/promotion-management',
+        href: '/admin/promotion-management',
     },
     {
         name: 'booking-management',
         icon: <FactCheck />,
         title: 'Booking Management',
-        href: '/booking-management',
+        href: '/admin/booking-management',
     },
 ];
 
 const Sidebar = () => {
     const [openSideBar, setOpenSideBar] = useState<boolean>(true);
-    const [selectedMenu, setSelectedMenu] = useState<string>('dashboard');
+    const [selectedMenu, setSelectedMenu] = useState<string>('/admin/dashboard');
     const [openPopupModal, setOpenPopupModal] = useState<boolean>(false);
     const drawerWidth = openSideBar ? '20rem' : '5rem';
     const drawerTransition = '0.2s ease';
@@ -176,7 +176,7 @@ const Sidebar = () => {
                         title={'Profile'}
                         selectedMenu={selectedMenu}
                         openSideBar={openSideBar}
-                        onClick={() => handleSelectMenu({ name: MENUS.PROFILE, href: '/profile' })}
+                        onClick={() => handleSelectMenu({ name: MENUS.PROFILE, href: '/admin/profile' })}
                     />
                 </List>
             </Box>

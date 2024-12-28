@@ -1,38 +1,68 @@
 import { Add, ArrowBackIosNewRounded, MoreHoriz } from '@mui/icons-material'
-import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination, TextField } from '@mui/material'
-import { AddNewRoomTypeModal } from './AddNewRoomTypeModal';
-import { EditRoomTypeModal } from './EditRoomTypeModal';
+import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination, TextField, MenuItem, Menu } from '@mui/material'
+import { IRoomType, IRoomTypeApi } from '../../../types';
+import { useDeleteRoomTypeMutation } from '../../../apis/roomTypeApi';
+import PopupModal from '../../../components/PopupModal';
+import toast from 'react-hot-toast';
 import React from 'react';
 
 interface RoomTypeManagementProps {
     onManageRoomType: () => void;
+    onAddNewRoomType: () => void;
+    onEditRoomType: (roomType: IRoomType | undefined) => void;
+    roomTypesData: IRoomTypeApi | undefined;
 }
 
-interface DataRow {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-}
+const RoomTypeManagement = ({ onManageRoomType, onAddNewRoomType, onEditRoomType, roomTypesData }: RoomTypeManagementProps) => {
+    const [search, setSearch] = React.useState<string>('');
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [selectedRoomType, setSelectedRoomType] = React.useState<IRoomType>();
+    const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
 
-const rows: DataRow[] = [
-    { id: 1, name: 'Single Room', description: '1 bed', price: 100 },
-    { id: 2, name: 'Double Room', description: '2 beds', price: 200 },
-    { id: 3, name: 'Triple Room', description: '3 beds', price: 300 },
-    { id: 4, name: 'Quad Room', description: '4 beds', price: 400 },
-    { id: 5, name: 'Queen Room', description: '5 beds', price: 500 },
-    { id: 6, name: 'King Room', description: '6 beds', price: 600 },
-]
+    const [deleteRoomType] = useDeleteRoomTypeMutation();
 
-const RoomTypeManagement = ({ onManageRoomType }: RoomTypeManagementProps) => {
-    const [openAddNewRoomType, setOpenAddNewRoomType] = React.useState(false);
-    const [openEditRoomType, setOpenEditRoomType] = React.useState(false);
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: any) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedRoomType(row);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(event.target.value);
+    };
+
+    const handleDeleteRoomType = async () => {
+        if (!selectedRoomType) return;
+        try {
+            await deleteRoomType(selectedRoomType.id);
+            toast.success('Room type deleted successfully');
+        } catch (error) {
+            toast.error('Failed to delete room type');
+        } finally {
+            setOpenDeleteModal(false);
+        }
+    };
+
+    const filteredRoomTypes = React.useMemo(() => {
+        if (!roomTypesData?.docs) return [];
+        const searchLower = search.toLowerCase();
+        return roomTypesData.docs.filter(
+            (row) =>
+                row.typeName.toLowerCase().includes(searchLower) ||
+                (row.description?.toLowerCase().includes(searchLower) || '') ||
+                row.basePrice.toString().includes(searchLower)
+        );
+    }, [roomTypesData, search]);
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
                 disableTouchRipple
                 sx={{
+                    width: 'fit-content',
                     textTransform: 'none',
                     fontSize: 16,
                     fontWeight: 500,
@@ -80,6 +110,8 @@ const RoomTypeManagement = ({ onManageRoomType }: RoomTypeManagementProps) => {
                             },
                         },
                     }}
+                    value={search}
+                    onChange={handleSearchChange}
                 />
                 {/* Button */}
                 <Button
@@ -92,7 +124,7 @@ const RoomTypeManagement = ({ onManageRoomType }: RoomTypeManagementProps) => {
                         borderRadius: 2,
                     }}
                     startIcon={<Add />}
-                    onClick={() => setOpenAddNewRoomType(true)}
+                    onClick={onAddNewRoomType}
                 >
                     Add New Room Type
                 </Button>
@@ -102,7 +134,7 @@ const RoomTypeManagement = ({ onManageRoomType }: RoomTypeManagementProps) => {
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Description</TableCell>
@@ -111,19 +143,63 @@ const RoomTypeManagement = ({ onManageRoomType }: RoomTypeManagementProps) => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
+                            {filteredRoomTypes.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{row.typeName}</TableCell>
                                     <TableCell>{row.description}</TableCell>
-                                    <TableCell>{`$${row.price}`}</TableCell>
+                                    <TableCell>{`$${row.basePrice}`}</TableCell>
                                     <TableCell>
-                                        <IconButton onClick={() => setOpenEditRoomType(true)}>
+                                        <IconButton onClick={(e) => handleMenuOpen(e, row)}>
                                             <MoreHoriz />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                sx={{
+                                    '& .MuiPaper-root': {
+                                        borderRadius: '8px',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        padding: '4px',
+                                        minWidth: '100px',
+                                    },
+                                    '& .MuiMenuItem-root': {
+                                        padding: '4px 16px',
+                                        borderRadius: '4px',
+                                        '&:hover': {
+                                            backgroundColor: 'gray.50',
+                                        },
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: 'black.300',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={() => {
+                                    onEditRoomType(selectedRoomType);
+                                    handleMenuClose();
+                                }}>
+                                    Edit
+                                </MenuItem>
+                                <MenuItem onClick={() => {
+                                    setOpenDeleteModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Delete
+                                </MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
@@ -136,8 +212,14 @@ const RoomTypeManagement = ({ onManageRoomType }: RoomTypeManagementProps) => {
                 sx={{ marginTop: 2, alignSelf: "flex-end" }}
             />
 
-            <AddNewRoomTypeModal open={openAddNewRoomType} onClose={() => setOpenAddNewRoomType(false)} />
-            <EditRoomTypeModal open={openEditRoomType} onClose={() => setOpenEditRoomType(false)} />
+            <PopupModal
+                type='delete'
+                open={openDeleteModal}
+                title='Delete Room Type'
+                message='Are you sure you want to delete this room type?'
+                onClose={() => setOpenDeleteModal(false)}
+                onConfirm={handleDeleteRoomType}
+            />
         </Box>
     )
 }

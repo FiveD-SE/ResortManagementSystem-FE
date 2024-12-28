@@ -9,14 +9,13 @@ import { Card, CardContent, CardMedia, Chip, IconButton, Typography, Box } from 
 import { useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { formatDateRange, formatPrice } from '../../../utils';
+import { IRoom } from '../../../types';
 
-interface AccommodationCardProps {
-  images: string[];
+interface AccommodationCardProps extends IRoom {
   location: string;
-  rating: number;
+  rating?: number;
   startDate: string;
   endDate: string;
-  price: number;
   isSuperhost?: boolean;
   onCardClick?: () => void;
 }
@@ -27,7 +26,7 @@ const AccommodationCard = ({
   rating,
   startDate,
   endDate,
-  price,
+  pricePerNight,
   isSuperhost = false,
   onCardClick = () => {},
 }: AccommodationCardProps) => {
@@ -39,11 +38,7 @@ const AccommodationCard = ({
   };
 
   return (
-    <Card
-      component="a"
-      onClick={onCardClick}
-      sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}
-    >
+    <Card component="a" sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}>
       <Carousel
         autoPlay={false}
         animation="slide"
@@ -128,7 +123,7 @@ const AccommodationCard = ({
       >
         {isFavorite ? <FavoriteRounded /> : <FavoriteBorderRounded />}
       </IconButton>
-      <CardContent sx={{ px: 0 }}>
+      <CardContent sx={{ px: 0, cursor: 'pointer' }} onClick={onCardClick}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.900' }}>
@@ -137,7 +132,7 @@ const AccommodationCard = ({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <StarRounded sx={{ fontSize: 16, color: 'yellow.500', mb: 0.1 }} />
               <Typography variant="body2" sx={{ color: 'black.900' }}>
-                {rating.toFixed(1)}
+                {rating?.toFixed(1)}
               </Typography>
             </Box>
           </Box>
@@ -145,7 +140,7 @@ const AccommodationCard = ({
             {formatDateRange(startDate, endDate)}
           </Typography>
           <Typography variant="body2">
-            <strong>{formatPrice(price)}</strong> / night
+            <strong>{formatPrice(pricePerNight)}</strong> / night
           </Typography>
         </Box>
       </CardContent>

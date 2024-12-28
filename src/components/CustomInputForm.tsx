@@ -12,6 +12,15 @@ interface CustomInputFormProps {
 }
 
 const CustomInputForm = ({ label, placeholder, value, onChange, type, error = false, helperText = '' }: CustomInputFormProps) => {
+    const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        if (type === 'number' && Number(value) < 0) e.target.value = '';
+    };
+
+    const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+        if (type === 'number') (e.target as HTMLInputElement).blur();
+    };
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Typography sx={{ color: 'black.900', fontSize: 16, fontWeight: 500 }}>
@@ -26,6 +35,8 @@ const CustomInputForm = ({ label, placeholder, value, onChange, type, error = fa
                 type={type}
                 error={error}
                 helperText={helperText}
+                onInput={handleInput}
+                onWheel={handleWheel}
                 sx={{
                     '& .MuiInputBase-root': {
                         borderRadius: 2,
@@ -42,6 +53,13 @@ const CustomInputForm = ({ label, placeholder, value, onChange, type, error = fa
                         '& .MuiInputBase-input': {
                             fontSize: 16,
                         },
+                    },
+                    '& input[type=number]': {
+                        MozAppearance: 'textfield',
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                        WebkitAppearance: 'none',
+                        margin: 0,
                     },
                 }}
             />

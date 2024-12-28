@@ -18,6 +18,7 @@ import { FiberManualRecord, MoreHoriz, Apps, CheckCircle, NoMeetingRoom, Handyma
 import AddNewRoomModal from "./AddNewRoomModal";
 import EditRoomModal from "./EditRoomModal";
 import React from "react";
+import { IRoomApiResponse, IRoomTypeApi } from '../../../types/room';
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -33,26 +34,55 @@ const tabIconStyle = {
     fontSize: '18px',
 };
 
-interface DataRow {
-    id: number;
-    roomNumber: string;
-    roomType: string;
-    status: string;
-    price: number;
+interface RoomTableProps {
+    roomsData: IRoomApiResponse | undefined;
+    roomTypesData: IRoomTypeApi | undefined;
 }
 
-const rows: DataRow[] = [
-    { id: 1, roomNumber: '101', roomType: 'Single Room', status: 'Active', price: 100 },
-    { id: 2, roomNumber: '102', roomType: 'Double Room', status: 'Active', price: 200 },
-    { id: 3, roomNumber: '103', roomType: 'Triple Room', status: 'Inactive', price: 300 },
-    { id: 4, roomNumber: '104', roomType: 'Quad Room', status: 'Active', price: 400 },
-    { id: 5, roomNumber: '105', roomType: 'Queen Room', status: 'Inactive', price: 500 },
-    { id: 6, roomNumber: '106', roomType: 'King Room', status: 'Active', price: 600 },
-];
 
-const RoomTable = () => {
+const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
     const [openAddNewRoomModal, setOpenAddNewRoomModal] = React.useState(false);
     const [openEditRoomModal, setOpenEditRoomModal] = React.useState(false);
+    const [tabSelected, setTabSelected] = React.useState<number>(0);
+    const [search, setSearch] = React.useState<string>('');
+
+    const getRoomTypeName = (roomTypeId: string): string => {
+        const roomType = roomTypesData?.docs.find((type) => type.id === roomTypeId);
+        return roomType ? roomType.typeName : 'Unknown';
+    };
+
+    const getFilteredRows = React.useCallback(() => {
+        const tabFilter = tabSelected === 0
+            ? roomsData?.docs
+            : roomsData?.docs.filter((room) =>
+                tabSelected === 1 ? room.status.toLowerCase() === "available"
+                    : tabSelected === 2 ? room.status.toLowerCase() === "occupied"
+                        : room.status.toLowerCase() === "under maintenance"
+            );
+
+        if (!tabFilter) return [];
+
+        return tabFilter.filter((room) => {
+            const searchLower = search.toLowerCase();
+            const roomTypeName = getRoomTypeName(room.roomTypeId).toLowerCase();
+            return (
+                room.roomNumber.toLowerCase().includes(searchLower) ||
+                roomTypeName.toLowerCase().includes(searchLower) ||
+                room.pricePerNight.toString().includes(searchLower)
+            );
+        });
+    }, [roomsData, tabSelected, search]);
+
+
+    const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
+
+    const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+        setTabSelected(newValue);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(event.target.value);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -74,7 +104,8 @@ const RoomTable = () => {
                             zIndex: -1,
                         },
                     }}
-                    value={0}
+                    value={tabSelected}
+                    onChange={handleTabChange}
                 >
                     <Tab
                         label="All rooms"
@@ -108,7 +139,6 @@ const RoomTable = () => {
 
                 {/* Search and Button */}
                 <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                    {/* Search */}
                     <TextField
                         id="search"
                         label="Search"
@@ -136,8 +166,9 @@ const RoomTable = () => {
                                 },
                             },
                         }}
+                        value={search}
+                        onChange={handleSearchChange}
                     />
-                    {/* Button */}
                     <Button
                         sx={{
                             bgcolor: 'primary.500',
@@ -158,7 +189,7 @@ const RoomTable = () => {
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Room Number</TableCell>
                                 <TableCell>Room Type</TableCell>
@@ -168,28 +199,19 @@ const RoomTable = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.roomNumber}</TableCell>
-                                    <TableCell>{row.roomType}</TableCell>
-                                    <TableCell>
-                                        {row.status.toLowerCase() === "active" ? (
-                                            <Typography
-                                                sx={{
-                                                    color: "black.900",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                <FiberManualRecord
-                                                    color="success"
-                                                    sx={{ height: 15, width: 15, padding: 0, margin: 0 }}
-                                                />
-                                                {row.status}
-                                            </Typography>
-                                        ) : (
+                            {filteredRows.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center">
+                                        No room found.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                filteredRows.map((room, index) =>
+                                    <TableRow key={index}>
+                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{room.roomNumber}</TableCell>
+                                        <TableCell>{getRoomTypeName(room.roomTypeId)}</TableCell>
+                                        <TableCell>
                                             <Typography
                                                 sx={{
                                                     color: "black.900",
@@ -200,25 +222,26 @@ const RoomTable = () => {
                                             >
                                                 <FiberManualRecord
                                                     sx={{
-                                                        color: "gray.200",
+                                                        color:
+                                                            room.status.toLowerCase() === "available"
+                                                                ? "success"
+                                                                : "gray.200",
                                                         height: 15,
                                                         width: 15,
-                                                        padding: 0,
-                                                        margin: 0,
                                                     }}
                                                 />
-                                                {row.status}
+                                                {room.status}
                                             </Typography>
-                                        )}
-                                    </TableCell>
-                                    <TableCell>{`$${row.price}`}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => setOpenEditRoomModal(true)}>
-                                            <MoreHoriz />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                        </TableCell>
+                                        <TableCell>{`$${room.pricePerNight}`}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={() => setOpenEditRoomModal(true)}>
+                                                <MoreHoriz />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
@@ -236,5 +259,6 @@ const RoomTable = () => {
         </Box>
     );
 };
+
 
 export default RoomTable;

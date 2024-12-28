@@ -20,7 +20,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
     return <Outlet />;
   }
 
-  if (role === Role.Customer) {
+  if (role === Role.User) {
     return <Navigate to={ROUTES.HOME} replace />;
   } else if (role === Role.Admin) {
     return <Navigate to={ROUTES.ADMIN.HOME} replace />;

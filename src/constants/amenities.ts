@@ -32,7 +32,7 @@ export const amenities: Record<string, Amenity> = {
   kitchen: { title: 'Kitchen', icon: KitchenRounded, category: 'essentials' },
   washer: { title: 'Washer', icon: BathroomRounded, category: 'essentials' },
   dryer: { title: 'Dryer', icon: BathroomRounded, category: 'essentials' },
-  air_conditioning: { title: 'Air conditioning', icon: BathroomRounded, category: 'essentials ' },
+  air_conditioning: { title: 'Air conditioning', icon: BathroomRounded, category: 'essentials' },
   heating: { title: 'Heating', icon: BathroomRounded, category: 'essentials' },
   dedicated_workspace: { title: 'Dedicated workspace', icon: BathroomRounded, category: 'essentials' },
   tv: { title: 'TV', icon: BathroomRounded, category: 'essentials' },

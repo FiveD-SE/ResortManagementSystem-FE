@@ -11,13 +11,16 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../stores/slices/userSlice';
+import { getAccessToken } from '../../../utils/tokenUtils';
 const SignInCard = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);
 
   const [login, { isLoading }] = useLoginMutation();
-  const { data: userData, refetch } = useMeQuery({});
+  const { data: userData, refetch } = useMeQuery({
+    skip: !getAccessToken(),
+  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -33,7 +36,8 @@ const SignInCard = () => {
     }
     Cookies.set('accessToken', response.data.accessToken);
     Cookies.set('refreshToken', response.data.refreshToken);
-    refetch();
+    await refetch();
+    console.log(userData);
     Cookies.set('user', JSON.stringify(userData));
     toast.success('Login successful!');
     dispatch(loginSuccess(userData));
