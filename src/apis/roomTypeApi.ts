@@ -1,4 +1,4 @@
-import { IRoomTypeApi, IRoomType } from './../types/room';
+import { IRoomTypeApiResponse, IRoomType } from './../types/room';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { ROOM_TYPE_ENDPOINT } from '../constants/endpoints';
 import { axiosBaseQuery } from './axiosInstance';
@@ -9,7 +9,7 @@ export const roomTypeApi = createApi({
         baseUrl: ROOM_TYPE_ENDPOINT,
     }),
     endpoints: (builder) => ({
-        getRoomTypes: builder.query<IRoomTypeApi, void>({
+        getRoomTypes: builder.query<IRoomTypeApiResponse, void>({
             query: () => ({
                 url: '',
                 method: 'GET',

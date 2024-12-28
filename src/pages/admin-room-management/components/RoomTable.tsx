@@ -18,7 +18,7 @@ import { FiberManualRecord, MoreHoriz, Apps, CheckCircle, NoMeetingRoom, Handyma
 import AddNewRoomModal from "./AddNewRoomModal";
 import EditRoomModal from "./EditRoomModal";
 import React from "react";
-import { IRoomApiResponse, IRoomTypeApi } from '../../../types/room';
+import { IRoomApiResponse, IRoomTypeApiResponse } from '../../../types/room';
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -36,7 +36,7 @@ const tabIconStyle = {
 
 interface RoomTableProps {
     roomsData: IRoomApiResponse | undefined;
-    roomTypesData: IRoomTypeApi | undefined;
+    roomTypesData: IRoomTypeApiResponse | undefined;
 }
 
 

@@ -1,6 +1,6 @@
 import { Add, ArrowBackIosNewRounded, MoreHoriz } from '@mui/icons-material'
 import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination, TextField, MenuItem, Menu } from '@mui/material'
-import { IRoomType, IRoomTypeApi } from '../../../types';
+import { IRoomType, IRoomTypeApiResponse } from '../../../types';
 import { useDeleteRoomTypeMutation } from '../../../apis/roomTypeApi';
 import PopupModal from '../../../components/PopupModal';
 import toast from 'react-hot-toast';
@@ -10,7 +10,7 @@ interface RoomTypeManagementProps {
     onManageRoomType: () => void;
     onAddNewRoomType: () => void;
     onEditRoomType: (roomType: IRoomType | undefined) => void;
-    roomTypesData: IRoomTypeApi | undefined;
+    roomTypesData: IRoomTypeApiResponse | undefined;
 }
 
 const RoomTypeManagement = ({ onManageRoomType, onAddNewRoomType, onEditRoomType, roomTypesData }: RoomTypeManagementProps) => {

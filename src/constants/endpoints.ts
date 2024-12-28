@@ -4,3 +4,5 @@ export const AUTH_ENDPOINT = `${API_BASE_URL}/auth`;
 export const USER_ENDPOINT = `${API_BASE_URL}/users`;
 export const ROOM_ENDPOINT = `${API_BASE_URL}/rooms`;
 export const ROOM_TYPE_ENDPOINT = `${API_BASE_URL}/room-types`;
+export const SERVICE_ENDPOINT = `${API_BASE_URL}/services`;
+export const SERVICE_TYPE_ENDPOINT = `${API_BASE_URL}/service-types`;

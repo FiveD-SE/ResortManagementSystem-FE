@@ -41,7 +41,7 @@ export interface IRoomApiResponse {
   docs: IRoom[];
 }
 
-export interface IRoomTypeApi {
+export interface IRoomTypeApiResponse {
   totalDocs: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;

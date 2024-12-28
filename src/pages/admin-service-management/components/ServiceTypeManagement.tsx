@@ -1,32 +1,59 @@
 import { Add, ArrowBackIosNewRounded, MoreHoriz } from '@mui/icons-material'
-import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination, TextField } from '@mui/material'
+import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination, TextField, Menu, MenuItem } from '@mui/material'
 import React from 'react';
 import { AddNewServiceTypeModal } from './AddNewServiceTypeModal';
 import { EditServiceTypeModal } from './EditServiceTypeModal';
+import { IServiceApiResponse, IServiceType, IServiceTypeApiResponse } from '../../../types';
+import PopupModal from '../../../components/PopupModal';
+import { useDeleteServiceTypeMutation } from '../../../apis/serviceTypeApi';
+import toast from 'react-hot-toast';
 
 interface ServiceTypeManagementProps {
     onManageServiceType: () => void;
+    serviceData: IServiceApiResponse | undefined;
+    serviceTypeData: IServiceTypeApiResponse | undefined;
+    onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-interface DataRow {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-}
-
-const rows: DataRow[] = [
-    { id: 1, name: 'Service 1', description: 'description service 1', price: 100 },
-    { id: 2, name: 'Service 2', description: 'description service 2', price: 200 },
-    { id: 3, name: 'Service 3', description: 'description service 3', price: 300 },
-    { id: 4, name: 'Service 4', description: 'description service 4', price: 400 },
-    { id: 5, name: 'Service 5', description: 'description service 5', price: 500 },
-    { id: 6, name: 'Service 6', description: 'description service 6', price: 600 },
-]
-
-const ServiceTypeManagement = ({ onManageServiceType }: ServiceTypeManagementProps) => {
+const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageChange }: ServiceTypeManagementProps) => {
     const [openAddNewServiceType, setOpenAddNewServiceType] = React.useState(false);
     const [openEditServiceType, setOpenEditServiceType] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [selectedServiceType, setSelectedServiceType] = React.useState<IServiceType>();
+    const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
+    const [search, setSearch] = React.useState<string>('');
+
+    const [deleteServiceType, { isLoading }] = useDeleteServiceTypeMutation();
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: any) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedServiceType(row);
+    }
+
+    const filterServiceTypes = React.useMemo(() => {
+        if (!serviceTypeData?.docs) return [];
+        const searchLower = search.toLowerCase();
+        return serviceTypeData.docs.filter(
+            (row) =>
+                row.typeName.toLowerCase().includes(searchLower) ||
+                (row.description?.toLowerCase().includes(searchLower) || '')
+        );
+    }, [serviceTypeData, search]);
+
+    const handleDeleteServiceType = async () => {
+        if (!selectedServiceType) return;
+        try {
+            await deleteServiceType(selectedServiceType.id).unwrap();
+            toast.success('Service type deleted successfully');
+            setOpenDeleteModal(false);
+        } catch (error) {
+            toast.error('Failed to delete service type');
+        }
+    }
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -80,6 +107,8 @@ const ServiceTypeManagement = ({ onManageServiceType }: ServiceTypeManagementPro
                             },
                         },
                     }}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                 />
                 {/* Button */}
                 <Button
@@ -102,42 +131,95 @@ const ServiceTypeManagement = ({ onManageServiceType }: ServiceTypeManagementPro
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Description</TableCell>
-                                <TableCell>Price</TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
+                            {filterServiceTypes.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{row.typeName}</TableCell>
                                     <TableCell>{row.description}</TableCell>
-                                    <TableCell>{`$${row.price}`}</TableCell>
                                     <TableCell>
-                                        <IconButton onClick={() => setOpenEditServiceType(true)}>
+                                        <IconButton onClick={(event) => handleMenuOpen(event, row)}>
                                             <MoreHoriz />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                sx={{
+                                    '& .MuiPaper-root': {
+                                        borderRadius: '8px',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        padding: '4px',
+                                        minWidth: '100px',
+                                    },
+                                    '& .MuiMenuItem-root': {
+                                        padding: '4px 16px',
+                                        borderRadius: '4px',
+                                        '&:hover': {
+                                            backgroundColor: 'gray.50',
+                                        },
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: 'black.300',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={() => {
+                                    setOpenEditServiceType(true);
+                                    handleMenuClose();
+                                }}>
+                                    Edit
+                                </MenuItem>
+                                <MenuItem onClick={() => {
+                                    setOpenDeleteModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Delete
+                                </MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
 
             <Pagination
-                count={10}
+                count={serviceTypeData?.totalPages}
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: "flex-end" }}
+                onChange={onPageChange}
             />
 
             <AddNewServiceTypeModal open={openAddNewServiceType} onClose={() => setOpenAddNewServiceType(false)} />
-            <EditServiceTypeModal open={openEditServiceType} onClose={() => setOpenEditServiceType(false)} />
+            <EditServiceTypeModal open={openEditServiceType} onClose={() => setOpenEditServiceType(false)} selectedServiceType={selectedServiceType} />
+
+            <PopupModal
+                type='delete'
+                open={openDeleteModal}
+                onClose={() => setOpenDeleteModal(false)}
+                title='Delete Service Type'
+                message='Are you sure you want to delete this service type?'
+                onConfirm={handleDeleteServiceType}
+                isLoading={isLoading}
+            />
         </Box>
     )
 }
