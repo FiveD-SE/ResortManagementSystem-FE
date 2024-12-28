@@ -1,169 +1,28 @@
-import { useLocation, useSearchParams } from 'react-router-dom';
 import { Box, IconButton, Typography } from '@mui/material';
 import CategoryBox from './CatetoryBox';
-import { ChevronLeftRounded, ChevronRightRounded, TuneRounded, VillaRounded } from '@mui/icons-material';
+import { ChevronLeftRounded, ChevronRightRounded, TuneRounded } from '@mui/icons-material';
 import { useEffect, useRef, useState } from 'react';
-
-export const categories = [
-  {
-    label: 'Villa1',
-    icon: VillaRounded,
-    description: 'This property is close to the beach!',
-  },
-  {
-    label: 'Villa2',
-    icon: VillaRounded,
-    description: 'This property has windmills!',
-  },
-  {
-    label: 'Villa3',
-    icon: VillaRounded,
-    description: 'This property is modern!',
-  },
-  {
-    label: 'Villa4',
-    icon: VillaRounded,
-    description: 'This property is in the countryside!',
-  },
-  {
-    label: 'Villa5',
-    icon: VillaRounded,
-    description: 'This property has a beautiful pool!',
-  },
-  {
-    label: 'Villa6',
-    icon: VillaRounded,
-    description: 'This property is on an island!',
-  },
-  {
-    label: 'Villa7',
-    icon: VillaRounded,
-    description: 'This property is near a lake!',
-  },
-  {
-    label: 'Villa8',
-    icon: VillaRounded,
-    description: 'This property has skiing activities!',
-  },
-  {
-    label: 'Villa9',
-    icon: VillaRounded,
-    description: 'This property is an ancient castle!',
-  },
-  {
-    label: 'Villa10',
-    icon: VillaRounded,
-    description: 'This property is in a spooky cave!',
-  },
-  {
-    label: 'Villa1',
-    icon: VillaRounded,
-    description: 'This property is close to the beach!',
-  },
-  {
-    label: 'Villa2',
-    icon: VillaRounded,
-    description: 'This property has windmills!',
-  },
-  {
-    label: 'Villa3',
-    icon: VillaRounded,
-    description: 'This property is modern!',
-  },
-  {
-    label: 'Villa4',
-    icon: VillaRounded,
-    description: 'This property is in the countryside!',
-  },
-  {
-    label: 'Villa5',
-    icon: VillaRounded,
-    description: 'This property has a beautiful pool!',
-  },
-  {
-    label: 'Villa6',
-    icon: VillaRounded,
-    description: 'This property is on an island!',
-  },
-  {
-    label: 'Villa7',
-    icon: VillaRounded,
-    description: 'This property is near a lake!',
-  },
-  {
-    label: 'Villa8',
-    icon: VillaRounded,
-    description: 'This property has skiing activities!',
-  },
-  {
-    label: 'Villa9',
-    icon: VillaRounded,
-    description: 'This property is an ancient castle!',
-  },
-  {
-    label: 'Villa10',
-    icon: VillaRounded,
-    description: 'This property is in a spooky cave!',
-  },
-  {
-    label: 'Villa1',
-    icon: VillaRounded,
-    description: 'This property is close to the beach!',
-  },
-  {
-    label: 'Villa2',
-    icon: VillaRounded,
-    description: 'This property has windmills!',
-  },
-  {
-    label: 'Villa3',
-    icon: VillaRounded,
-    description: 'This property is modern!',
-  },
-  {
-    label: 'Villa4',
-    icon: VillaRounded,
-    description: 'This property is in the countryside!',
-  },
-  {
-    label: 'Villa5',
-    icon: VillaRounded,
-    description: 'This property has a beautiful pool!',
-  },
-  {
-    label: 'Villa6',
-    icon: VillaRounded,
-    description: 'This property is on an island!',
-  },
-  {
-    label: 'Villa7',
-    icon: VillaRounded,
-    description: 'This property is near a lake!',
-  },
-  {
-    label: 'Villa8',
-    icon: VillaRounded,
-    description: 'This property has skiing activities!',
-  },
-  {
-    label: 'Villa9',
-    icon: VillaRounded,
-    description: 'This property is an ancient castle!',
-  },
-  {
-    label: 'Villa10',
-    icon: VillaRounded,
-    description: 'This property is in a spooky cave!',
-  },
-];
+import { useGetRoomTypesQuery } from '../../../apis/roomTypeApi';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 function Categories() {
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const category = searchParams.get('category');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const roomTypeId = searchParams.get('roomType');
   const containerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const { data: roomTypesData } = useGetRoomTypesQuery({ page: 1, limit: 10 });
+
+  const handleSelectRoomType = (selectedRoomTypeId: string) => {
+    if (roomTypeId === selectedRoomTypeId) {
+      searchParams.delete('roomType');
+    } else {
+      searchParams.set('roomType', selectedRoomTypeId);
+    }
+    setSearchParams(searchParams);
+  };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -263,11 +122,16 @@ function Categories() {
           }}
           ref={containerRef}
         >
-          {categories.map((item, index) => (
-            <CategoryBox key={index} icon={item.icon} label={item.label} selected={category === item.label} />
+          {roomTypesData?.docs.map((item) => (
+            <CategoryBox
+              key={item.id}
+              label={item.typeName}
+              selected={roomTypeId === item.id}
+              onClick={() => handleSelectRoomType(item.id)}
+            />
           ))}
         </Box>
-        {canScrollRight && (
+        {canScrollRight && roomTypesData?.docs && roomTypesData.docs.length > 10 && (
           <Box
             sx={{
               position: 'absolute',
