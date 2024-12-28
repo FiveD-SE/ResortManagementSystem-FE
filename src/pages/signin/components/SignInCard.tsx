@@ -36,7 +36,7 @@ const SignInCard = () => {
     }
     Cookies.set('accessToken', response.data.accessToken);
     Cookies.set('refreshToken', response.data.refreshToken);
-    await refetch();
+    refetch();
     console.log(userData);
     Cookies.set('user', JSON.stringify(userData));
     toast.success('Login successful!');
