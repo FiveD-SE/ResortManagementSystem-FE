@@ -1,7 +1,7 @@
 import { RoomStatus } from './enums';
 
 export interface IRoom {
-  roomId: string;
+  id: string;
   roomNumber: string;
   roomTypeId: string;
   status: RoomStatus;
@@ -22,6 +22,12 @@ export interface IRoomType {
   sharedBathAmount: number;
   amenities: string[];
   keyFeatures: string[];
+}
+
+export interface IRoomApiRequest {
+  page: number;
+  limit: number;
+  sort?: string;
 }
 
 export interface IRoomApiResponse {
