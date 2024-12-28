@@ -4,6 +4,8 @@ import TotalCard from './components/TotalCard';
 import BookingTab from './components/BookingTab';
 import { IReceptionistDashboard } from '../../type';
 import * as React from 'react';
+import { useGetBookingsQuery } from '../../../../apis/bookingApi';
+import { IBooking } from '../../../../types';
 
 const bookings: IReceptionistDashboard[] = [
   {
@@ -89,14 +91,17 @@ const bookings: IReceptionistDashboard[] = [
 ];
 
 const Dashboard = () => {
+  const { data, isLoading } = useGetBookingsQuery({ page: 1, limit: 5 });
   const [totalCheckIn, setTotalCheckIn] = React.useState(0);
   const [totalStaying, setTotalStaying] = React.useState(0);
   const [totalCheckOut, setTotalCheckOut] = React.useState(0);
 
   React.useEffect(() => {
-    setTotalCheckIn(bookings.filter((booking) => booking.status === 'Check-in').length);
-    setTotalStaying(bookings.filter((booking) => booking.status === 'Staying').length);
-    setTotalCheckOut(bookings.filter((booking) => booking.status === 'Check-out').length);
+    if (data) {
+      setTotalCheckIn(data.docs.filter((booking) => booking.status === 'Checked in').length);
+      setTotalStaying(data.docs.filter((booking) => booking.status === 'Pending').length);
+      setTotalCheckOut(data.docs.filter((booking) => booking.status === 'Checked out').length);
+    }
   });
   return (
     <Box sx={{ padding: 4 }}>
@@ -111,9 +116,12 @@ const Dashboard = () => {
           <TotalCard amount={totalCheckOut} type="Check-out" />
         </Grid>
       </Grid>
-      <Box sx={{ marginTop: 4 }}>
-        <BookingTab bookings={bookings} />
-      </Box>
+
+      {!isLoading && data && (
+        <Box sx={{ marginTop: 4 }}>
+          <BookingTab bookings={data.docs} />
+        </Box>
+      )}
     </Box>
   );
 };

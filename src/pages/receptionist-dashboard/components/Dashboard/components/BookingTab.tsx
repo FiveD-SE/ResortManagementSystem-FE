@@ -4,11 +4,11 @@ import AppsIcon from '@mui/icons-material/Apps';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import HomeIcon from '@mui/icons-material/Home';
 import NoCrashIcon from '@mui/icons-material/NoCrash';
-import { IReceptionistDashboard } from '../../../type';
 import BookingList from './BookingList';
+import { IBooking } from '../../../../../types';
 
 interface IProps {
-  bookings: IReceptionistDashboard[];
+  bookings: IBooking[];
 }
 
 const BookingTab = (props: IProps) => {
@@ -28,11 +28,11 @@ const BookingTab = (props: IProps) => {
     if (newValue === 0) {
       setFilteredBookings(bookings);
     } else if (newValue === 1) {
-      setFilteredBookings(bookings.filter((booking) => booking.status === 'Check-in'));
+      setFilteredBookings(bookings.filter((booking) => booking.status === 'Checked in'));
     } else if (newValue === 2) {
-      setFilteredBookings(bookings.filter((booking) => booking.status === 'Staying'));
+      setFilteredBookings(bookings.filter((booking) => booking.status === 'Pending'));
     } else if (newValue === 3) {
-      setFilteredBookings(bookings.filter((booking) => booking.status === 'Check-out'));
+      setFilteredBookings(bookings.filter((booking) => booking.status === 'Checked out'));
     }
   };
 

@@ -18,10 +18,10 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
-import { IReceptionistDashboard } from '../../../type';
+import { IBooking } from '../../../../../types';
 
 interface IProps {
-  bookings: IReceptionistDashboard[];
+  bookings: IBooking[];
   type: string;
 }
 
@@ -81,7 +81,6 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 const BookingList = (props: IProps) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.bookings.length) : 0;
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -119,9 +118,11 @@ const BookingList = (props: IProps) => {
               props.bookings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
                 <TableRow key={index}>
                   <TableCell>{row.id}</TableCell>
-                  <TableCell>{row.guestName}</TableCell>
-                  <TableCell>{row.roomNumber}</TableCell>
-                  <TableCell>{row.roomType}</TableCell>
+                  <TableCell>
+                    {row.customerId.firstName} + {row.customerId.lastName}
+                  </TableCell>
+                  <TableCell>{row.roomId.roomNumber}</TableCell>
+                  <TableCell>{row.roomId.roomTypeId}</TableCell>
                   <TableCell>{row.status}</TableCell>
                   <TableCell>{row.totalAmount}</TableCell>
                   <TableCell>
