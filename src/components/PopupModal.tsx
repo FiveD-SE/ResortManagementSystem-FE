@@ -1,16 +1,17 @@
 import { TaskAltRounded, CloseRounded, DeleteRounded } from "@mui/icons-material";
-import { Box, Button, IconButton, Modal, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Modal, Typography } from "@mui/material";
 
 interface PopupModalProps {
     type: string;
     open: boolean;
     title: string;
     message: string;
+    isLoading: boolean;
     onClose: () => void;
     onConfirm: () => void;
 }
 
-const PopupModal = ({ type, open, title, message, onClose, onConfirm }: PopupModalProps) => {
+const PopupModal = ({ type, open, title, message, onClose, onConfirm, isLoading }: PopupModalProps) => {
     const renderIconBasedOnType = () => {
         switch (type) {
             case 'confirm':
@@ -67,11 +68,11 @@ const PopupModal = ({ type, open, title, message, onClose, onConfirm }: PopupMod
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, padding: 1, mt: 6 }}>
-                    <Button sx={{ display: 'flex', flex: 1, bgcolor: 'white.50', color: 'black.900', border: '1px solid', borderRadius: 2, textTransform: 'none', fontSize: 16, fontWeight: 600, ":hover": { scale: 0.95 }, transition: 'ease-in-out 0.2s' }} onClick={onClose}>
+                    <Button fullWidth sx={{ display: 'flex', fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.100' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-                    <Button sx={{ display: 'flex', flex: 1, bgcolor: 'primary.500', color: 'white.50', border: '1px solid', borderRadius: 2, textTransform: 'none', fontSize: 16, fontWeight: 600, ":hover": { scale: 0.95 }, transition: 'ease-in-out 0.2s' }} onClick={onConfirm}>
-                        Confirm
+                    <Button fullWidth sx={{ display: 'flex', fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={onConfirm} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Confirm'}
                     </Button>
                 </Box>
             </Box>

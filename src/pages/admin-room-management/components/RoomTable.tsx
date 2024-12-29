@@ -12,13 +12,18 @@ import {
     TextField,
     Tabs,
     Tab,
-    Button
+    Button,
+    Menu,
+    MenuItem,
 } from "@mui/material";
 import { FiberManualRecord, MoreHoriz, Apps, CheckCircle, NoMeetingRoom, Handyman, Add } from "@mui/icons-material";
 import AddNewRoomModal from "./AddNewRoomModal";
 import EditRoomModal from "./EditRoomModal";
 import React from "react";
-import { IRoomApiResponse, IRoomTypeApi } from '../../../types/room';
+import { IRoom, IRoomApiResponse, IRoomTypeApiResponse } from '../../../types/room';
+import { useDeleteRoomMutation } from "../../../apis/roomApi";
+import PopupModal from "../../../components/PopupModal";
+import toast from "react-hot-toast";
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -36,15 +41,30 @@ const tabIconStyle = {
 
 interface RoomTableProps {
     roomsData: IRoomApiResponse | undefined;
-    roomTypesData: IRoomTypeApi | undefined;
+    roomTypesData: IRoomTypeApiResponse | undefined;
+    onPageChange?: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
 
-const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
+const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) => {
     const [openAddNewRoomModal, setOpenAddNewRoomModal] = React.useState(false);
     const [openEditRoomModal, setOpenEditRoomModal] = React.useState(false);
     const [tabSelected, setTabSelected] = React.useState<number>(0);
     const [search, setSearch] = React.useState<string>('');
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [selectedRoom, setSelectedRoom] = React.useState<IRoom | undefined>();
+    const [openDeleteRoomModal, setOpenDeleteRoomModal] = React.useState(false);
+
+    const [deleteRoomMutation, { isLoading }] = useDeleteRoomMutation();
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, room: IRoom) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedRoom(room);
+    }
 
     const getRoomTypeName = (roomTypeId: string): string => {
         const roomType = roomTypesData?.docs.find((type) => type.id === roomTypeId);
@@ -74,7 +94,7 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
     }, [roomsData, tabSelected, search]);
 
 
-    const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
+    const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows, roomsData, tabSelected, search]);
 
     const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
         setTabSelected(newValue);
@@ -82,6 +102,19 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
+    };
+
+    const handleDeleteRoom = async () => {
+        if (!selectedRoom) return;
+
+        try {
+            await deleteRoomMutation(selectedRoom.id).unwrap();
+            toast.success('Room deleted successfully');
+        } catch (error) {
+            toast.error('Failed to delete room');
+        } finally {
+            setSelectedRoom(undefined);
+        }
     };
 
     return (
@@ -235,27 +268,76 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
                                         </TableCell>
                                         <TableCell>{`$${room.pricePerNight}`}</TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => setOpenEditRoomModal(true)}>
+                                            <IconButton onClick={(event) => handleMenuOpen(event, room)}>
                                                 <MoreHoriz />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 )
                             )}
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                sx={{
+                                    '& .MuiPaper-root': {
+                                        borderRadius: '8px',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        padding: '4px',
+                                        minWidth: '100px',
+                                    },
+                                    '& .MuiMenuItem-root': {
+                                        padding: '4px 16px',
+                                        borderRadius: '4px',
+                                        '&:hover': {
+                                            backgroundColor: 'gray.50',
+                                        },
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: 'black.300',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={() => setOpenEditRoomModal(true)}>
+                                    Edit
+                                </MenuItem>
+                                <MenuItem onClick={() => setOpenDeleteRoomModal(true)}>
+                                    Delete
+                                </MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
 
             <Pagination
-                count={10}
+                count={roomsData?.totalPages ?? 0}
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: "flex-end" }}
+                onChange={onPageChange}
             />
 
-            <AddNewRoomModal open={openAddNewRoomModal} onClose={() => setOpenAddNewRoomModal(false)} />
-            <EditRoomModal open={openEditRoomModal} onClose={() => setOpenEditRoomModal(false)} />
+            <AddNewRoomModal open={openAddNewRoomModal} onClose={() => setOpenAddNewRoomModal(false)} roomTypesData={roomTypesData} />
+            <EditRoomModal open={openEditRoomModal} onClose={() => setOpenEditRoomModal(false)} roomTypesData={roomTypesData} selectedRoom={selectedRoom} />
+
+            <PopupModal
+                title="Delete Room"
+                message="Are you sure you want to delete this room?"
+                type="delete"
+                open={openDeleteRoomModal}
+                isLoading={isLoading}
+                onClose={() => setOpenDeleteRoomModal(false)}
+                onConfirm={handleDeleteRoom}
+            />
         </Box>
     );
 };

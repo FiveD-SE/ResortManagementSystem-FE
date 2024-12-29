@@ -1,28 +1,124 @@
 import { Add, Close } from "@mui/icons-material";
-import { Box, Button, IconButton, Modal, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Modal, Typography } from "@mui/material";
 import React from "react";
 import CustomInputForm from "../../../components/CustomInputForm";
 import CustomSelectingForm from "../../../components/CustomSelectingForm";
+import { useUpdateRoomMutation } from "../../../apis/roomApi";
+import toast from "react-hot-toast";
+import { IRoom, IRoomTypeApiResponse } from "../../../types";
+import { RoomStatus } from "../../../types";
 
 interface EditRoomModalProps {
+    roomTypesData: IRoomTypeApiResponse | undefined;
+    selectedRoom: IRoom | undefined;
     open: boolean;
     onClose: () => void;
 }
 
-const statuses = ['Available', 'Unavailable'];
-const roomTypes = ['Single', 'Double', 'Triple', 'Quad', 'Queen', 'King', 'Twin', 'Double-double', 'Studio', 'Master Suite', 'Mini Suite', 'President Suite'];
-
-const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
+const EditRoomModal = ({ roomTypesData, selectedRoom, open, onClose }: EditRoomModalProps) => {
     const [roomNumber, setRoomNumber] = React.useState('');
-    const [price, setPrice] = React.useState('');
+    const [pricePerNight, setPricePerNight] = React.useState('');
     const [roomType, setRoomType] = React.useState('');
     const [status, setStatus] = React.useState('');
-    const [roomPictures, setRoomPictures] = React.useState<File[]>([]);
+    const [images, setImages] = React.useState<File[]>([]);
+
+    const roomTypeNameOptions = roomTypesData?.docs.map((roomType) => roomType.typeName) || [];
+    const statuses = [RoomStatus.Available, RoomStatus.Occupied, RoomStatus.Under_Maintenance];
+    const getRoomTypeNameById = (id: string) => roomTypesData?.docs.find((roomType) => roomType.id === id)?.typeName || '';
+
+    React.useEffect(() => {
+        const fetchImagesAsFiles = async (imageUrls: string[]) => {
+            const files = await Promise.all(
+                imageUrls.map(async (url) => {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const fileName = url.split('/').pop() || 'room-image';
+                    return new File([blob], fileName, { type: blob.type });
+                })
+            );
+            setImages(files);
+        };
+
+        if (selectedRoom) {
+            setRoomNumber(selectedRoom.roomNumber);
+            setPricePerNight(selectedRoom.pricePerNight.toString());
+            setRoomType(getRoomTypeNameById(selectedRoom.roomTypeId));
+            setStatus(selectedRoom.status);
+            fetchImagesAsFiles(selectedRoom.images);
+        }
+    }, [selectedRoom]);
+
+    const [updateRoom, { isLoading }] = useUpdateRoomMutation();
+
+    const validateForm = () => {
+        if (!roomNumber) {
+            toast.error('Room number is required');
+            return false;
+        }
+
+        if (!pricePerNight) {
+            toast.error('Price is required');
+            return false;
+        }
+
+        if (!roomType) {
+            toast.error('Room type is required');
+            return false;
+        }
+
+        if (!status) {
+            toast.error('Status is required');
+            return false;
+        }
+
+        if (images.length === 0) {
+            toast.error('Room pictures are required');
+            return false;
+        }
+
+        return true;
+    }
+
+    const resetForm = () => {
+        setRoomNumber('');
+        setPricePerNight('');
+        setRoomType('');
+        setStatus('');
+        setImages([]);
+    }
+
+    const handleUpdateRoom = async () => {
+        if (!validateForm()) return;
+
+        const id = selectedRoom?.id || '';
+        const roomTypeId = roomTypesData?.docs.find((roomTypeData) => roomTypeData.typeName === roomType)?.id || '';
+
+        const formData = new FormData();
+        formData.append('roomNumber', roomNumber);
+        formData.append('roomTypeId', roomTypeId);
+        formData.append('status', status);
+        formData.append('pricePerNight', pricePerNight);
+
+        images.forEach((picture) => {
+            formData.append('images', picture);
+        });
+
+        try {
+            await updateRoom({ id, formData }).unwrap();
+            toast.success('Room updated successfully');
+            resetForm();
+            onClose();
+        } catch (error) {
+            toast.error('Failed to update room');
+        }
+    };
 
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={() => { onClose(); resetForm(); }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
         >
             <Box
                 sx={{
@@ -41,7 +137,7 @@ const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
                     <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
                         Update room information
                     </Typography>
-                    <IconButton onClick={onClose}>
+                    <IconButton onClick={() => { onClose(); resetForm(); }}>
                         <Close fontSize="small" />
                     </IconButton>
                 </Box>
@@ -60,7 +156,7 @@ const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
                         scrollbarWidth: 'none',
                     }}
                 >
-                    {roomPictures.map((picture, index) => (
+                    {images.map((picture, index) => (
                         <Box key={index} sx={{ position: 'relative', height: 150, gap: 1 }}>
                             <img
                                 src={URL.createObjectURL(picture)}
@@ -104,7 +200,7 @@ const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
                         onChange={(e) => {
                             const files = Array.from(e.target.files || []);
                             const validFiles = files.filter((file) => file.type.startsWith('image/'));
-                            setRoomPictures((prev) => [...prev, ...validFiles]);
+                            setImages((prev) => [...prev, ...validFiles]);
                         }}
                     />
                 </Box>
@@ -123,8 +219,8 @@ const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
                         <CustomInputForm
                             label="Price"
                             placeholder="Enter price"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            value={pricePerNight}
+                            onChange={(e) => setPricePerNight(e.target.value)}
                             type="number"
                         />
                     </Box>
@@ -134,7 +230,7 @@ const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
                             placeholder="Select room type"
                             value={roomType}
                             onChange={(e) => setRoomType(e.target.value)}
-                            options={roomTypes}
+                            options={roomTypeNameOptions}
                         />
                         <CustomSelectingForm
                             label="Status"
@@ -147,12 +243,11 @@ const EditRoomModal = ({ open, onClose }: EditRoomModalProps) => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
+                    <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
-                        Confirm
+                    <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleUpdateRoom} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Save'}
                     </Button>
                 </Box>
             </Box>
