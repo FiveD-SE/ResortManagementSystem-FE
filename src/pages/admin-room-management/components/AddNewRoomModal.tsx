@@ -1,28 +1,99 @@
 import { Add, Close } from "@mui/icons-material";
-import { Box, Button, IconButton, Modal, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Modal, Typography } from "@mui/material";
 import React from "react";
 import CustomInputForm from "../../../components/CustomInputForm";
 import CustomSelectingForm from "../../../components/CustomSelectingForm";
+import { useCreateRoomMutation } from "../../../apis/roomApi";
+import toast from "react-hot-toast";
+import { IRoomTypeApiResponse } from "../../../types";
+import { RoomStatus } from "../../../types";
 
 interface AddNewRoomModalProps {
+    roomTypesData: IRoomTypeApiResponse | undefined;
     open: boolean;
     onClose: () => void;
 }
 
-const statuses = ['Available', 'Unavailable'];
-const roomTypes = ['Single', 'Double', 'Triple', 'Quad', 'Queen', 'King', 'Twin', 'Double-double', 'Studio', 'Master Suite', 'Mini Suite', 'President Suite'];
-
-const AddNewRoomModal = ({ open, onClose }: AddNewRoomModalProps) => {
+const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps) => {
     const [roomNumber, setRoomNumber] = React.useState('');
-    const [price, setPrice] = React.useState('');
+    const [pricePerNight, setPricePerNight] = React.useState('');
     const [roomType, setRoomType] = React.useState('');
     const [status, setStatus] = React.useState('');
     const [roomPictures, setRoomPictures] = React.useState<File[]>([]);
 
+    const roomTypeNameOptions = roomTypesData?.docs.map((roomType) => roomType.typeName) || [];
+    const statuses = [RoomStatus.Available, RoomStatus.Occupied, RoomStatus.Under_Maintenance];
+
+    const [createRoom, { isLoading }] = useCreateRoomMutation();
+
+    const validateForm = () => {
+        if (!roomNumber) {
+            toast.error('Room number is required');
+            return false;
+        }
+
+        if (!pricePerNight) {
+            toast.error('Price is required');
+            return false;
+        }
+
+        if (!roomType) {
+            toast.error('Room type is required');
+            return false;
+        }
+
+        if (!status) {
+            toast.error('Status is required');
+            return false;
+        }
+
+        if (roomPictures.length === 0) {
+            toast.error('Room pictures are required');
+            return false;
+        }
+
+        return true;
+    }
+
+    const resetForm = () => {
+        setRoomNumber('');
+        setPricePerNight('');
+        setRoomType('');
+        setStatus('');
+        setRoomPictures([]);
+    }
+
+    const handleAddRoom = async () => {
+        if (!validateForm()) return;
+
+        const roomTypeId = roomTypesData?.docs.find((roomTypeData) => roomTypeData.typeName === roomType)?.id || '';
+
+        const formData = new FormData();
+        formData.append('roomNumber', roomNumber);
+        formData.append('roomTypeId', roomTypeId);
+        formData.append('status', status);
+        formData.append('pricePerNight', pricePerNight);
+
+        roomPictures.forEach((picture) => {
+            formData.append('images', picture);
+        });
+
+        try {
+            await createRoom(formData).unwrap();
+            toast.success('Room added successfully');
+            resetForm();
+            onClose();
+        } catch (error) {
+            toast.error('Failed to add room');
+        }
+    };
+
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={() => { onClose(); resetForm(); }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
         >
             <Box
                 sx={{
@@ -41,7 +112,7 @@ const AddNewRoomModal = ({ open, onClose }: AddNewRoomModalProps) => {
                     <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
                         Add new room
                     </Typography>
-                    <IconButton onClick={onClose}>
+                    <IconButton onClick={() => { onClose(); resetForm(); }}>
                         <Close fontSize="small" />
                     </IconButton>
                 </Box>
@@ -123,8 +194,8 @@ const AddNewRoomModal = ({ open, onClose }: AddNewRoomModalProps) => {
                         <CustomInputForm
                             label="Price"
                             placeholder="Enter price"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            value={pricePerNight}
+                            onChange={(e) => setPricePerNight(e.target.value)}
                             type="number"
                         />
                     </Box>
@@ -134,7 +205,7 @@ const AddNewRoomModal = ({ open, onClose }: AddNewRoomModalProps) => {
                             placeholder="Select room type"
                             value={roomType}
                             onChange={(e) => setRoomType(e.target.value)}
-                            options={roomTypes}
+                            options={roomTypeNameOptions}
                         />
                         <CustomSelectingForm
                             label="Status"
@@ -147,12 +218,11 @@ const AddNewRoomModal = ({ open, onClose }: AddNewRoomModalProps) => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
+                    <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
-                        Add Room
+                    <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleAddRoom} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Add Room'}
                     </Button>
                 </Box>
             </Box>
