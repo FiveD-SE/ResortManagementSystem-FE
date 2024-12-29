@@ -32,4 +32,5 @@ export const ROUTES = {
     REVIEW: '/trips/review/:id',
   },
   ROOMS: '/rooms',
+  THIRD_PARTY: '/third-party',
 };

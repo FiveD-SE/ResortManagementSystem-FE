@@ -1,6 +1,6 @@
 import { Add, ArrowBackIosNewRounded, MoreHoriz } from '@mui/icons-material'
 import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Pagination, TextField, MenuItem, Menu } from '@mui/material'
-import { IRoomType, IRoomTypeApi } from '../../../types';
+import { IRoomType, IRoomTypeApiResponse } from '../../../types';
 import { useDeleteRoomTypeMutation } from '../../../apis/roomTypeApi';
 import PopupModal from '../../../components/PopupModal';
 import toast from 'react-hot-toast';
@@ -10,16 +10,17 @@ interface RoomTypeManagementProps {
     onManageRoomType: () => void;
     onAddNewRoomType: () => void;
     onEditRoomType: (roomType: IRoomType | undefined) => void;
-    roomTypesData: IRoomTypeApi | undefined;
+    roomTypesData: IRoomTypeApiResponse | undefined;
+    onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const RoomTypeManagement = ({ onManageRoomType, onAddNewRoomType, onEditRoomType, roomTypesData }: RoomTypeManagementProps) => {
+const RoomTypeManagement = ({ onManageRoomType, onAddNewRoomType, onEditRoomType, roomTypesData, onPageChange }: RoomTypeManagementProps) => {
     const [search, setSearch] = React.useState<string>('');
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [selectedRoomType, setSelectedRoomType] = React.useState<IRoomType>();
     const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
 
-    const [deleteRoomType] = useDeleteRoomTypeMutation();
+    const [deleteRoomType, { isLoading }] = useDeleteRoomTypeMutation();
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: any) => {
         setAnchorEl(event.currentTarget);
@@ -206,10 +207,11 @@ const RoomTypeManagement = ({ onManageRoomType, onAddNewRoomType, onEditRoomType
             </Box>
 
             <Pagination
-                count={10}
+                count={roomTypesData?.totalPages ?? 0}
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: "flex-end" }}
+                onChange={onPageChange}
             />
 
             <PopupModal
@@ -219,6 +221,7 @@ const RoomTypeManagement = ({ onManageRoomType, onAddNewRoomType, onEditRoomType
                 message='Are you sure you want to delete this room type?'
                 onClose={() => setOpenDeleteModal(false)}
                 onConfirm={handleDeleteRoomType}
+                isLoading={isLoading}
             />
         </Box>
     )
