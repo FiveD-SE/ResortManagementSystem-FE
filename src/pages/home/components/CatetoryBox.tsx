@@ -1,14 +1,13 @@
-import React from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
-import Icon from '@mui/icons-material/Category';
+import { HolidayVillageRounded } from '@mui/icons-material';
 
-type Props = {
-  icon?: React.ElementType;
+type CategoryBoxProps = {
   label: string;
   selected?: boolean;
+  onClick?: () => void;
 };
 
-function CategoryBox({ icon: IconComponent = Icon, label, selected }: Props) {
+function CategoryBox({ label, selected, onClick }: CategoryBoxProps) {
   return (
     <Box
       sx={{
@@ -22,6 +21,7 @@ function CategoryBox({ icon: IconComponent = Icon, label, selected }: Props) {
             },
         transition: 'border-color 0.3s',
       }}
+      onClick={onClick}
     >
       <Box
         sx={{
@@ -48,7 +48,7 @@ function CategoryBox({ icon: IconComponent = Icon, label, selected }: Props) {
             p: { xs: 0, sm: 1 },
           }}
         >
-          <IconComponent />
+          <HolidayVillageRounded />
         </IconButton>
         <Typography
           variant="body2"
