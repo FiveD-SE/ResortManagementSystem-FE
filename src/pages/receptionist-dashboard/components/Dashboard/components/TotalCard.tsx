@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import HomeIcon from '@mui/icons-material/Home';
 import NoCrashIcon from '@mui/icons-material/NoCrash';
@@ -6,6 +6,7 @@ import NoCrashIcon from '@mui/icons-material/NoCrash';
 interface IProps {
   amount: number;
   type: string;
+  isLoading?: boolean;
 }
 
 const TotalCard = (props: IProps) => {
@@ -14,10 +15,14 @@ const TotalCard = (props: IProps) => {
       <Stack spacing={2}>
         {props.type === 'Check-in' && <DirectionsCarIcon sx={{ color: '#FFA500' }} />}
         {props.type === 'Check-out' && <NoCrashIcon sx={{ color: '#FF0000' }} />}
-        {props.type === 'Staying' && <HomeIcon sx={{ color: '#32CD32' }} />}
-        <Typography variant="h4" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
-          {props.amount}
-        </Typography>
+        {props.type === 'Pending' && <HomeIcon sx={{ color: '#32CD32' }} />}
+        {props.isLoading ? (
+          <CircularProgress sx={{ borderColor: 'gray' }} size={20} />
+        ) : (
+          <Typography variant="h4" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
+            {props.amount}
+          </Typography>
+        )}
         <Typography variant="h4" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
           {props.type}
         </Typography>

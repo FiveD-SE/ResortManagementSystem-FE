@@ -1,7 +1,11 @@
 export interface IRoom {
   _id: string;
   roomNumber: string;
-  roomTypeId: string;
+  roomTypeId: {
+    _id: string;
+    typeName: string;
+    id: string;
+  };
   status: string;
   pricePerNight: number;
   images: string[];
@@ -82,6 +86,7 @@ export interface IBookingApiRequest {
   sortBy?: 'checkinDate' | 'checkoutDate' | 'totalAmount' | 'createdAt' | 'status';
   page?: number;
   limit?: number;
+  filter?: 'pending' | 'checked in' | 'checked out';
 }
 
 export interface IBookingApiResponse {

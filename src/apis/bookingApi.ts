@@ -10,12 +10,37 @@ export const bookingApi = createApi({
   }),
   endpoints: (builder) => ({
     getBookings: builder.query<IBookingApiResponse, IBookingApiRequest>({
-      query: () => ({
+      query: (request) => ({
         url: '/',
+        method: 'GET',
+        params: {
+          page: request.page,
+          limit: request.limit,
+          sortBy: request.sortBy,
+          sortOrder: request.sortOrder,
+          filter: request.filter,
+        },
+      }),
+    }),
+    checkin: builder.mutation<IBookingApiResponse, string>({
+      query: (id) => ({
+        url: `/${id}/checkin`,
+        method: 'PATCH',
+      }),
+    }),
+    checkout: builder.mutation<IBookingApiResponse, string>({
+      query: (id) => ({
+        url: `/${id}/checkout`,
+        method: 'POST',
+      }),
+    }),
+    getBookingsStatusCount: builder.query<{ checkedIn: number; checkedOut: number; pending: number }, void>({
+      query: () => ({
+        url: '/status-count',
         method: 'GET',
       }),
     }),
   }),
 });
 
-export const { useGetBookingsQuery } = bookingApi;
+export const { useGetBookingsQuery, useCheckinMutation, useCheckoutMutation, useGetBookingsStatusCountQuery } = bookingApi;
