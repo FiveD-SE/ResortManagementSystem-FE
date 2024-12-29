@@ -6,6 +6,7 @@ import PrivateRoute from './PrivateRoute';
 import { Role } from '../types';
 import TripDetail from '../pages/trips/components/TripDetail';
 import TripReview from '../pages/trips/components/TripReview';
+import ThirdParty from '../pages/third-party';
 
 const Home = lazy(() => import('../pages/home'));
 const SignUp = lazy(() => import('../pages/signup'));
@@ -26,6 +27,7 @@ const Routing = () => {
   return (
     <Routes>
       <Route path={ROUTES.HOME} element={<Home />} />
+      <Route path={ROUTES.THIRD_PARTY} element={<ThirdParty />} />
       <Route
         path={ROUTES.AUTH.REGISTER}
         element={

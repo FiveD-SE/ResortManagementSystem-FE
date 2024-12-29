@@ -42,8 +42,34 @@ export const roomApi = createApi({
         return currentArg !== previousArg;
       },
     }),
+    createRoom: builder.mutation<void, FormData>({
+      query: (formData) => ({
+        url: '/',
+        method: 'POST',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    }),
+    updateRoom: builder.mutation<void, { id: string; formData: FormData }>({
+      query: ({ id, formData }) => ({
+        url: `/${id}`,
+        method: 'PATCH',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    }),
+    deleteRoom: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
-export const { useGetRoomsQuery, useGetRoomsByRoomTypeIdQuery } = roomApi;
+export const { useGetRoomsQuery, useGetRoomsByRoomTypeIdQuery, useCreateRoomMutation, useUpdateRoomMutation, useDeleteRoomMutation } = roomApi;
 export const resetRoomsState = roomApi.util.resetApiState;

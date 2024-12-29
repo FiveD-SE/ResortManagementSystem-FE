@@ -1,7 +1,9 @@
-import { Box, Modal, Typography, IconButton, TextField, Button } from '@mui/material';
+import { Box, Modal, Typography, IconButton, TextField, Button, CircularProgress } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import React from 'react'
 import CustomInputForm from '../../../components/CustomInputForm';
+import { useCreatePromotionMutation } from '../../../apis/promotionApi';
+import toast from 'react-hot-toast';
 
 interface AddPromotionModalProps {
     open: boolean;
@@ -9,16 +11,70 @@ interface AddPromotionModalProps {
 }
 
 const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
-    const [name, setName] = React.useState('');
+    const [promotionName, setPromotionName] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [discount, setDiscount] = React.useState('');
     const [startDate, setStartDate] = React.useState('');
     const [endDate, setEndDate] = React.useState('');
+    const [amount, setAmount] = React.useState('');
+
+    const [createPromotion, { isLoading }] = useCreatePromotionMutation();
+
+    const validateForm = () => {
+        if (!promotionName) {
+            toast.error('Please enter promotion name');
+            return false;
+        }
+        if (!discount) {
+            toast.error('Please enter discount');
+            return false;
+        }
+        if (!startDate) {
+            toast.error('Please enter start date');
+            return false;
+        }
+        if (!endDate) {
+            toast.error('Please enter end date');
+            return false;
+        }
+        return true;
+    }
+
+    const resetForm = () => {
+        setPromotionName('');
+        setDescription('');
+        setDiscount('');
+        setStartDate('');
+        setEndDate('');
+        setAmount('');
+    }
+
+    const handleCreatePromotion = async () => {
+        if (!validateForm()) return;
+
+        const data = {
+            promotionName,
+            description,
+            discount: Number(discount),
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+            amount: Number(amount),
+        }
+
+        try {
+            await createPromotion(data).unwrap();
+            toast.success('Create promotion successfully');
+            onClose();
+            resetForm();
+        } catch (error) {
+            toast.error('Create promotion failed');
+        }
+    }
 
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={() => { onClose(); resetForm() }}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -49,8 +105,8 @@ const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
                         <CustomInputForm
                             label="Name"
                             placeholder='Enter promotion name'
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={promotionName}
+                            onChange={(e) => setPromotionName(e.target.value)}
                             type='text'
                         />
 
@@ -78,6 +134,15 @@ const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             type='date'
+                        />
+                    </Box>
+                    <Box sx={{ gap: 2, mt: 2 }}>
+                        <CustomInputForm
+                            label="Amount"
+                            placeholder='Enter amount'
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            type='number'
                         />
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
@@ -114,12 +179,11 @@ const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
+                    <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
-                        Add Promotion
+                    <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleCreatePromotion} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Add Promotion'}
                     </Button>
                 </Box>
             </Box>

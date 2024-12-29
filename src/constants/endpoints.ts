@@ -6,3 +6,4 @@ export const ROOM_ENDPOINT = `${API_BASE_URL}/rooms`;
 export const ROOM_TYPE_ENDPOINT = `${API_BASE_URL}/room-types`;
 export const SERVICE_ENDPOINT = `${API_BASE_URL}/services`;
 export const SERVICE_TYPE_ENDPOINT = `${API_BASE_URL}/service-types`;
+export const PROMOTION_ENDPOINT = `${API_BASE_URL}/promotions`;
