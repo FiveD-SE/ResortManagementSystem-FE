@@ -22,6 +22,7 @@ const ServiceManagement = lazy(() => import('../pages/admin-service-management')
 const PromotionManagement = lazy(() => import('../pages/admin-promotion-management'));
 const BookingManagement = lazy(() => import('../pages/admin-booking-management'));
 const AdminProfile = lazy(() => import('../pages/admin-profile'));
+const ReceptionistDashboard = lazy(() => import('../pages/receptionist-dashboard/ReceptionistDashboard'));
 
 const Routing = () => {
   return (
@@ -61,6 +62,9 @@ const Routing = () => {
         <Route path={ROUTES.ADMIN.PROMOTION_MANAGEMENT} element={<PromotionManagement />} />
         <Route path={ROUTES.ADMIN.BOOKING_MANAGEMENT} element={<BookingManagement />} />
         <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfile />} />
+      </Route>
+      <Route element={<PrivateRoute allowedRoles={[Role.Receptionist]} />}>
+        <Route path={ROUTES.RECEPTIONIST.HOME} element={<ReceptionistDashboard />} />
       </Route>
     </Routes>
   );

@@ -6,6 +6,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { userApi } from '../apis/userApi';
 import { roomApi } from '../apis/roomApi';
 import { roomTypeApi } from '../apis/roomTypeApi';
+import { bookingApi } from '../apis/bookingApi';
 import { serviceApi } from '../apis/serviceApi';
 import { serviceTypeApi } from '../apis/serviceTypeApi';
 import { promotionApi } from '../apis/promotionApi';
@@ -17,6 +18,7 @@ const store = configureStore({
     [userApi.reducerPath]: userApi.reducer,
     [roomApi.reducerPath]: roomApi.reducer,
     [roomTypeApi.reducerPath]: roomTypeApi.reducer,
+    [bookingApi.reducerPath]: bookingApi.reducer,
     [serviceApi.reducerPath]: serviceApi.reducer,
     [serviceTypeApi.reducerPath]: serviceTypeApi.reducer,
     [promotionApi.reducerPath]: promotionApi.reducer,
@@ -27,6 +29,7 @@ const store = configureStore({
       userApi.middleware,
       roomApi.middleware,
       roomTypeApi.middleware,
+      bookingApi.middleware,
       serviceApi.middleware,
       serviceTypeApi.middleware,
       promotionApi.middleware,
