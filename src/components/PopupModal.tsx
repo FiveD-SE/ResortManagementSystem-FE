@@ -10,7 +10,6 @@ interface PopupModalProps {
   onClose: () => void;
   onConfirm: () => void;
 }
-s;
 
 const PopupModal = ({ type, open, title, message, onClose, onConfirm, isLoading }: PopupModalProps) => {
   const renderIconBasedOnType = () => {
