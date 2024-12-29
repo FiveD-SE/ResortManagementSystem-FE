@@ -1,9 +1,16 @@
 import { AppsRounded } from '@mui/icons-material';
 import { Button, Typography } from '@mui/material';
 
-const ShowAllPhotosButton = () => {
+import { MouseEventHandler } from 'react';
+
+interface ShowAllPhotosButtonProps {
+  onClick: MouseEventHandler<HTMLButtonElement>;
+}
+
+const ShowAllPhotosButton = ({ onClick }: ShowAllPhotosButtonProps) => {
   return (
     <Button
+      onClick={onClick}
       variant="contained"
       startIcon={<AppsRounded sx={{ color: 'gray.500' }} />}
       sx={{

@@ -20,6 +20,8 @@ import {
   WaterRounded,
   WifiRounded,
 } from '@mui/icons-material';
+import { SvgIconTypeMap } from '@mui/material';
+import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 interface Amenity {
   title: string;
@@ -60,3 +62,32 @@ export const amenities: Record<string, Amenity> = {
   smoke_alarm: { title: 'Smoke alarm', icon: SmokeFreeRounded, category: 'safety' },
   carbon_monoxide_alarm: { title: 'Carbon monoxide alarm', icon: Co2Rounded, category: 'safety' },
 };
+
+const allAvailableIcons: (OverridableComponent<SvgIconTypeMap<object, 'svg'>> & {
+  muiName: string;
+})[] = [
+  BathroomRounded,
+  BeachAccessRounded,
+  BreakfastDiningRounded,
+  ChildFriendlyRounded,
+  Co2Rounded,
+  DownhillSkiingRounded,
+  EvStationRounded,
+  FireplaceRounded,
+  FitnessCenterRounded,
+  HotTubRounded,
+  KingBedRounded,
+  KitchenRounded,
+  LocalParkingRounded,
+  OutdoorGrillRounded,
+  PoolRounded,
+  SmokeFreeRounded,
+  SmokingRoomsRounded,
+  WaterRounded,
+  WifiRounded,
+];
+
+export function getRandomIcon() {
+  const randomIndex = Math.floor(Math.random() * allAvailableIcons.length);
+  return allAvailableIcons[randomIndex];
+}

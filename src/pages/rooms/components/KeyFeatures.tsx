@@ -1,11 +1,12 @@
 import { Box } from '@mui/material';
 import KeyFeatureItem from './KeyFeatureItem';
+import { getRandomIcon, keyFeatures } from '../../../constants/keyFeatures';
 
 interface KeyFeaturesProps {
-  keyFeatures: { icon: React.ElementType; title: string; description: string }[];
+  keyFeatures: string[];
 }
 
-const KeyFeatures = ({ keyFeatures }: KeyFeaturesProps) => {
+const KeyFeatures = ({ keyFeatures: selectedFeatures }: KeyFeaturesProps) => {
   return (
     <Box
       sx={{
@@ -19,9 +20,14 @@ const KeyFeatures = ({ keyFeatures }: KeyFeaturesProps) => {
         borderColor: 'black.50',
       }}
     >
-      {keyFeatures.map((feature, index) => (
-        <KeyFeatureItem key={index} icon={feature.icon} title={feature.title} description={feature.description} />
-      ))}
+      {selectedFeatures.map((featureKey, index) => {
+        const feature = keyFeatures[featureKey];
+        const displayIcon = feature ? feature.icon : getRandomIcon();
+        const displayTitle = feature ? feature.title : featureKey;
+        const displayDescription = feature ? feature.description : '';
+
+        return <KeyFeatureItem key={index} icon={displayIcon} title={displayTitle} description={displayDescription} />;
+      })}
     </Box>
   );
 };
