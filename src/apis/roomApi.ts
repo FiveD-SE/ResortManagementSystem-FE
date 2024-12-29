@@ -10,12 +10,66 @@ export const roomApi = createApi({
   }),
   endpoints: (builder) => ({
     getRooms: builder.query<IRoomApiResponse, IRoomApiRequest>({
-      query: () => ({
+      query: ({ page, limit, sort }) => ({
         url: '/',
         method: 'GET',
+        params: { page, limit, sort },
+      }),
+      serializeQueryArgs: ({ endpointName }) => {
+        return endpointName;
+      },
+      merge: (currentCache, newItems) => {
+        currentCache.docs.push(...newItems.docs);
+      },
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
+    }),
+    getRoomsByRoomTypeId: builder.query<IRoomApiResponse, IRoomApiRequest>({
+      query: ({ roomTypeId, page = 1, limit = 10, sort }) => ({
+        url: `/roomType/${roomTypeId}`,
+        method: 'GET',
+        params: { page, limit, sort },
+      }),
+      serializeQueryArgs: ({ endpointName, queryArgs }) => {
+        const { roomTypeId, ...rest } = queryArgs;
+        return { endpointName, roomTypeId, ...rest };
+      },
+      merge: (currentCache, newItems) => {
+        currentCache.docs.push(...newItems.docs);
+      },
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
+    }),
+    createRoom: builder.mutation<void, FormData>({
+      query: (formData) => ({
+        url: '/',
+        method: 'POST',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    }),
+    updateRoom: builder.mutation<void, { id: string; formData: FormData }>({
+      query: ({ id, formData }) => ({
+        url: `/${id}`,
+        method: 'PATCH',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    }),
+    deleteRoom: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/${id}`,
+        method: 'DELETE',
       }),
     }),
   }),
 });
 
-export const { useGetRoomsQuery } = roomApi;
+export const { useGetRoomsQuery, useGetRoomsByRoomTypeIdQuery, useCreateRoomMutation, useUpdateRoomMutation, useDeleteRoomMutation } = roomApi;
+export const resetRoomsState = roomApi.util.resetApiState;

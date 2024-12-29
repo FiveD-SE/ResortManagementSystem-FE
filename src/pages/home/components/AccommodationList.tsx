@@ -1,56 +1,124 @@
 import { Box, Grid2 as Grid } from '@mui/material';
 import AccommodationCard from './AccommodationCard';
 import AccommodationCardSkeleton from './AccommodationCardSkeleton';
-// import { faker } from '@faker-js/faker';
-import { useGetRoomsQuery } from '../../../apis/roomApi';
-
-// interface AccommodationData {
-//   images: string[];
-//   location: string;
-//   rating: number;
-//   startDate: string;
-//   endDate: string;
-//   price: number;
-//   isSuperhost: boolean;
-// }
-
-// const generateFakeData = (count: number): AccommodationData[] => {
-//   return Array.from({ length: count }).map(() => ({
-//     images: Array.from({ length: faker.number.int({ min: 3, max: 10 }) }, () => faker.image.avatarGitHub()),
-//     location: faker.location.city() + ', ' + faker.location.country(),
-//     rating: faker.number.float({ min: 3, max: 5, fractionDigits: 1 }),
-//     startDate: faker.date.future().toISOString(),
-//     endDate: faker.date.future({ years: 1 }).toISOString(),
-//     price: faker.number.float({ min: 50, max: 500, fractionDigits: 2 }),
-//     isSuperhost: faker.datatype.boolean(),
-//   }));
-// };
-
-// const fakeData = generateFakeData(12);
+import { resetRoomsState, useGetRoomsByRoomTypeIdQuery, useGetRoomsQuery } from '../../../apis/roomApi';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { IRoomApiResponse } from '../../../types';
+interface ObserverEntry {
+  isIntersecting: boolean;
+}
 
 const AccommodationList = () => {
-  const { data, isLoading } = useGetRoomsQuery({ page: 1, limit: 36 });
+  const dispatch = useDispatch();
+  const [page, setPage] = useState<number>(1);
+  const [searchParams] = useSearchParams();
+  const roomTypeId = searchParams.get('roomType');
 
-  const handleCardClick = (roomId: string) => {
-    window.open(`/rooms/${roomId}`, '_blank');
-  };
+  const {
+    data: allRoomsData,
+    isLoading: isAllRoomsLoading,
+    isFetching: isAllRoomsFetching,
+    error: allRoomsError,
+    refetch: refetchAllRooms,
+  } = useGetRoomsQuery(
+    { page, limit: 12 },
+    {
+      skip: !!roomTypeId,
+    },
+  );
+
+  const {
+    data: roomTypeData,
+    isLoading: isRoomTypeLoading,
+    isFetching: isRoomTypeFetching,
+    error: roomTypeError,
+    refetch: refetchRoomType,
+  } = useGetRoomsByRoomTypeIdQuery({ roomTypeId: roomTypeId as string, page, limit: 12 }, { skip: !roomTypeId });
+
+  const loader = useRef(null);
+  const navigate = useNavigate();
+  const [currentData, setCurrentData] = useState<IRoomApiResponse | null>(null);
+  const isLoading = roomTypeId ? isRoomTypeLoading : isAllRoomsLoading;
+  const isFetching = roomTypeId ? isRoomTypeFetching : isAllRoomsFetching;
+  const error = roomTypeId ? roomTypeError : allRoomsError;
+
+  const hasNextPage = currentData?.hasNextPage;
+  const totalPages = currentData?.totalPages;
+
+  useEffect(() => {
+    if (roomTypeId) {
+      setCurrentData(roomTypeData ?? null);
+    } else {
+      setCurrentData(allRoomsData ?? null);
+    }
+  }, [roomTypeData, allRoomsData, roomTypeId]);
+
+  const handleCardClick = useCallback(
+    (roomId: string) => {
+      navigate(`/rooms/${roomId}`);
+    },
+    [navigate],
+  );
+
+  const handleObserver = useCallback(
+    (entries: ObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasNextPage && !isLoading && !isFetching && page < (totalPages ?? 0)) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    [hasNextPage, isLoading, isFetching, page, totalPages],
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: '12px',
+      threshold: 1.0,
+    });
+
+    if (loader.current) {
+      observer.observe(loader.current);
+    }
+
+    return () => {
+      if (loader.current) {
+        observer.unobserve(loader.current);
+      }
+    };
+  }, [handleObserver]);
+
+  useEffect(() => {
+    setCurrentData(null);
+    dispatch(resetRoomsState());
+    if (roomTypeId) {
+      refetchRoomType();
+    } else {
+      refetchAllRooms();
+    }
+    setPage(1);
+  }, [roomTypeId, refetchAllRooms, refetchRoomType, dispatch]);
+
+  if (error) {
+    console.error('Error fetching rooms:', error);
+    return <div>Error loading accommodations.</div>;
+  }
 
   return (
     <Box sx={{ pt: 2, px: 5 }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 1, md: 2 }}>
-        {isLoading &&
-          Array.from({ length: 36 }).map((_, index) => (
-            <Grid key={`skeleton-${index}`} size={{ xs: 12, sm: 12, md: 2 }}>
-              <AccommodationCardSkeleton />
-            </Grid>
-          ))}
         {!isLoading &&
-          data &&
-          (Array.isArray(data) ? data : data.docs).map((item: any, index) => (
-            <Grid key={item.id} size={{ xs: 12, sm: 12, md: 2 }}>
+          currentData &&
+          (Array.isArray(currentData) ? currentData : currentData.docs).map((item: any, index) => (
+            <Grid key={item.id + index} size={{ xs: 12, sm: 12, md: 2 }}>
               <AccommodationCard
+                roomNumber={item.roomNumber}
+                roomTypeId={item.roomTypeId}
+                roomTypeName={item.roomTypeName}
+                averageRating={item.averageRating}
                 images={item.images}
-                location={item.roomNumber}
                 startDate={item.startDate}
                 endDate={item.endDate}
                 pricePerNight={item.pricePerNight}
@@ -58,6 +126,13 @@ const AccommodationList = () => {
               />
             </Grid>
           ))}
+        {(isLoading || isFetching) &&
+          Array.from({ length: 12 }).map((_, index) => (
+            <Grid key={`skeleton-${index}`} size={{ xs: 12, sm: 12, md: 2 }}>
+              <AccommodationCardSkeleton />
+            </Grid>
+          ))}
+        <Box ref={loader} sx={{ width: '100%' }} />
       </Grid>
     </Box>
   );

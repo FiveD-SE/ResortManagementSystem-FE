@@ -28,6 +28,7 @@ export interface IRoomApiRequest {
   page: number;
   limit: number;
   sort?: string;
+  roomTypeId?: string;
 }
 
 export interface IRoomApiResponse {
@@ -41,7 +42,13 @@ export interface IRoomApiResponse {
   docs: IRoom[];
 }
 
-export interface IRoomTypeApi {
+export interface IRoomTypeApiRequest {
+  page: number;
+  limit: number;
+  sort?: string;
+}
+
+export interface IRoomTypeApiResponse {
   totalDocs: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;

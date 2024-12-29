@@ -1,12 +1,12 @@
 import { Circle, Settings } from '@mui/icons-material'
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { PieChart } from '@mui/x-charts/PieChart';
-import { IRoomApiResponse, IRoomTypeApi } from '../../../types';
+import { IRoomApiResponse, IRoomTypeApiResponse } from '../../../types';
 
 interface StatisticRoomTypeProps {
     onManageRoomType: () => void;
     roomsData: IRoomApiResponse | undefined;
-    roomTypesData: IRoomTypeApi | undefined;
+    roomTypesData: IRoomTypeApiResponse | undefined;
 }
 
 

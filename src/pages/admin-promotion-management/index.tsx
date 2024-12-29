@@ -2,8 +2,16 @@ import { Box, Typography, IconButton } from "@mui/material"
 import { Notifications } from "@mui/icons-material"
 import Statistic from "./components/Statistic"
 import PromotionTable from "./components/PromotionTable"
+import { useGetPromotionsQuery } from "../../apis/promotionApi"
+import React from "react"
 
 const PromotionManagement = () => {
+    const [page, setPage] = React.useState(1)
+    const { data: promotionData } = useGetPromotionsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' })
+    const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value)
+    }
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -17,7 +25,7 @@ const PromotionManagement = () => {
             <Statistic />
 
             {/* Promotion Table */}
-            <PromotionTable />
+            <PromotionTable promotionData={promotionData} onPageChange={handlePageChange} />
         </Box>
     )
 }
