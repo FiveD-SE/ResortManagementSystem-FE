@@ -8,6 +8,7 @@ interface IProps {
   type: string;
   id: string;
   setData: React.Dispatch<React.SetStateAction<IBooking[]>>;
+  openDetailModal: () => void;
 }
 const DropdownList = (props: IProps) => {
   const [checkin] = useCheckinMutation();
@@ -20,7 +21,7 @@ const DropdownList = (props: IProps) => {
   const handleMenuOpen = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   }, []);
-  const handleCheckInOrCheckOut = React.useCallback(
+  const handleOnClick = React.useCallback(
     (type: string) => {
       console.log(type);
       if (type == 'Checked in') {
@@ -35,6 +36,7 @@ const DropdownList = (props: IProps) => {
         );
       } else {
         console.log('View Details');
+        props.openDetailModal();
       }
 
       handleMenuClose();
@@ -73,7 +75,7 @@ const DropdownList = (props: IProps) => {
         PaperProps={{ sx: { width: '10%', borderRadius: '0.75rem' } }}
       >
         {types.map((type, index) => (
-          <MenuItem key={index} onClick={() => handleCheckInOrCheckOut(type)}>
+          <MenuItem key={index} onClick={() => handleOnClick(type)}>
             {type}
           </MenuItem>
         ))}
