@@ -9,32 +9,73 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Button
+    Button,
+    Menu,
+    MenuItem,
 } from "@mui/material";
 import { Add, MoreHoriz } from "@mui/icons-material";
 import AddNewServiceModal from "./AddNewServiceModal";
 import EditServiceModal from "./EditServiceModal";
 import React from "react";
+import { IService, IServiceApiResponse, IServiceTypeApiResponse } from "../../../types";
+import PopupModal from "../../../components/PopupModal";
+import { useDeleteServiceMutation } from "../../../apis/serviceApi";
+import toast from "react-hot-toast";
 
-interface DataRow {
-    id: number;
-    name: string;
-    serviceType: string;
-    description: string;
-    price: number;
+interface ServiceTableProps {
+    serviceData: IServiceApiResponse | undefined;
+    serviceTypeData: IServiceTypeApiResponse | undefined;
+    onPageChange?: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const rows: DataRow[] = [
-    { id: 1, name: "Service 1", serviceType: "Type 1", description: "Description 1", price: 100 },
-    { id: 2, name: "Service 2", serviceType: "Type 2", description: "Description 2", price: 200 },
-    { id: 3, name: "Service 3", serviceType: "Type 3", description: "Description 3", price: 300 },
-    { id: 4, name: "Service 4", serviceType: "Type 4", description: "Description 4", price: 400 },
-    { id: 5, name: "Service 5", serviceType: "Type 5", description: "Description 5", price: 500 },
-];
-
-const ServiceTable = () => {
+const ServiceTable = ({ serviceData, serviceTypeData, onPageChange }: ServiceTableProps) => {
     const [openAddNewServiceModal, setOpenAddNewServiceModal] = React.useState(false);
     const [openEditServiceModal, setOpenEditServiceModal] = React.useState(false);
+    const [search, setSearch] = React.useState<string>('');
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
+    const [selectedService, setSelectedService] = React.useState<IService>();
+
+    const [deleteService, { isLoading }] = useDeleteServiceMutation();
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const getServiceTypeName = (serviceTypeId: string): string => {
+        const serviceType = serviceTypeData?.docs.find((type) => type.id === serviceTypeId);
+        return serviceType ? serviceType.typeName : 'Unknown';
+    };
+
+    const getFilteredRows = React.useCallback(() => {
+        return serviceData?.docs.filter((service) => {
+            const searchLower = search.toLowerCase();
+            const serviceTypeName = getServiceTypeName(service.serviceTypeId).toLowerCase();
+            return (
+                service.serviceName.toLowerCase().includes(searchLower) ||
+                serviceTypeName.toLowerCase().includes(searchLower) ||
+                service.price.toString().includes(searchLower)
+            );
+        });
+    }, [serviceData, search]);
+
+    const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(event.target.value);
+    };
+
+    const handleDeleteService = async () => {
+        if (!selectedService) return;
+        try {
+            await deleteService(selectedService.id);
+            toast.success('Service deleted successfully');
+        } catch (error) {
+            toast.error('Failed to delete service');
+        } finally {
+            setOpenDeleteModal(false);
+        }
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', mt: 2 }}>
@@ -67,6 +108,8 @@ const ServiceTable = () => {
                             },
                         },
                     }}
+                    value={search}
+                    onChange={handleSearchChange}
                 />
                 {/* Button */}
                 <Button
@@ -98,34 +141,100 @@ const ServiceTable = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.serviceType}</TableCell>
-                                    <TableCell>{row.description}</TableCell>
-                                    <TableCell>{`$${row.price}`}</TableCell>
-                                    <TableCell>
-                                        <IconButton onClick={() => setOpenEditServiceModal(true)}>
-                                            <MoreHoriz />
-                                        </IconButton>
+                            {filteredRows?.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center">
+                                        No service found.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                filteredRows?.map((row, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{row.serviceName}</TableCell>
+                                        <TableCell>{getServiceTypeName(row.serviceTypeId)}</TableCell>
+                                        <TableCell>{row.description}</TableCell>
+                                        <TableCell>{`$${row.price}`}</TableCell>
+                                        <TableCell>
+                                            <IconButton onClick={(event) => {
+                                                setAnchorEl(event.currentTarget);
+                                                setSelectedService(row);
+                                            }}>
+                                                <MoreHoriz />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                sx={{
+                                    '& .MuiPaper-root': {
+                                        borderRadius: '8px',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        padding: '4px',
+                                        minWidth: '100px',
+                                    },
+                                    '& .MuiMenuItem-root': {
+                                        padding: '4px 16px',
+                                        borderRadius: '4px',
+                                        '&:hover': {
+                                            backgroundColor: 'gray.50',
+                                        },
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: 'black.300',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={() => {
+                                    setOpenEditServiceModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Edit
+                                </MenuItem>
+                                <MenuItem onClick={() => {
+                                    setOpenDeleteModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Delete
+                                </MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
 
             <Pagination
-                count={10}
+                count={serviceData?.totalPages}
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: "flex-end" }}
+                onChange={onPageChange}
             />
 
-            <AddNewServiceModal open={openAddNewServiceModal} onClose={() => setOpenAddNewServiceModal(false)} />
-            <EditServiceModal open={openEditServiceModal} onClose={() => setOpenEditServiceModal(false)} />
+            <AddNewServiceModal open={openAddNewServiceModal} onClose={() => setOpenAddNewServiceModal(false)} serviceTypeData={serviceTypeData} />
+            <EditServiceModal open={openEditServiceModal} onClose={() => setOpenEditServiceModal(false)} selectedService={selectedService} serviceTypeData={serviceTypeData} />
+
+            <PopupModal
+                type='delete'
+                open={openDeleteModal}
+                title='Delete Service'
+                message='Are you sure you want to delete this service?'
+                onClose={() => setOpenDeleteModal(false)}
+                onConfirm={handleDeleteService}
+                isLoading={isLoading}
+            />
         </Box>
     );
 };

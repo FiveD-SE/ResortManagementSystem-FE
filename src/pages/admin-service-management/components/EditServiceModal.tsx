@@ -1,21 +1,95 @@
 import { Close } from "@mui/icons-material";
-import { Box, Button, IconButton, Modal, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Modal, TextField, Typography } from "@mui/material";
 import CustomSelectingForm from "../../../components/CustomSelectingForm";
 import CustomInputForm from "../../../components/CustomInputForm";
 import React from "react";
+import { IService, IServiceTypeApiResponse } from "../../../types";
+import { useUpdateServiceMutation } from "../../../apis/serviceApi";
+import toast from "react-hot-toast";
 
 interface EditServiceModalProps {
+    selectedService: IService | undefined;
+    serviceTypeData: IServiceTypeApiResponse | undefined;
     open: boolean;
     onClose: () => void;
 }
 
-const serviceTypes = ['Room service', 'Food service', 'Drink service', 'Other'];
-
-const EditServiceModal = ({ open, onClose }: EditServiceModalProps) => {
+const EditServiceModal = ({ selectedService, serviceTypeData, open, onClose }: EditServiceModalProps) => {
     const [serviceName, setServiceName] = React.useState('');
     const [price, setPrice] = React.useState('');
     const [serviceType, setServiceType] = React.useState('');
     const [description, setDescription] = React.useState('');
+
+    React.useEffect(() => {
+        const getServiceTypeName = serviceTypeData?.docs.find((serviceType) => serviceType.id === selectedService?.serviceTypeId)?.typeName || '';
+
+        if (selectedService) {
+            setServiceName(selectedService.serviceName);
+            setPrice(selectedService.price.toString());
+            setServiceType(getServiceTypeName);
+            setDescription(selectedService.description || '');
+        }
+
+    }, [selectedService]);
+
+    const [updateService, { isLoading }] = useUpdateServiceMutation();
+
+    const serviceTypes = React.useMemo(() => {
+        if (!serviceTypeData?.docs) return [];
+        return serviceTypeData.docs.map((serviceType) => ({
+            label: serviceType.typeName,
+            value: serviceType.id,
+        }));
+    }, [serviceTypeData]);
+
+    const validateForm = () => {
+        if (!serviceName) {
+            toast.error('Service name is required');
+            return false;
+        }
+        if (!price) {
+            toast.error('Price is required');
+            return false;
+        }
+        if (!serviceType) {
+            toast.error('Service type is required');
+            return false;
+        }
+        if (!description) {
+            toast.error('Description is required');
+            return false;
+        }
+        return true;
+    }
+
+    const resetForm = () => {
+        setServiceName('');
+        setPrice('');
+        setServiceType('');
+        setDescription('');
+    }
+
+    const handleUpdateService = async () => {
+        if (!validateForm()) return;
+
+        const serviceTypeId = serviceTypes.find((type) => type.label === serviceType)?.value || '';
+
+        const data = {
+            id: selectedService?.id || '',
+            serviceName,
+            price: parseInt(price),
+            serviceTypeId,
+            description,
+        };
+        try {
+            await updateService(data).unwrap();
+            toast.success('Update service successfully');
+            onClose();
+            resetForm();
+        } catch (error) {
+            toast.error('Update service failed');
+        }
+    }
 
     return (
         <Modal
@@ -58,7 +132,7 @@ const EditServiceModal = ({ open, onClose }: EditServiceModalProps) => {
                             label="Price"
                             placeholder="Enter price"
                             value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            onChange={(e) => setPrice(e.target.value.toString())}
                             type="number"
                         />
                     </Box>
@@ -68,7 +142,7 @@ const EditServiceModal = ({ open, onClose }: EditServiceModalProps) => {
                             placeholder="Select service type"
                             value={serviceType}
                             onChange={(e) => setServiceType(e.target.value)}
-                            options={serviceTypes}
+                            options={serviceTypes.map((serviceType) => serviceType.label)}
                         />
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
@@ -105,12 +179,11 @@ const EditServiceModal = ({ open, onClose }: EditServiceModalProps) => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
+                    <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
-                        Confirm
+                    <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleUpdateService} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Save'}
                     </Button>
                 </Box>
             </Box>
