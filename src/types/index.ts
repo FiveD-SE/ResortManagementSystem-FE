@@ -7,7 +7,6 @@ export * from './invoice';
 export * from './promotion';
 export * from './receptionist';
 export * from './report';
-export * from './review';
 export * from './room';
 export * from './service';
 export * from './serviceStaff';

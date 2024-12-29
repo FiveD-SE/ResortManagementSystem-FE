@@ -57,7 +57,7 @@ const AccommodationList = () => {
 
   const handleCardClick = useCallback(
     (roomId: string) => {
-      navigate(`/rooms/${roomId}`);
+      navigate(`/rooms/${roomId}/detail`);
     },
     [navigate],
   );
@@ -122,7 +122,7 @@ const AccommodationList = () => {
                 startDate={item.startDate}
                 endDate={item.endDate}
                 pricePerNight={item.pricePerNight}
-                onCardClick={() => handleCardClick(item._id)}
+                onCardClick={() => handleCardClick(item.id)}
               />
             </Grid>
           ))}

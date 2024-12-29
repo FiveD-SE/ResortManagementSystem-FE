@@ -1,4 +1,4 @@
-import { IRoomApiRequest, IRoomApiResponse } from './../types/room';
+import { IRoomApiRequest, IRoomApiResponse, IRoomDetailApiResponse } from './../types/room';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { ROOM_ENDPOINT } from '../constants/endpoints';
 import { axiosBaseQuery } from './axiosInstance';
@@ -42,6 +42,12 @@ export const roomApi = createApi({
         return currentArg !== previousArg;
       },
     }),
+    getRoomDetailById: builder.query<IRoomDetailApiResponse, string>({
+      query: (id) => ({
+        url: `/${id}/detail`,
+        method: 'GET',
+      }),
+    }),
     createRoom: builder.mutation<void, FormData>({
       query: (formData) => ({
         url: '/',
@@ -71,5 +77,12 @@ export const roomApi = createApi({
   }),
 });
 
-export const { useGetRoomsQuery, useGetRoomsByRoomTypeIdQuery, useCreateRoomMutation, useUpdateRoomMutation, useDeleteRoomMutation } = roomApi;
+export const {
+  useGetRoomsQuery,
+  useGetRoomsByRoomTypeIdQuery,
+  useGetRoomDetailByIdQuery,
+  useCreateRoomMutation,
+  useUpdateRoomMutation,
+  useDeleteRoomMutation,
+} = roomApi;
 export const resetRoomsState = roomApi.util.resetApiState;

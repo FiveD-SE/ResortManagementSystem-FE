@@ -13,17 +13,19 @@ import {
   Button,
   Menu,
   MenuItem,
+  Avatar,
 } from '@mui/material';
 import { Close, ExpandMoreRounded, Search, StarRounded, SvgIconComponent } from '@mui/icons-material';
 import RatingProgress from './RatingProgress';
 import RatingItem from './RatingItem';
 import { TransitionProps } from '@mui/material/transitions';
 import React, { Fragment, useState } from 'react';
+import { IRating } from '../../../types/rating';
 
 interface GuestReviewsDialogProps {
   open: boolean;
   onClose: () => void;
-  reviews: { avatar?: string; name: string; location: string; stars: number; date: string; review: string }[];
+  ratings: IRating[];
   overallRatings: { label: string; value: number }[];
   detailedRatings: { label: string; value: number; icon: SvgIconComponent }[];
   averageRating: number;
@@ -42,7 +44,7 @@ const Transition = React.forwardRef(function Transition(
 const GuestReviewsDialog: React.FC<GuestReviewsDialogProps> = ({
   open,
   onClose,
-  reviews,
+  ratings,
   overallRatings,
   detailedRatings,
   averageRating,
@@ -86,7 +88,7 @@ const GuestReviewsDialog: React.FC<GuestReviewsDialogProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <StarRounded sx={{ mr: 1, fontSize: 48 }} />
               <Typography sx={{ display: 'flex', alignItems: 'center', fontSize: 48, fontWeight: 600 }}>
-                {averageRating}
+                {averageRating.toFixed(1)}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>
@@ -190,40 +192,44 @@ const GuestReviewsDialog: React.FC<GuestReviewsDialogProps> = ({
             />
 
             <Box sx={{ overflowY: 'auto', maxHeight: 800 }}>
-              {reviews.map((review, index) => (
+              {ratings.map((rating, index) => (
                 <Box key={index} sx={{ mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Box
-                      component="img"
-                      src={review.avatar || '../../../assets/images/avatar.png'}
-                      alt={review.name}
-                      sx={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover' }}
-                    />
+                    <Avatar sx={{ backgroundColor: 'gray.300', width: 40, height: 40 }} />
                     <Box>
                       <Typography variant="subtitle1" fontWeight="bold">
-                        {review.name}
+                        {rating.userId}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {review.location}
+                        {new Date(rating.createdAt).toLocaleString('default', {
+                          month: 'long',
+                          year: 'numeric',
+                        })}
                       </Typography>
                     </Box>
                   </Box>
                   <Box sx={{ my: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {[...Array(5)].map((_, index) => (
+                    {[...Array(5)].map((_, starIndex) => (
                       <StarRounded
-                        key={index}
-                        sx={{ fontSize: 16, color: index + 1 <= review.stars ? 'black.500' : 'gray.200' }}
+                        key={starIndex}
+                        sx={{
+                          fontSize: 16,
+                          color: starIndex + 1 <= rating.average ? 'black.500' : 'gray.200',
+                        }}
                       />
                     ))}
                     <Typography variant="caption" color="text.secondary">
                       •
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {review.date}
+                      {new Date(rating.createdAt).toLocaleString('default', {
+                        month: 'long',
+                        year: 'numeric',
+                      })}
                     </Typography>
                   </Box>
-                  <Typography variant="body2">{review.review}</Typography>
-                  {index < reviews.length - 1 && <Divider sx={{ mt: 3 }} />}
+                  <Typography variant="body2">{rating.comment}</Typography>
+                  {index < ratings.length - 1 && <Divider sx={{ mt: 3 }} />}
                 </Box>
               ))}
             </Box>
