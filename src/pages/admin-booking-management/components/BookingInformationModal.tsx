@@ -1,12 +1,112 @@
-import { Box, Modal, Typography, IconButton, Divider } from '@mui/material'
-import { Check, Close } from '@mui/icons-material'
+import React from 'react';
+import { Box, Modal, Typography, IconButton, Divider } from '@mui/material';
+import { Close } from '@mui/icons-material';
+import { IBooking } from '../../../types';
+import { formatPrice } from '../../../utils';
 
 interface BookingInformationModalProps {
-    open: boolean
-    onClose: () => void
+    open: boolean;
+    onClose: () => void;
+    selectedBooking: IBooking | undefined;
 }
 
-const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps) => {
+const BookingInformationModal = ({ open, onClose, selectedBooking }: BookingInformationModalProps) => {
+    const [formattedData, setFormattedData] = React.useState({
+        customerName: '',
+        customerId: '',
+        checkinDate: '',
+        checkoutDate: '',
+        issuedDate: '',
+        roomType: '',
+        status: '',
+        roomNumber: '',
+        extras: [] as { serviceName: string; price: string }[],
+        roomTotal: '',
+        extra: '',
+        subtotal: '',
+        total: '',
+        discount: '',
+        nights: 0,
+        images: [] as string[],
+    });
+
+    React.useEffect(() => {
+        if (!selectedBooking) return;
+
+        const checkinDate = selectedBooking.checkinDate ? new Date(selectedBooking.checkinDate).toDateString() : 'N/A';
+        const checkoutDate = selectedBooking.checkoutDate ? new Date(selectedBooking.checkoutDate).toDateString() : 'N/A';
+        const issuedDate = selectedBooking.createdAt ? new Date(selectedBooking.createdAt).toDateString() : 'N/A';
+
+        const customerName = `${selectedBooking.customerId.firstName} ${selectedBooking.customerId.lastName}`;
+        const customerId = selectedBooking.customerId.id;
+        const roomType = selectedBooking.roomId.roomTypeId.typeName;
+        const status = selectedBooking.status;
+        const roomNumber = selectedBooking.roomId.roomNumber;
+
+        // Tính toán số ngày ở
+        const nights =
+            selectedBooking.checkinDate && selectedBooking.checkoutDate
+                ? Math.ceil(
+                    (new Date(selectedBooking.checkoutDate).getTime() - new Date(selectedBooking.checkinDate).getTime()) /
+                    (1000 * 60 * 60 * 24)
+                )
+                : 0;
+
+        // Tổng tiền phòng
+        const roomTotal =
+            selectedBooking.roomId.pricePerNight && nights
+                ? formatPrice(selectedBooking.roomId.pricePerNight * nights)
+                : formatPrice(0);
+
+        // Tổng tiền dịch vụ thêm
+        const extras = selectedBooking.services.map((service) => ({
+            serviceName: service.serviceId.serviceName,
+            price: formatPrice(service.serviceId.price),
+        }));
+        const extraTotal = formatPrice(
+            selectedBooking.services.reduce((acc, service) => acc + service.serviceId.price, 0)
+        );
+
+        // Tổng cộng trước giảm giá
+        const subtotal =
+            selectedBooking.roomId.pricePerNight && nights
+                ? formatPrice(
+                    selectedBooking.roomId.pricePerNight * nights +
+                    selectedBooking.services.reduce((acc, service) => acc + service.serviceId.price, 0)
+                )
+                : formatPrice(0);
+
+        // Giảm giá
+        const discount = selectedBooking.promotionId
+            ? `${formatPrice(selectedBooking.totalAmount * (selectedBooking.promotionId.discount / 100))} (${selectedBooking.promotionId.discount}%)`
+            : formatPrice(0);
+
+        // Tổng tiền sau giảm giá
+        const total = formatPrice(selectedBooking.totalAmount);
+
+        // Ảnh phòng
+        const images = selectedBooking.roomId.images.map((image) => image);
+
+        setFormattedData({
+            customerName,
+            customerId,
+            checkinDate,
+            checkoutDate,
+            issuedDate,
+            roomType,
+            status,
+            roomNumber,
+            extras,
+            roomTotal,
+            extra: extraTotal,
+            subtotal,
+            total,
+            discount,
+            nights,
+            images,
+        });
+    }, [selectedBooking]);
+
     return (
         <Modal
             open={open}
@@ -39,22 +139,55 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                 <Box sx={{ display: 'flex', flexDirection: 'row', height: '80vh', gap: 2, mt: 1, p: 1 }}>
                     {/* Room Image Section */}
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, borderRadius: 2, padding: 1, boxShadow: 4 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.100', height: '50%', borderRadius: 1 }} />
-
+                        {/* Main Image */}
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.100', height: '50%', borderRadius: 1 }} >
+                            <img
+                                src={formattedData.images[0]}
+                                alt="Main Room"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    borderRadius: '8px',
+                                }}
+                            />
+                        </Box>
+                        {/* Sub Images */}
                         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, height: '50%' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.500', borderRadius: 1 }} />
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.500', borderRadius: 1 }} />
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.500', borderRadius: 1 }} />
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: 'gray.500', borderRadius: 1 }} />
+                            {formattedData.images.slice(1, 5).map((image, index) => (
+                                <Box
+                                    key={index}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        bgcolor: 'gray.500',
+                                        borderRadius: 1,
+                                        overflow: 'hidden',
+                                        mb: index > 1 ? 1 : 0,
+                                    }}
+                                >
+                                    <img
+                                        src={image}
+                                        alt="Sub Room"
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                        }}
+                                    />
+                                </Box>
+                            ))}
                         </Box>
                     </Box>
                     {/* Customer Information */}
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, borderRadius: 2, p: 2 }}>
                         <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
-                            Customer name
+                            {formattedData.customerName}
                         </Typography>
                         <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                            ID:
+                            ID: {formattedData.customerId}
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '50%' }}>
@@ -62,7 +195,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                     Check in
                                 </Typography>
                                 <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                    Sat, 24 Dec 2022
+                                    {formattedData.checkinDate}
                                 </Typography>
                             </Box>
 
@@ -71,7 +204,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                     Check out
                                 </Typography>
                                 <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                    Sun, 25 Dec 2022
+                                    {formattedData.checkoutDate}
                                 </Typography>
                             </Box>
                         </Box>
@@ -82,7 +215,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                     Issued Date
                                 </Typography>
                                 <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                    Tue, 20 Dec 2022
+                                    {formattedData.issuedDate}
                                 </Typography>
                             </Box>
 
@@ -91,7 +224,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                     Room Type
                                 </Typography>
                                 <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                    Single Room
+                                    {formattedData.roomType}
                                 </Typography>
                             </Box>
                         </Box>
@@ -102,7 +235,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                     Status
                                 </Typography>
                                 <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                    Pending
+                                    {formattedData.status}
                                 </Typography>
                             </Box>
 
@@ -111,7 +244,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                     Room Number
                                 </Typography>
                                 <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                    101
+                                    {formattedData.roomNumber}
                                 </Typography>
                             </Box>
                         </Box>
@@ -120,31 +253,17 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                             <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 600 }}>
                                 Extras
                             </Typography>
-                            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                                    <Check color='success' fontSize='small' />
-                                    <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                        Extra 1
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                                    <Check color='success' fontSize='small' />
-                                    <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                        Extra 1
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                                    <Check color='success' fontSize='small' />
-                                    <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                        Extra 1
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-                                    <Check color='success' fontSize='small' />
-                                    <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                                        Extra 1
-                                    </Typography>
-                                </Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                {formattedData?.extras.map((service, index) => (
+                                    <Box key={index} sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                                        <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
+                                            {service.serviceName}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
+                                            {service.price}
+                                        </Typography>
+                                    </Box>
+                                ))}
                             </Box>
                         </Box>
                     </Box>
@@ -155,10 +274,10 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Typography sx={{ fontSize: 16, color: 'black.300', fontWeight: 500 }}>
-                                Room Total (1 night)
+                                Room Total ({formattedData?.nights} night)
                             </Typography>
                             <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 500 }}>
-                                $100
+                                {formatPrice(selectedBooking?.roomId?.pricePerNight ? selectedBooking.roomId.pricePerNight * (selectedBooking?.checkoutDate && selectedBooking?.checkinDate ? Math.ceil((new Date(selectedBooking.checkoutDate).getTime() - new Date(selectedBooking.checkinDate).getTime()) / (1000 * 60 * 60 * 24)) : 0) : 0)}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -166,7 +285,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                 Extra Person
                             </Typography>
                             <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 500 }}>
-                                $20
+                                $0
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -174,7 +293,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                 Extra
                             </Typography>
                             <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 500 }}>
-                                $20
+                                {formattedData.extra}
                             </Typography>
                         </Box>
                         <Divider />
@@ -183,7 +302,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                 Subtotal
                             </Typography>
                             <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 500 }}>
-                                $140
+                                {formattedData.subtotal}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -191,7 +310,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                 Discount
                             </Typography>
                             <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 500 }}>
-                                $33.00 (10%)
+                                {formattedData.discount}
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -199,7 +318,7 @@ const BookingInformationModal = ({ open, onClose }: BookingInformationModalProps
                                 Total
                             </Typography>
                             <Typography sx={{ fontSize: 18, color: 'primary.600', fontWeight: 500 }}>
-                                $320.00
+                                {formattedData.total}
                             </Typography>
                         </Box>
                     </Box>
