@@ -1,6 +1,8 @@
-import { Apps, MotionPhotosOff, FiberManualRecord, MoreHoriz, NotificationsActive } from "@mui/icons-material";
-import { Box, IconButton, Pagination, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography } from "@mui/material";
-import React, { useState, useCallback, useMemo } from "react";
+import { Apps, MotionPhotosOff, FiberManualRecord, NotificationsActive } from "@mui/icons-material";
+import { Box, Pagination, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography } from "@mui/material";
+import React, { useState, useCallback } from "react";
+import { IUserApiResponse } from "../../../types/user";
+import CustomerTableSkeleton from "./CustomerTableSkeleton";
 
 const tabTextStyle = {
     color: "gray.200",
@@ -16,67 +18,28 @@ const tabIconStyle = {
     fontSize: "18px",
 };
 
-interface DataRow {
-    id: number;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    status: string;
+interface CustomerTableProps {
+    CustomerData: IUserApiResponse | undefined;
+    isLoading: boolean;
+    onPageChange?: (_event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const rows: DataRow[] = [
-    {
-        id: 1,
-        name: "John Doe",
-        email: "johndoe@gmail.com",
-        phone: "123456789",
-        address: "123 Main St, New York, NY 10030",
-        status: "Active",
-    },
-    {
-        id: 2,
-        name: "Jane Doe",
-        email: "janedoe@gmail.com",
-        phone: "123456789",
-        address: "123 Main St, New York, NY 10030",
-        status: "Active",
-    },
-    {
-        id: 3,
-        name: "Alice",
-        email: "alice@gmail.com",
-        phone: "123456789",
-        address: "123 Main St, New York, NY 10030",
-        status: "Inactive",
-    },
-];
-
-const CustomerTable = () => {
+const CustomerTable = ({ CustomerData, isLoading, onPageChange }: CustomerTableProps) => {
     const [tabSelected, setTabSelected] = useState<number>(0);
     const [search, setSearch] = useState<string>("");
 
-    // Bộ lọc dữ liệu dựa trên tab và tìm kiếm
-    const filteredRows = useMemo(() => {
-        let filtered = rows;
+    const filteredRows = CustomerData?.docs.filter((row) => {
+        const matchTab =
+            tabSelected === 0 ||
+            (tabSelected === 1 && row.isActive) ||
+            (tabSelected === 2 && !row.isActive);
 
-        if (tabSelected === 1) {
-            filtered = rows.filter((row) => row.status.toLowerCase() === "active");
-        } else if (tabSelected === 2) {
-            filtered = rows.filter((row) => row.status.toLowerCase() === "inactive");
-        }
-
-        if (search.trim() !== "") {
-            filtered = filtered.filter((row) =>
-                row.name.toLowerCase().includes(search.toLowerCase()) ||
-                row.email.toLowerCase().includes(search.toLowerCase()) ||
-                row.phone.includes(search) ||
-                row.address.toLowerCase().includes(search.toLowerCase())
-            );
-        }
-
-        return filtered;
-    }, [tabSelected, search]);
+        const matchSearch =
+            row.firstName.toLowerCase().includes(search.toLowerCase()) ||
+            row.lastName.toLowerCase().includes(search.toLowerCase()) ||
+            row.email.toLowerCase().includes(search.toLowerCase());
+        return matchTab && matchSearch;
+    }) || [];
 
     const handleTabChange = useCallback((_event: React.SyntheticEvent, newValue: number) => {
         setTabSelected(newValue);
@@ -167,71 +130,76 @@ const CustomerTable = () => {
                 </Box>
             </Box>
 
-            {/* Table */}
-            <Box sx={{ height: "85vh", borderRadius: 2, border: "1px solid rgb(222, 222, 222)", marginTop: 2 }}>
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
-                                <TableCell>ID</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Email</TableCell>
-                                <TableCell>Phone</TableCell>
-                                <TableCell>Address</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredRows.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} align="center">
-                                        No customer found.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                filteredRows.map((row) => (
-                                    <TableRow key={row.id}>
-                                        <TableCell>{row.id}</TableCell>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.email}</TableCell>
-                                        <TableCell>{row.phone}</TableCell>
-                                        <TableCell>{row.address}</TableCell>
-                                        <TableCell>
-                                            <Typography
-                                                sx={{
-                                                    color: "black.900",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                <FiberManualRecord
-                                                    sx={{
-                                                        color: row.status.toLowerCase() === "active" ? "green.500" : "gray.200",
-                                                        height: 15,
-                                                        width: 15,
-                                                    }}
-                                                />
-                                                {row.status}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            <IconButton>
-                                                <MoreHoriz />
-                                            </IconButton>
-                                        </TableCell>
+            {!isLoading ? (
+                <>
+                    {/* Table */}
+                    < Box sx={{ height: "85vh", borderRadius: 2, border: "1px solid rgb(222, 222, 222)", marginTop: 2 }}>
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow sx={{ bgcolor: 'rgb(222, 222, 222)' }}>
+                                        <TableCell>ID</TableCell>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Email</TableCell>
+                                        <TableCell>Gender</TableCell>
+                                        <TableCell>DoB</TableCell>
+                                        <TableCell>Status</TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-
-            {/* Pagination */}
-            <Pagination count={10} variant="outlined" shape="rounded" sx={{ marginTop: 2, alignSelf: "flex-end" }} />
-        </Box>
+                                </TableHead>
+                                <TableBody>
+                                    {filteredRows.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={6} align="center">
+                                                No customer found.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        filteredRows.map((row, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{row.firstName} {row.lastName}</TableCell>
+                                                <TableCell>{row.email}</TableCell>
+                                                <TableCell>{row.gender}</TableCell>
+                                                <TableCell>{new Date(row.dob).toDateString()}</TableCell>
+                                                <TableCell>
+                                                    <Typography
+                                                        sx={{
+                                                            color: "black.900",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            gap: 1,
+                                                        }}
+                                                    >
+                                                        <FiberManualRecord
+                                                            sx={{
+                                                                color: row.isActive ? "green.500" : "gray.200",
+                                                                height: 15,
+                                                                width: 15,
+                                                            }}
+                                                        />
+                                                        {row.isActive ? "Active" : "Inactive"}
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box>
+                    {/* Pagination */}
+                    <Pagination
+                        count={CustomerData?.totalPages ?? 0}
+                        variant="outlined"
+                        shape="rounded"
+                        sx={{ marginTop: 2, alignSelf: "flex-end" }}
+                        onChange={onPageChange}
+                    />
+                </>
+            ) : (
+                <CustomerTableSkeleton />
+            )}
+        </Box >
     );
 };
 

@@ -28,3 +28,17 @@ export enum Role {
   Receptionist = 'receptionist',
   ServiceStaff = 'service_staff',
 }
+
+export enum UserSortBy {
+  FirstName = 'firstName',
+  LastName = 'lastName',
+  IsActive = 'isActive',
+  CreatedAt = 'createdAt',
+  UpdatedAt = 'updatedAt',
+}
+
+export enum Gender {
+  Male = 'male',
+  Female = 'female',
+  Other = 'other',
+}

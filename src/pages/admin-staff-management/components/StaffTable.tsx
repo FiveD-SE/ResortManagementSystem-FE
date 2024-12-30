@@ -1,8 +1,13 @@
 import { Add, Apps, EmojiPeople, FiberManualRecord, MoreHoriz, SupportAgent } from "@mui/icons-material";
-import { Box, Button, IconButton, Pagination, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography } from "@mui/material";
+import { Box, Button, IconButton, Pagination, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography, Menu, MenuItem } from "@mui/material";
 import AddNewStaffModal from "./AddNewStaffModal";
 import EditStaffInformation from "./EditStaffInformation";
 import React from "react";
+import { IUserApiResponse } from "../../../types/user";
+import PopupModal from "../../../components/PopupModal";
+import { useGetServiceTypesQuery } from "../../../apis/serviceTypeApi";
+import { useDeleteUserMutation } from "../../../apis/userApi";
+import toast from "react-hot-toast";
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -18,35 +23,84 @@ const tabIconStyle = {
     fontSize: '18px',
 };
 
-interface DataRow {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    status: string;
+interface StaffTableProps {
+    ReceptionistData: IUserApiResponse | undefined;
+    ServiceStaffData: IUserApiResponse | undefined;
+    onChangePage?: (_event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const rows: DataRow[] = [
-    { id: 1, name: 'John Doe', email: 'johndoe@gmail.com', role: 'Receptionist', status: 'Active' },
-    { id: 2, name: 'Jane Doe', email: 'janedoe@gmail.com', role: 'Manager', status: 'Active' },
-    { id: 3, name: 'Alice', email: 'alice@gmail.com', role: 'Receptionist', status: 'Inactive' },
-];
-
-const StaffTable = () => {
+const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffTableProps) => {
     const [openAddStaffModal, setOpenAddStaffModal] = React.useState<boolean>(false);
     const [openEditStaffModal, setOpenEditStaffModal] = React.useState<boolean>(false);
     const [tabSelected, setTabSelected] = React.useState<number>(0);
     const [search, setSearch] = React.useState<string>('');
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [selectedStaffId, setSelectedStaffId] = React.useState<string>('');
+    const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
+    const [totalPage, setTotalPage] = React.useState<number>(0);
+
+    React.useEffect(() => {
+        if (tabSelected === 0) {
+            if ((ReceptionistData?.docs?.length ?? 0) + (ServiceStaffData?.docs?.length ?? 0) > 10) {
+                setTotalPage((ReceptionistData?.totalPages ?? 0) + (ServiceStaffData?.totalPages ?? 0));
+            } else {
+                setTotalPage(1);
+            }
+        } else if (tabSelected === 1) {
+            setTotalPage(ReceptionistData?.totalPages ?? 0);
+        } else {
+            setTotalPage(ServiceStaffData?.totalPages ?? 0);
+        }
+    }, [tabSelected]);
+
+    const [deleteUser, { isLoading }] = useDeleteUserMutation();
+
+    const { data: serviceTypeData } = useGetServiceTypesQuery({ page: 1, limit: 20, sort: 'asc' });
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, id: string) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedStaffId(id);
+    }
+
+    const combinedRows = React.useMemo(() => {
+        const receptionistRows = ReceptionistData?.docs.map((doc) => ({
+            id: doc.id,
+            name: `${doc.firstName} ${doc.lastName}`,
+            email: doc.email,
+            role: 'Receptionist',
+            status: doc.isActive ? 'Active' : 'Inactive',
+        })) || [];
+
+        const serviceStaffRows = ServiceStaffData?.docs.map((doc) => ({
+            id: doc.id,
+            name: `${doc.firstName} ${doc.lastName}`,
+            email: doc.email,
+            role: 'Service Staff',
+            status: doc.isActive ? 'Active' : 'Inactive',
+            serviceTypeId: doc.serviceTypeId,
+        })) || [];
+
+        return [...receptionistRows, ...serviceStaffRows];
+    }, [ReceptionistData, ServiceStaffData]);
 
     const getFilteredRows = React.useCallback(() => {
         const tabFilter = tabSelected === 0
-            ? rows
-            : rows.filter((row) =>
+            ? combinedRows
+            : combinedRows.filter((row) =>
                 tabSelected === 1 ? row.role.toLowerCase() === "receptionist"
-                    : row.role.toLowerCase() === "manager"
+                    : row.role.toLowerCase() === "service staff"
             );
-        return tabFilter.filter((row) => row.name.toLowerCase().includes(search.toLowerCase()));
-    }, [tabSelected, search]);
+
+        return tabFilter.filter((row) =>
+            row.name.toLowerCase().includes(search.toLowerCase()) ||
+            row.email.toLowerCase().includes(search.toLowerCase()) ||
+            row.status.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [combinedRows, tabSelected, search]);
 
     const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
 
@@ -57,6 +111,16 @@ const StaffTable = () => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
     };
+
+    const handleDeleteUser = async () => {
+        try {
+            await deleteUser(selectedStaffId);
+            toast.success('Staff deleted successfully');
+            setOpenDeleteModal(false);
+        } catch (error) {
+            toast.error('Failed to delete staff');
+        }
+    }
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -96,7 +160,7 @@ const StaffTable = () => {
                         disableRipple
                     />
                     <Tab
-                        label="Managers"
+                        label="Service Staff"
                         sx={tabTextStyle}
                         icon={<EmojiPeople sx={tabIconStyle} />}
                         iconPosition="start"
@@ -176,9 +240,9 @@ const StaffTable = () => {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredRows.map((row) => (
-                                    <TableRow key={row.id}>
-                                        <TableCell>{row.id}</TableCell>
+                                filteredRows.map((row, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.name}</TableCell>
                                         <TableCell>{row.email}</TableCell>
                                         <TableCell>{row.role}</TableCell>
@@ -199,29 +263,85 @@ const StaffTable = () => {
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton onClick={() => setOpenEditStaffModal(true)}>
+                                            <IconButton onClick={(event) => handleMenuOpen(event, row.id)}>
                                                 <MoreHoriz />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             )}
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'left',
+                                }}
+                                sx={{
+                                    '& .MuiPaper-root': {
+                                        borderRadius: '8px',
+                                        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                                        padding: '4px',
+                                        minWidth: '100px',
+                                    },
+                                    '& .MuiMenuItem-root': {
+                                        padding: '4px 16px',
+                                        borderRadius: '4px',
+                                        '&:hover': {
+                                            backgroundColor: 'gray.50',
+                                        },
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        color: 'black.300',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={() => {
+                                    setOpenEditStaffModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Edit
+                                </MenuItem>
+                                <MenuItem onClick={() => {
+                                    setOpenDeleteModal(true);
+                                    handleMenuClose();
+                                }}>
+                                    Delete
+                                </MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
 
             <Pagination
-                count={10}
+                count={totalPage}
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: 'flex-end' }}
+                onChange={onChangePage}
             />
 
-            <AddNewStaffModal open={openAddStaffModal} onClose={() => setOpenAddStaffModal(false)} />
-            <EditStaffInformation open={openEditStaffModal} onClose={() => setOpenEditStaffModal(false)} />
+            <AddNewStaffModal open={openAddStaffModal} onClose={() => setOpenAddStaffModal(false)} serviceTypeData={serviceTypeData} />
+            <EditStaffInformation open={openEditStaffModal} onClose={() => setOpenEditStaffModal(false)} serviceTypeData={serviceTypeData} selectedStaffId={selectedStaffId} />
+
+            <PopupModal
+                open={openDeleteModal}
+                onClose={() => setOpenDeleteModal(false)}
+                title="Delete Staff"
+                message="Are you sure you want to delete this staff?"
+                type="delete"
+                onConfirm={handleDeleteUser}
+                isLoading={isLoading}
+            />
         </Box>
     );
 };
+
 
 export default StaffTable;

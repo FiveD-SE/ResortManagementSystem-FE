@@ -3,7 +3,7 @@ import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
 import userSlice from './slices/userSlice';
 import { authApi } from '../apis/authApi';
 import { setupListeners } from '@reduxjs/toolkit/query';
-import { userApi } from '../apis/userApi';
+import { adminUserApi, userApi } from '../apis/userApi';
 import { roomApi } from '../apis/roomApi';
 import { roomTypeApi } from '../apis/roomTypeApi';
 import { bookingApi } from '../apis/bookingApi';
@@ -22,6 +22,7 @@ const store = configureStore({
     [serviceApi.reducerPath]: serviceApi.reducer,
     [serviceTypeApi.reducerPath]: serviceTypeApi.reducer,
     [promotionApi.reducerPath]: promotionApi.reducer,
+    [adminUserApi.reducerPath]: adminUserApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware().concat(
@@ -33,6 +34,7 @@ const store = configureStore({
       serviceApi.middleware,
       serviceTypeApi.middleware,
       promotionApi.middleware,
+      adminUserApi.middleware,
     );
   },
 });
