@@ -41,3 +41,20 @@ export interface IServiceTypeApiResponse {
   pagingCounter: number;
   docs: IServiceType[];
 }
+
+export interface IBookingService {
+  serviceId: {
+    _id: string;
+    serviceName: string;
+    descriptin: string;
+    serviceTypedId: string;
+    price: number;
+    createdAt: Date;
+    updatedAt: Date;
+    __v: number;
+    id: string;
+  };
+  status: string;
+  _id: string;
+  id: string;
+}
