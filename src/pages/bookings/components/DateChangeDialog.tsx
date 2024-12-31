@@ -1,27 +1,68 @@
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import CustomDialog from '../../../components/CustomDialog';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 interface DateChangeDialogProps {
   open: boolean;
   onClose: () => void;
-  checkInDate: dayjs.Dayjs | null;
-  handleCheckInChange: (date: dayjs.Dayjs | null) => void;
-  checkOutDate: dayjs.Dayjs | null;
-  handleCheckOutChange: (date: dayjs.Dayjs | null) => void;
+  selectedCheckInDate: dayjs.Dayjs | null;
+  selectedCheckOutDate: dayjs.Dayjs | null;
 }
 
-const DateChangeDialog = ({
-  open,
-  onClose,
-  checkInDate,
-  handleCheckInChange,
-  checkOutDate,
-  handleCheckOutChange,
-}: DateChangeDialogProps) => {
+const DateChangeDialog = ({ open, onClose, selectedCheckInDate, selectedCheckOutDate }: DateChangeDialogProps) => {
+  const [currentCheckInDate, setCurrentCheckInDate] = useState<dayjs.Dayjs | null>(selectedCheckInDate);
+  const [currentCheckOutDate, setCurrentCheckOutDate] = useState<dayjs.Dayjs | null>(selectedCheckOutDate);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const handleCheckInChange = (date: dayjs.Dayjs | null) => {
+    setCurrentCheckInDate(date);
+  };
+
+  const handleCheckOutChange = (date: dayjs.Dayjs | null) => {
+    setCurrentCheckOutDate(date);
+  };
+
+  const handleDeleteDate = () => {
+    setCurrentCheckInDate(null);
+    setCurrentCheckOutDate(null);
+  };
+
+  const handleSaveDateChange = () => {
+    if (currentCheckInDate && currentCheckOutDate) {
+      const formattedCheckIn = currentCheckInDate.format('YYYY-MM-DD');
+      const formattedCheckOut = currentCheckOutDate.format('YYYY-MM-DD');
+
+      const currentParams = new URLSearchParams(searchParams);
+      currentParams.set('checkin', formattedCheckIn);
+      currentParams.set('checkout', formattedCheckOut);
+      setSearchParams(currentParams, { replace: true });
+    }
+
+    onClose();
+  };
+
   return (
-    <CustomDialog open={open} onClose={onClose}>
+    <CustomDialog
+      open={open}
+      onClose={onClose}
+      actions={
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Button variant="outlined" onClick={handleDeleteDate} sx={{ borderRadius: 2 }}>
+            <Typography sx={{ fontSize: 16, textTransform: 'none', fontWeight: 600 }}>Delete date</Typography>
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveDateChange}
+            sx={{ borderRadius: 2 }}
+            disabled={!currentCheckInDate || !currentCheckOutDate}
+          >
+            <Typography sx={{ fontSize: 16, textTransform: 'none', fontWeight: 600 }}>Save</Typography>
+          </Button>
+        </Box>
+      }
+    >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
           <Typography variant="h4" component="h2" sx={{ color: 'black.500' }}>
@@ -52,7 +93,7 @@ const DateChangeDialog = ({
             </Typography>
             <DatePicker
               label="Check-in"
-              value={checkInDate}
+              value={currentCheckInDate}
               onChange={handleCheckInChange}
               minDate={dayjs()}
               format="DD/MM/YYYY"
@@ -96,9 +137,9 @@ const DateChangeDialog = ({
             </Typography>
             <DatePicker
               label="Checkout"
-              value={checkOutDate}
+              value={currentCheckOutDate}
               onChange={handleCheckOutChange}
-              minDate={checkInDate ? checkInDate.add(1, 'day') : dayjs().add(1, 'day')}
+              minDate={currentCheckInDate ? currentCheckInDate.add(1, 'day') : dayjs().add(1, 'day')}
               format="DD/MM/YYYY"
               slotProps={{
                 field: {

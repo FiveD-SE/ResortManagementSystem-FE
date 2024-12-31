@@ -1,13 +1,26 @@
-import { Avatar, Box, Menu, Typography } from '@mui/material';
+import { AccountBalanceRounded, PaymentsRounded } from '@mui/icons-material';
+import { Box, Menu, MenuItem, Typography } from '@mui/material';
 import { MenuProps } from '@mui/material';
 
 interface PaymentDropdownMenuProps {
   anchorEl: MenuProps['anchorEl'];
   open: boolean;
   onClose: () => void;
+  onSelect: (method: { icon: JSX.Element; text: string }) => void;
 }
 
-const PaymentDropdownMenu = ({ anchorEl, open, onClose }: PaymentDropdownMenuProps) => {
+const PaymentDropdownMenu = ({ anchorEl, open, onClose, onSelect }: PaymentDropdownMenuProps) => {
+  const paymentMethods = [
+    {
+      icon: <PaymentsRounded sx={{ color: 'black.500' }} />,
+      text: 'Pay on arrival',
+    },
+    {
+      icon: <AccountBalanceRounded sx={{ color: 'black.500' }} />,
+      text: 'Pay via Bank Transfer',
+    },
+  ];
+
   const handleClose = () => {
     onClose();
   };
@@ -28,23 +41,29 @@ const PaymentDropdownMenu = ({ anchorEl, open, onClose }: PaymentDropdownMenuPro
       PaperProps={{ sx: { width: '40%', borderRadius: '0.75rem' } }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            py: 1,
-            px: 2,
-            cursor: 'pointer',
-            ':hover': { backgroundColor: 'gray.50' },
-            transition: 'background-color 0.2s',
-          }}
-        >
-          <Avatar src="/src/assets/icons/payos.svg" sx={{ width: 32, height: 32, backgroundColor: 'black.100' }} />
-          <Typography variant="body2" sx={{ flex: 1, color: 'black.500', fontWeight: '500' }}>
-            PayOS
-          </Typography>
-        </Box>
+        {paymentMethods.map((method) => (
+          <MenuItem
+            key={method.text}
+            onClick={() => {
+              onSelect(method);
+            }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              py: 1,
+              px: 2,
+              cursor: 'pointer',
+              ':hover': { backgroundColor: 'gray.50' },
+              transition: 'background-color 0.2s',
+            }}
+          >
+            {method.icon}
+            <Typography variant="body2" sx={{ flex: 1, color: 'black.500', fontWeight: '500' }}>
+              {method.text}
+            </Typography>
+          </MenuItem>
+        ))}
       </Box>
     </Menu>
   );

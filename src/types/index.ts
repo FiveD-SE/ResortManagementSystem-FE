@@ -1,6 +1,5 @@
 export * from './administrator';
 export * from './auth';
-export * from './booking';
 export * from './customer';
 export * from './enums';
 export * from './invoice';

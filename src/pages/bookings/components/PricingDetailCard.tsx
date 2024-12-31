@@ -1,28 +1,53 @@
 import { StarRounded } from '@mui/icons-material';
 import { Avatar, Box, Divider, Typography } from '@mui/material';
+import dayjs, { Dayjs } from 'dayjs';
+import { IRoomDetailApiResponse, IService } from '../../../types';
 
-const PricingDetailCard = () => {
+interface PricingDetailCardProps {
+  roomDetail: IRoomDetailApiResponse | null;
+  checkInDate: Dayjs | null;
+  checkOutDate: Dayjs | null;
+  discount: number;
+  services: IService[];
+}
+
+const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, services }: PricingDetailCardProps) => {
+  const averageRating = roomDetail?.ratings
+    ? roomDetail.ratings.reduce((acc, rating) => acc + rating.average, 0) / (roomDetail.ratings.length || 1)
+    : 0;
+
+  const nights = checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 0;
+
+  const roomPrice = roomDetail ? roomDetail.roomType.basePrice * nights : 0;
+  const serviceFee = services.reduce((acc, service) => acc + service.price, 0);
+  const discountAmount = roomPrice * (discount / 100);
+  const totalPrice = roomPrice - discountAmount + serviceFee;
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 3, borderRadius: 2 }}>
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <Avatar variant="rounded" sx={{ width: 128, height: 128, backgroundColor: 'gray.300' }} />
+        <Avatar
+          variant="rounded"
+          sx={{ width: 128, height: 128, backgroundColor: 'gray.300' }}
+          src={roomDetail?.room.images[0]}
+        />
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 2 }}>
           <Box>
             <Typography variant="body2" sx={{ color: 'black.300' }}>
-              Entire cabin
+              {roomDetail?.roomType.typeName}
             </Typography>
             <Typography variant="body1" sx={{ color: 'black.500' }}>
-              Glacier Pines Cabin (New Hot Tub Installed!)
+              {roomDetail?.room.roomNumber}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <StarRounded sx={{ fontSize: 14 }} />
               <Typography variant="body1" sx={{ color: 'black.500' }}>
-                4.98
+                {averageRating}
               </Typography>
               <Typography variant="body1" sx={{ color: 'black.300' }}>
-                (56 reviews)
+                ({roomDetail?.ratings.length} reviews)
               </Typography>
             </Box>
           </Box>
@@ -34,10 +59,10 @@ const PricingDetailCard = () => {
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            500 x 5 nights
+            {roomDetail?.roomType.basePrice} x {nights} nights
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            $2,500
+            ${roomPrice}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -45,7 +70,7 @@ const PricingDetailCard = () => {
             Discount
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            -$300
+            -${discountAmount}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -53,7 +78,7 @@ const PricingDetailCard = () => {
             Service fee
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            $0
+            ${serviceFee}
           </Typography>
         </Box>
         <Divider orientation="horizontal" flexItem sx={{ my: 1 }} />
@@ -62,7 +87,7 @@ const PricingDetailCard = () => {
             Total
           </Typography>
           <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
-            $0
+            ${totalPrice.toFixed(2)}
           </Typography>
         </Box>
       </Box>

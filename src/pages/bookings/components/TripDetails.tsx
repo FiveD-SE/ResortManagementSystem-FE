@@ -1,34 +1,23 @@
 import { Box, Grid, Link, Typography } from '@mui/material';
-import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 import DateChangeDialog from './DateChangeDialog';
 import GuestChangeDialog from './GuestChangeDialog';
+import { formatDateRange } from '../../../utils';
+import { Dayjs } from 'dayjs';
 
 interface TripDetailsProps {
-  guests: { adults: number; children: number };
-  handleGuestChange: (type: keyof { adults: number; children: number }, delta: number) => void;
-  totalGuests: number;
+  guests: {
+    adults: number;
+    children: number;
+  };
+  checkInDate: Dayjs | null;
+  checkOutDate: Dayjs | null;
   guestAmount: number;
 }
 
-const TripDetails = ({ guests, handleGuestChange, totalGuests, guestAmount }: TripDetailsProps) => {
+const TripDetails = ({ guests, checkInDate, checkOutDate, guestAmount }: TripDetailsProps) => {
   const [openDateChangeDialog, setOpenDateChangeDialog] = useState(false);
   const [openGuestChangeDialog, setOpenGuestChangeDialog] = useState(false);
-  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(dayjs());
-  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs().add(5, 'day'));
-  const handleCheckInChange = (date: Dayjs | null) => {
-    setCheckInDate(date);
-    if (checkOutDate && date && date.isAfter(checkOutDate.subtract(1, 'day'))) {
-      setCheckOutDate(date.add(1, 'day'));
-    }
-  };
-
-  const handleCheckOutChange = (date: Dayjs | null) => {
-    setCheckOutDate(date);
-    if (checkInDate && date && date.isBefore(checkInDate.add(1, 'day'))) {
-      setCheckInDate(date.subtract(1, 'day'));
-    }
-  };
 
   const handleOpenDateChangeDialog = () => {
     setOpenDateChangeDialog(true);
@@ -46,6 +35,8 @@ const TripDetails = ({ guests, handleGuestChange, totalGuests, guestAmount }: Tr
     setOpenGuestChangeDialog(false);
   };
 
+  const totalGuests = guests.adults + guests.children;
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', pb: 2 }}>
       <Box sx={{ width: '100%', mb: 3 }}>
@@ -60,7 +51,10 @@ const TripDetails = ({ guests, handleGuestChange, totalGuests, guestAmount }: Tr
               Dates
             </Typography>
             <Typography variant="body2" component="p" sx={{ color: 'black.300' }}>
-              Nov 16 - 20
+              {formatDateRange(
+                checkInDate ? checkInDate.format('YYYY-MM-DD') : '',
+                checkOutDate ? checkOutDate.format('YYYY-MM-DD') : '',
+              )}
             </Typography>
           </Box>
         </Grid>
@@ -77,10 +71,8 @@ const TripDetails = ({ guests, handleGuestChange, totalGuests, guestAmount }: Tr
         <DateChangeDialog
           open={openDateChangeDialog}
           onClose={handleCloseDateChangeDialog}
-          checkInDate={checkInDate}
-          checkOutDate={checkOutDate}
-          handleCheckInChange={handleCheckInChange}
-          handleCheckOutChange={handleCheckOutChange}
+          selectedCheckInDate={checkInDate}
+          selectedCheckOutDate={checkOutDate}
         />
       </Grid>
       <Grid container sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -90,7 +82,8 @@ const TripDetails = ({ guests, handleGuestChange, totalGuests, guestAmount }: Tr
               Guests
             </Typography>
             <Typography variant="body2" sx={{ color: 'black.300' }}>
-              2 guests
+              {totalGuests} {totalGuests > 1 ? 'guests' : 'guest'} ({guests.adults} {guests.adults > 1 ? 'adults' : 'adult'},{' '}
+              {guests.children} {guests.children > 1 ? 'children' : 'child'})
             </Typography>
           </Box>
         </Grid>
@@ -108,9 +101,7 @@ const TripDetails = ({ guests, handleGuestChange, totalGuests, guestAmount }: Tr
           open={openGuestChangeDialog}
           onClose={handleCloseGuestChangeDialog}
           guests={guests}
-          handleGuestChange={handleGuestChange}
-          totalGuests={totalGuests}
-          guestAmount={guestAmount}
+          guestAmount={guestAmount || 0}
         />
       </Grid>
     </Box>

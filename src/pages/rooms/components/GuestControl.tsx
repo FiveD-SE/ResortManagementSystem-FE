@@ -27,22 +27,22 @@ const GuestControl: React.FC<GuestControlProps> = ({
         {description}
       </Typography>
     </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, justifyContent: 'flex-end' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'flex-end' }}>
       <IconButton
         disabled={value <= (label === 'Adults' ? 1 : 0)}
         size="small"
-        sx={{ border: 1, borderColor: 'black.100' }}
+        sx={{ border: 1, borderColor: 'black.100', opacity: value <= (label === 'Adults' ? 1 : 0) ? 0.2 : 1 }}
         onClick={onDecrement}
       >
         <RemoveRounded sx={{ color: 'black.500' }} />
       </IconButton>
-      <Typography variant="body1" sx={{ fontWeight: 600, color: 'black.500' }}>
+      <Typography variant="body1" sx={{ fontWeight: 600, color: 'black.500', px: 4 }}>
         {value}
       </Typography>
       <IconButton
         disabled={disabledIncrement}
         size="small"
-        sx={{ border: 1, borderColor: 'black.100' }}
+        sx={{ border: 1, borderColor: 'black.100', opacity: disabledIncrement ? 0.2 : 1 }}
         onClick={onIncrement}
       >
         <AddRounded sx={{ color: 'black.500' }} />

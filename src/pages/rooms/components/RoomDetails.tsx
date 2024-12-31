@@ -9,9 +9,10 @@ import { IRoomType } from '../../../types';
 interface IRoomDetailsProps {
   ratings: IRating[];
   roomType: IRoomType;
+  roomId: string;
 }
 
-const RoomDetails = ({ ratings, roomType }: IRoomDetailsProps) => {
+const RoomDetails = ({ ratings, roomType, roomId }: IRoomDetailsProps) => {
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
       <Grid item xs={8}>
@@ -20,7 +21,7 @@ const RoomDetails = ({ ratings, roomType }: IRoomDetailsProps) => {
         <Amenities amenities={roomType.amenities} />
       </Grid>
       <Grid item xs={4}>
-        <ReservationCard roomType={roomType} />
+        <ReservationCard roomType={roomType} roomId={roomId} />
       </Grid>
     </Grid>
   );

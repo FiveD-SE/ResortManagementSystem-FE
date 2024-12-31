@@ -33,5 +33,5 @@ export const ROUTES = {
   },
   ROOMS: '/rooms/:id/detail',
   THIRD_PARTY: '/third-party',
-  BOOKINGS: '/bookings',
+  BOOKINGS: '/bookings/:roomId',
 };

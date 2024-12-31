@@ -93,6 +93,7 @@ const Rooms = () => {
     <Container>
       <PhotoGallery images={roomDetail?.room.images || []} />
       <RoomDetails
+        roomId={id || ''}
         ratings={roomDetail?.ratings || []}
         roomType={
           roomDetail?.roomType ?? {

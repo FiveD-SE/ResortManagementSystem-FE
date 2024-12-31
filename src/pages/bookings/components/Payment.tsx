@@ -1,4 +1,4 @@
-import { Avatar, Box, IconButton, Paper, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Typography } from '@mui/material';
 import PaymentDropdownMenu from './PaymentDropdownMenu';
 import { useState } from 'react';
 import { ExpandMoreRounded } from '@mui/icons-material';
@@ -7,19 +7,33 @@ interface HandleClickEvent {
   currentTarget: EventTarget & HTMLDivElement;
 }
 
-const Payment = () => {
-  const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
+interface PaymentProps {
+  selectedPaymentMethod: {
+    icon: JSX.Element;
+    text: string;
+  };
+  handlePaymentMethodSelect: (method: { icon: JSX.Element; text: string }) => void;
+}
+
+const Payment = ({ selectedPaymentMethod, handlePaymentMethodSelect }: PaymentProps) => {
+  const [isPaymentMenuOpen, setIsPaymentMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const handleClick = (event: HandleClickEvent) => {
-    setIsGuestMenuOpen(true);
+    setIsPaymentMenuOpen(true);
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
-    setIsGuestMenuOpen(false);
+    setIsPaymentMenuOpen(false);
     setAnchorEl(null);
   };
+
+  const onPaymentMethodSelect = (method: { icon: JSX.Element; text: string }) => {
+    handlePaymentMethodSelect(method);
+    handleClose();
+  };
+
   return (
     <Box
       sx={{
@@ -54,15 +68,25 @@ const Payment = () => {
         }}
         onClick={handleClick}
       >
-        <Avatar src="/src/assets/icons/payos.svg" sx={{ width: 32, height: 32, backgroundColor: 'black.100' }} />
+        {selectedPaymentMethod.icon}
         <Typography variant="body2" sx={{ flex: 1, color: 'black.500', fontWeight: 500 }}>
-          PayOS
+          {selectedPaymentMethod.text}
         </Typography>
         <IconButton size="small">
-          <ExpandMoreRounded />
+          <ExpandMoreRounded
+            sx={{
+              transition: 'transform 0.2s ease-in-out',
+              transform: isPaymentMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
         </IconButton>
       </Paper>
-      <PaymentDropdownMenu anchorEl={anchorEl} open={isGuestMenuOpen} onClose={handleClose} />
+      <PaymentDropdownMenu
+        anchorEl={anchorEl}
+        open={isPaymentMenuOpen}
+        onClose={handleClose}
+        onSelect={onPaymentMethodSelect}
+      />
     </Box>
   );
 };

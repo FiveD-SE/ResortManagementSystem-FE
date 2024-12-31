@@ -5,6 +5,8 @@ import GuestDropdownMenu from './GuestDropdownMenu';
 import { IRoomType } from '../../../types';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../../constants/routes';
 
 interface HandleClickEvent {
   currentTarget: EventTarget & HTMLDivElement;
@@ -12,9 +14,10 @@ interface HandleClickEvent {
 
 interface ReservationCardProps {
   roomType: IRoomType;
+  roomId: string;
 }
 
-const ReservationCard = ({ roomType }: ReservationCardProps) => {
+const ReservationCard = ({ roomType, roomId }: ReservationCardProps) => {
   const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [checkInDate, setCheckInDate] = useState<Dayjs | null>(dayjs());
@@ -57,6 +60,9 @@ const ReservationCard = ({ roomType }: ReservationCardProps) => {
   const numNights = checkInDate && checkOutDate ? checkOutDate.diff(checkInDate, 'day') : 0;
 
   const totalPrice = numNights > 0 ? roomType.basePrice * numNights - roomType.basePrice * numNights * 0.05 : 0;
+
+  const formattedCheckInDate = checkInDate ? checkInDate.format('YYYY-MM-DD') : '';
+  const formattedCheckOutDate = checkOutDate ? checkOutDate.format('YYYY-MM-DD') : '';
 
   return (
     <Box
@@ -212,7 +218,12 @@ const ReservationCard = ({ roomType }: ReservationCardProps) => {
               </Typography>
             </Box>
             <IconButton>
-              <ExpandMoreRounded />
+              <ExpandMoreRounded
+                sx={{
+                  transition: 'transform 0.2s ease-in-out',
+                  transform: isGuestMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              />
             </IconButton>
           </Grid>
           <GuestDropdownMenu
@@ -223,17 +234,22 @@ const ReservationCard = ({ roomType }: ReservationCardProps) => {
             onGuestChange={handleGuestSelectionChange}
           />
         </Grid>
-        <Button
-          variant="contained"
-          sx={{
-            width: '100%',
-            py: 2,
-            backgroundColor: 'primary.500',
-            borderRadius: 3,
-          }}
+        <Link
+          to={`${ROUTES.BOOKINGS.replace(':roomId', roomId)}?checkin=${formattedCheckInDate}&checkout=${formattedCheckOutDate}&adults=${selectedGuests.adults}&children=${selectedGuests.children}`}
+          style={{ textDecoration: 'none' }}
         >
-          <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>Reserve</Typography>
-        </Button>
+          <Button
+            variant="contained"
+            sx={{
+              width: '100%',
+              py: 2,
+              backgroundColor: 'primary.500',
+              borderRadius: 3,
+            }}
+          >
+            <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>Reserve</Typography>
+          </Button>
+        </Link>
         <Typography variant="body2" sx={{ textAlign: 'center', color: 'black.400' }}>
           You won't be charged yet
         </Typography>
