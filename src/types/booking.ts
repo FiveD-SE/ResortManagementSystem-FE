@@ -1,78 +1,16 @@
-export interface IRoom {
-  _id: string;
-  roomNumber: string;
-  roomTypeId: {
-    _id: string;
-    typeName: string;
-    id: string;
-  };
-  status: string;
-  pricePerNight: number;
-  images: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-  averageRating: number;
-  ratings: string[];
-  id: string;
-}
-
-export interface ICustomer {
-  _id: string;
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  avatar: string | null;
-  gender: 'male' | 'female';
-  isVerified: boolean;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-  id: string;
-}
-
-export interface IService {
-  serviceId: {
-    _id: string;
-    serviceName: string;
-    descriptin: string;
-    serviceTypedId: string;
-    price: number;
-    createdAt: Date;
-    updatedAt: Date;
-    __v: number;
-    id: string;
-  };
-  status: string;
-  _id: string;
-  id: string;
-}
-
-export interface IPromotion {
-  _id: string;
-  promotionName: string;
-  description: string;
-  discount: number;
-  startDate: Date;
-  endDate: Date;
-  amount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-  id: string;
-}
+import { ICustomer } from './customer';
+import { IPromotion } from './promotion';
+import { IBookingRoom } from './room';
+import { IBookingService } from './service';
 
 export interface IBooking {
   _id: string;
-  roomId: IRoom;
+  roomId: IBookingRoom;
   customerId: ICustomer;
   checkinDate: Date;
   checkoutDate: Date;
   status: string;
-  services: IService[];
+  services: IBookingService[];
   promotionId: IPromotion;
   totalAmount: number;
   createdAt: Date;
