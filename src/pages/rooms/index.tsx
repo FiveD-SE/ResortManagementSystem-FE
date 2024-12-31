@@ -14,10 +14,11 @@ import {
   MapOutlined,
   VpnKeyOutlined,
 } from '@mui/icons-material';
+import RoomDetailSkeleton from './components/RoomDetailSkeleton';
 
 const Rooms = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: roomDetail } = useGetRoomDetailByIdQuery(id ?? '', {
+  const { data: roomDetail, isLoading } = useGetRoomDetailByIdQuery(id ?? '', {
     skip: !id,
   });
 
@@ -90,59 +91,65 @@ const Rooms = () => {
   ];
 
   return (
-    <Container>
-      <PhotoGallery images={roomDetail?.room.images || []} />
-      <RoomDetails
-        roomId={id || ''}
-        ratings={roomDetail?.ratings || []}
-        roomType={
-          roomDetail?.roomType ?? {
-            id: '',
-            typeName: '',
-            description: '',
-            basePrice: 0,
-            guestAmount: 0,
-            bedAmount: 0,
-            bedroomAmount: 0,
-            sharedBathAmount: 0,
-            amenities: [],
-            keyFeatures: [],
-          }
-        }
-      />
-      <Ratings
-        detailedRatings={detailedRatings}
-        averageScores={
-          roomDetail?.averageScores ?? {
-            cleanliness: 0,
-            accuracy: 0,
-            checkIn: 0,
-            communication: 0,
-            location: 0,
-            value: 0,
-          }
-        }
-        ratingCounts={
-          roomDetail?.ratingCounts ?? {
-            oneStar: 0,
-            twoStars: 0,
-            threeStars: 0,
-            fourStars: 0,
-            fiveStars: 0,
-          }
-        }
-        averageRating={averageRating}
-        ratingCount={roomDetail?.ratingCount || 0}
-      />
-      <GuestReviews
-        detailedRatings={detailedRatings}
-        averageRating={averageRating}
-        totalReviews={totalReviews}
-        overallRatings={overallRatings}
-        ratings={roomDetail?.ratings || []}
-      />
-      <ThingsToKnow />
-    </Container>
+    <>
+      {isLoading ? (
+        <RoomDetailSkeleton />
+      ) : (
+        <Container>
+          <PhotoGallery images={roomDetail?.room.images || []} />
+          <RoomDetails
+            roomId={id || ''}
+            ratings={roomDetail?.ratings || []}
+            roomType={
+              roomDetail?.roomType ?? {
+                id: '',
+                typeName: '',
+                description: '',
+                basePrice: 0,
+                guestAmount: 0,
+                bedAmount: 0,
+                bedroomAmount: 0,
+                sharedBathAmount: 0,
+                amenities: [],
+                keyFeatures: [],
+              }
+            }
+          />
+          <Ratings
+            detailedRatings={detailedRatings}
+            averageScores={
+              roomDetail?.averageScores ?? {
+                cleanliness: 0,
+                accuracy: 0,
+                checkIn: 0,
+                communication: 0,
+                location: 0,
+                value: 0,
+              }
+            }
+            ratingCounts={
+              roomDetail?.ratingCounts ?? {
+                oneStar: 0,
+                twoStars: 0,
+                threeStars: 0,
+                fourStars: 0,
+                fiveStars: 0,
+              }
+            }
+            averageRating={averageRating}
+            ratingCount={roomDetail?.ratingCount || 0}
+          />
+          <GuestReviews
+            detailedRatings={detailedRatings}
+            averageRating={averageRating}
+            totalReviews={totalReviews}
+            overallRatings={overallRatings}
+            ratings={roomDetail?.ratings || []}
+          />
+          <ThingsToKnow />
+        </Container>
+      )}
+    </>
   );
 };
 

@@ -1,38 +1,56 @@
 import { Box, Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { IServiceRevenue } from '../../../types/statistic';
 
-const RevenueByServiceType = () => {
-    const data = [
-        { year: '2022', laundry: 10, sauna: 7, hotSpring: 15 },
-        { year: '2023', laundry: 12, sauna: 6, hotSpring: 20 },
-        { year: '2024', laundry: 9, sauna: 8, hotSpring: 18 },
-    ];
+interface IRevenueByServiceTypeProps {
+    serviceRevenue: IServiceRevenue[] | undefined;
+}
+
+const RevenueByServiceType = ({ serviceRevenue }: IRevenueByServiceTypeProps) => {
+    const data = serviceRevenue?.map((item) => {
+        const { year, services } = item;
+        return {
+            year,
+            ...services,
+        };
+    });
+
+    const filteredData = data?.slice(-4);
+
+    const formatRevenue = (value: number) => {
+        if (value >= 1000000) {
+            return `${(value / 1000000).toFixed(1)}M$`;
+        } else if (value >= 1000) {
+            return `${(value / 1000).toFixed(1)}k$`;
+        }
+        return `${value}$`;
+    };
 
     return (
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: '100%', justifyContent: 'center' }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
             {/* Title */}
-            <Typography variant="h4" sx={{ mb: 4, textAlign: "left" }}>
+            <Typography variant="h4" sx={{ mb: 4, textAlign: 'left' }}>
                 Revenue by service type
             </Typography>
 
             {/* Content */}
-            <Box sx={{ flexGrow: 1, width: "100%", height: 400 }}>
+            <Box sx={{ flexGrow: 1, width: '100%', height: 400 }}>
                 <ResponsiveContainer width="100%">
-                    <BarChart
-                        data={data}
-                    >
+                    <BarChart data={filteredData}>
                         <XAxis
                             dataKey="year"
                             tick={{ dy: 8, fill: '#000000' }}
                             fontSize={16}
                             fontWeight={600}
                             tickLine={{ stroke: '#000000', strokeWidth: 1 }}
+                            domain={['dataMin', 'dataMax']}
                         />
                         <YAxis
                             tick={{ dx: -8, fill: '#000000' }}
                             fontSize={16}
                             fontWeight={600}
                             tickLine={{ stroke: '#000000', strokeWidth: 1 }}
+                            tickFormatter={(value) => formatRevenue(value)}
                         />
                         <Tooltip
                             contentStyle={{
@@ -59,8 +77,17 @@ const RevenueByServiceType = () => {
                                 return (
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, ml: 2 }}>
                                         {payload.map((entry: any, index: number) => (
-                                            <Box key={`item-${index}`} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Box sx={{ width: 16, height: 16, backgroundColor: entry.color }} />
+                                            <Box
+                                                key={`item-${index}`}
+                                                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: 16,
+                                                        height: 16,
+                                                        backgroundColor: entry.color,
+                                                    }}
+                                                />
                                                 <Typography variant="body1">{entry.value}</Typography>
                                             </Box>
                                         ))}
@@ -68,21 +95,15 @@ const RevenueByServiceType = () => {
                                 );
                             }}
                         />
-                        <Bar
-                            dataKey="laundry"
-                            fill={'#F6D7DF'}
-                            name={"Laundry"}
-                        />
-                        <Bar
-                            dataKey="sauna"
-                            fill={'#222222'}
-                            name={"Sauna"}
-                        />
-                        <Bar
-                            dataKey="hotSpring"
-                            fill={'#F6475F'}
-                            name={"Hot Spring"}
-                        />
+                        {data &&
+                            Object.keys(data[0]).slice(1, 4).map((key, index) => (
+                                <Bar
+                                    key={`bar-${key}-${filteredData?.[0]?.year}-${index}`}
+                                    dataKey={key}
+                                    fill={index === 0 ? '#F6D7DF' : index === 1 ? '#222222' : '#F6475F'}
+                                    name={key}
+                                />
+                            ))}
                     </BarChart>
                 </ResponsiveContainer>
             </Box>
