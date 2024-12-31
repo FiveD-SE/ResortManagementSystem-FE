@@ -1,5 +1,5 @@
-import { ArrowDropDown, CalendarMonth, MoreHoriz, MeetingRoom } from '@mui/icons-material'
-import { Box, Button, Tab, Tabs, TextField, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Pagination, IconButton, FormControl, Select, MenuItem, InputAdornment, Popover } from '@mui/material'
+import { ArrowDropDown, CalendarMonth, MeetingRoom } from '@mui/icons-material'
+import { Box, Button, Tab, Tabs, TextField, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Pagination, FormControl, Select, MenuItem, InputAdornment, Popover } from '@mui/material'
 import { Apps, PaidRounded, PendingActionsRounded } from '@mui/icons-material'
 import BookingInformationModal from './BookingInformationModal';
 import React from 'react';
@@ -9,6 +9,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 import { SelectChangeEvent } from '@mui/material';
 import { DateRange } from 'react-date-range';
+import { IBooking, IBookingApiResponse } from '../../../types';
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -38,26 +39,14 @@ const getButtonStyles = (isActive: boolean) => ({
     },
 });
 
-interface DataRow {
-    id: number;
-    roomType: string;
-    roomNumber: number;
-    customerId: number;
-    checkInDate: string;
-    checkOutDate: string;
-    totalAmount: number;
-    status: string;
+interface BookingTableProps {
+    pendingBookingData: IBookingApiResponse | undefined;
+    checkedInBookingData: IBookingApiResponse | undefined;
+    checkedOutBookingData: IBookingApiResponse | undefined;
+    onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const rows: DataRow[] = [
-    { id: 1, roomType: 'Single', roomNumber: 101, customerId: 1, checkInDate: '2024/12/10', checkOutDate: '2024/12/30', totalAmount: 100, status: 'Pending' },
-    { id: 2, roomType: 'Double', roomNumber: 102, customerId: 2, checkInDate: '2024/11/10', checkOutDate: '2024/11/15', totalAmount: 200, status: 'Pending' },
-    { id: 3, roomType: 'Single', roomNumber: 103, customerId: 3, checkInDate: '2024/12/10', checkOutDate: '2024/12/30', totalAmount: 300, status: 'Paid' },
-    { id: 4, roomType: 'Double', roomNumber: 104, customerId: 4, checkInDate: '2024/10/10', checkOutDate: '2024/10/25', totalAmount: 400, status: 'Paid' },
-    { id: 5, roomType: 'Single', roomNumber: 105, customerId: 5, checkInDate: '2024/09/10', checkOutDate: '2024/09/15', totalAmount: 500, status: 'Pending' },
-];
-
-const BookingTable = () => {
+const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBookingData, onPageChange }: BookingTableProps) => {
     const [bookingDate, setBookingDate] = React.useState('monthly');
     const [open, setOpen] = React.useState(false);
     const [openCalendar, setOpenCalendar] = React.useState(false);
@@ -67,14 +56,71 @@ const BookingTable = () => {
     const [selectedSearch, setSelectedSearch] = React.useState('Room Type');
     const [tabSelected, setTabSelected] = React.useState(0);
     const [search, setSearch] = React.useState('');
+    const [selectedBooking, setSelectedBooking] = React.useState<IBooking>();
+    const [count, setCount] = React.useState(0);
+
+    const handleSelectBooking = (id: string, status: string) => {
+        if (status === 'Pending') {
+            setSelectedBooking(pendingBookingData?.docs.find((booking) => booking.id === id));
+        }
+        if (status === 'Checked in') {
+            setSelectedBooking(checkedInBookingData?.docs.find((booking) => booking.id === id));
+        }
+        if (status === 'Checked out') {
+            setSelectedBooking(checkedOutBookingData?.docs.find((booking) => booking.id === id));
+        }
+    }
+
+    const allBookings = React.useMemo(() => {
+        const pendingBookings = pendingBookingData?.docs.map((booking) => ({
+            id: booking.id,
+            roomType: booking.roomId.roomTypeId.typeName,
+            roomNumber: booking.roomId.roomNumber,
+            customerId: booking.customerId.id,
+            checkInDate: dayjs(booking.checkinDate).format('YYYY/MM/DD'),
+            checkOutDate: dayjs(booking.checkoutDate).format('YYYY/MM/DD'),
+            totalAmount: booking.totalAmount,
+            status: booking.status,
+        }));
+
+        const checkedInBookings = checkedInBookingData?.docs.map((booking) => ({
+            id: booking.id,
+            roomType: booking.roomId.roomTypeId.typeName,
+            roomNumber: booking.roomId.roomNumber,
+            customerId: booking.customerId.id,
+            checkInDate: dayjs(booking.checkinDate).format('YYYY/MM/DD'),
+            checkOutDate: dayjs(booking.checkoutDate).format('YYYY/MM/DD'),
+            totalAmount: booking.totalAmount,
+            status: booking.status,
+        }));
+
+        const checkedOutBookings = checkedOutBookingData?.docs.map((booking) => ({
+            id: booking.id,
+            roomType: booking.roomId.roomTypeId.typeName,
+            roomNumber: booking.roomId.roomNumber,
+            customerId: booking.customerId.id,
+            checkInDate: dayjs(booking.checkinDate).format('YYYY/MM/DD'),
+            checkOutDate: dayjs(booking.checkoutDate).format('YYYY/MM/DD'),
+            totalAmount: booking.totalAmount,
+            status: booking.status,
+        }));
+
+        return [
+            ...(pendingBookings || []),
+            ...(checkedInBookings || []),
+            ...(checkedOutBookings || []),
+        ];
+    }, [pendingBookingData, checkedInBookingData, checkedOutBookingData]);
 
     const getFilteredRows = React.useCallback(() => {
         const tabFilter = tabSelected === 0
-            ? rows
-            : tabSelected === 1
-                ? rows.filter((row) => row.status === 'Pending')
-                : rows.filter((row) => row.status === 'Paid');
-
+            ? allBookings
+            : allBookings.filter((booking) =>
+                tabSelected === 1
+                    ? booking.status.toLowerCase() === 'pending'
+                    : tabSelected === 2
+                        ? booking.status.toLowerCase() === 'checked in'
+                        : booking.status.toLowerCase() === 'checked out');
         const dateFilter = tabFilter.filter((row) => {
             const checkInDate = dayjs(row.checkInDate);
             const checkOutDate = dayjs(row.checkOutDate);
@@ -146,6 +192,22 @@ const BookingTable = () => {
         setOpenCalendar(false);
     };
 
+    React.useEffect(() => {
+        const filteredRows = getFilteredRows();
+
+        const totalItems = filteredRows.length;
+        const itemsPerPage = 10;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        if (count > totalPages) {
+            setCount(totalPages);
+        }
+
+        if (totalPages === 0) {
+            setCount(1);
+        }
+    }, [tabSelected, search, bookingDate, selectedDateRange, selectedMonth, selectedSearch, getFilteredRows]);
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', paddingX: 2, gap: 2 }}>
@@ -214,7 +276,14 @@ const BookingTable = () => {
                         disableRipple
                     />
                     <Tab
-                        label="Paid"
+                        label="Checked In"
+                        sx={tabTextStyle}
+                        icon={<PaidRounded sx={tabIconStyle} />}
+                        iconPosition='start'
+                        disableRipple
+                    />
+                    <Tab
+                        label="Checked Out"
                         sx={tabTextStyle}
                         icon={<PaidRounded sx={tabIconStyle} />}
                         iconPosition='start'
@@ -312,20 +381,19 @@ const BookingTable = () => {
                                 <TableCell>Check Out Date</TableCell>
                                 <TableCell>Total Amount</TableCell>
                                 <TableCell>Status</TableCell>
-                                <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredRows.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center">
+                                    <TableCell colSpan={8} align="center">
                                         No booking found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 filteredRows.map((row, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{row.id}</TableCell>
+                                    <TableRow key={index} sx={{ cursor: 'pointer', ":hover": { bgcolor: 'gray.50' } }} onClick={() => { setOpen(true); handleSelectBooking(row.id, row.status) }}>
+                                        <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.roomType}</TableCell>
                                         <TableCell>{row.roomNumber}</TableCell>
                                         <TableCell>{row.customerId}</TableCell>
@@ -333,11 +401,6 @@ const BookingTable = () => {
                                         <TableCell>{row.checkOutDate}</TableCell>
                                         <TableCell>{row.totalAmount}</TableCell>
                                         <TableCell>{row.status}</TableCell>
-                                        <TableCell>
-                                            <IconButton onClick={() => setOpen(true)}>
-                                                <MoreHoriz />
-                                            </IconButton>
-                                        </TableCell>
                                     </TableRow>
                                 ))
                             )}
@@ -347,13 +410,15 @@ const BookingTable = () => {
             </Box>
 
             <Pagination
-                count={10}
+                count={Math.ceil(filteredRows.length / 10) || 1}
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: 'flex-end' }}
+                page={count}
+                onChange={(event, value) => onPageChange(event, value)}
             />
 
-            <BookingInformationModal open={open} onClose={() => setOpen(false)} />
+            <BookingInformationModal open={open} onClose={() => setOpen(false)} selectedBooking={selectedBooking} />
 
             {/* Calendar Popover */}
             <Popover

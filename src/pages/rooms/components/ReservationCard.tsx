@@ -1,15 +1,32 @@
-import { ExpandMoreRounded, StarRounded } from '@mui/icons-material';
+import { ExpandMoreRounded } from '@mui/icons-material';
 import { Box, Button, Divider, Grid, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
 import GuestDropdownMenu from './GuestDropdownMenu';
+import { IRoomType } from '../../../types';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface HandleClickEvent {
   currentTarget: EventTarget & HTMLDivElement;
 }
 
-const ReservationCard = () => {
+interface ReservationCardProps {
+  roomType: IRoomType;
+}
+
+const ReservationCard = ({ roomType }: ReservationCardProps) => {
   const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(dayjs());
+  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs().add(5, 'day'));
+  const [selectedGuests, setSelectedGuests] = useState<{ adults: number; children: number }>({
+    adults: 1,
+    children: 0,
+  });
+
+  const handleGuestSelectionChange = (newGuests: { adults: number; children: number }) => {
+    setSelectedGuests(newGuests);
+  };
 
   const handleClick = (event: HandleClickEvent) => {
     setIsGuestMenuOpen(true);
@@ -20,6 +37,26 @@ const ReservationCard = () => {
     setIsGuestMenuOpen(false);
     setAnchorEl(null);
   };
+
+  const handleCheckInChange = (date: Dayjs | null) => {
+    setCheckInDate(date);
+    if (checkOutDate && date && date.isAfter(checkOutDate.subtract(1, 'day'))) {
+      setCheckOutDate(date.add(1, 'day'));
+    }
+  };
+
+  const handleCheckOutChange = (date: Dayjs | null) => {
+    setCheckOutDate(date);
+    if (checkInDate && date && date.isBefore(checkInDate.add(1, 'day'))) {
+      setCheckInDate(date.subtract(1, 'day'));
+    }
+  };
+
+  const numGuests = selectedGuests.adults + selectedGuests.children;
+
+  const numNights = checkInDate && checkOutDate ? checkOutDate.diff(checkInDate, 'day') : 0;
+
+  const totalPrice = numNights > 0 ? roomType.basePrice * numNights - roomType.basePrice * numNights * 0.05 : 0;
 
   return (
     <Box
@@ -50,23 +87,13 @@ const ReservationCard = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="h4" sx={{ color: 'gray.500', textDecoration: 'line-through' }}>
-              $500
+              ${roomType.basePrice}
             </Typography>
             <Typography variant="h4" sx={{ color: 'black.500' }}>
-              $440
+              ${roomType.basePrice - roomType.basePrice * 0.05}
             </Typography>
             <Typography variant="body1" sx={{ color: 'black.500' }}>
               night
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <StarRounded sx={{ fontSize: 14, color: 'black.500' }} />
-            <Typography variant="body1" sx={{ color: 'black.500' }}>
-              4.99
-            </Typography>
-            •
-            <Typography variant="body1" sx={{ color: 'black.500' }}>
-              337 reviews
             </Typography>
           </Box>
         </Box>
@@ -89,9 +116,30 @@ const ReservationCard = () => {
             <Typography variant="caption" sx={{ color: 'black.500', fontSize: 10, fontWeight: 600 }}>
               CHECK-IN
             </Typography>
-            <Typography variant="body2" sx={{ color: 'black.500' }}>
-              2/6/2023
-            </Typography>
+            <DatePicker
+              label="Check-in"
+              value={checkInDate}
+              onChange={handleCheckInChange}
+              minDate={dayjs()}
+              format="DD/MM/YYYY"
+              slotProps={{
+                field: {
+                  clearable: true,
+                },
+                textField: {
+                  size: 'small',
+                  variant: 'standard',
+                  InputProps: {
+                    disableUnderline: true,
+                    sx: {
+                      fontSize: '14px',
+                      fontWeight: '500',
+                    },
+                  },
+                  label: null,
+                },
+              }}
+            />
           </Grid>
           <Grid
             item
@@ -112,9 +160,30 @@ const ReservationCard = () => {
             <Typography variant="caption" sx={{ color: 'black.500', fontSize: 10, fontWeight: 600 }}>
               CHECKOUT
             </Typography>
-            <Typography variant="body2" sx={{ color: 'black.500' }}>
-              2/11/2023
-            </Typography>
+            <DatePicker
+              label="Checkout"
+              value={checkOutDate}
+              onChange={handleCheckOutChange}
+              minDate={checkInDate ? checkInDate.add(1, 'day') : dayjs().add(1, 'day')}
+              format="DD/MM/YYYY"
+              slotProps={{
+                field: {
+                  clearable: true,
+                },
+                textField: {
+                  size: 'small',
+                  variant: 'standard',
+                  InputProps: {
+                    disableUnderline: true,
+                    sx: {
+                      fontSize: '14px',
+                      fontWeight: '500',
+                    },
+                  },
+                  label: null,
+                },
+              }}
+            />
           </Grid>
           <Grid
             item
@@ -139,14 +208,20 @@ const ReservationCard = () => {
                 GUESTS
               </Typography>
               <Typography variant="body2" sx={{ color: 'black.500' }}>
-                2 guests
+                {numGuests} {numGuests === 1 ? 'guest' : 'guests'}
               </Typography>
             </Box>
             <IconButton>
               <ExpandMoreRounded />
             </IconButton>
           </Grid>
-          <GuestDropdownMenu anchorEl={anchorEl} open={isGuestMenuOpen} onClose={handleClose} />
+          <GuestDropdownMenu
+            anchorEl={anchorEl}
+            open={isGuestMenuOpen}
+            onClose={handleClose}
+            guestAmount={roomType.guestAmount}
+            onGuestChange={handleGuestSelectionChange}
+          />
         </Grid>
         <Button
           variant="contained"
@@ -164,28 +239,21 @@ const ReservationCard = () => {
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            500 x 5 nights
+            ${roomType.basePrice} x {numNights} nights
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            $2,500
+            ${roomType.basePrice * 5}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            Long stay discount
+            Discount
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            -$300
+            -${roomType.basePrice * 0.05}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            Cleaning fee
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            $200
-          </Typography>
-        </Box>
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
             Service fee
@@ -200,7 +268,7 @@ const ReservationCard = () => {
             Total
           </Typography>
           <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
-            $0
+            ${totalPrice.toFixed(2)}
           </Typography>
         </Box>
       </Box>

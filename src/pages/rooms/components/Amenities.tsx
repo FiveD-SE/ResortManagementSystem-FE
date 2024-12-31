@@ -1,7 +1,12 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import AmenityItem from './AmenitiyItem';
+import { amenities, getRandomIcon } from '../../../constants/amenities';
 
-const Amenities = ({ amenities }) => {
+interface AmenitiesProps {
+  amenities: string[];
+}
+
+const Amenities = ({ amenities: selectedAmenities }: AmenitiesProps) => {
   return (
     <Box
       sx={{
@@ -22,9 +27,12 @@ const Amenities = ({ amenities }) => {
         </Typography>
       </Box>
       <Grid container spacing={2}>
-        {amenities.map((amenity, index) => (
-          <AmenityItem key={index} icon={amenity.icon} title={amenity.title} />
-        ))}
+        {selectedAmenities.map((amenityKey, index) => {
+          const amenity = amenities[amenityKey];
+          const displayIcon = amenity ? amenity.icon : getRandomIcon();
+          const displayTitle = amenity ? amenity.title : amenityKey;
+          return <AmenityItem key={index} icon={displayIcon} title={displayTitle} />;
+        })}
       </Grid>
       <Box>
         <Button
@@ -43,7 +51,7 @@ const Amenities = ({ amenities }) => {
           }}
         >
           <Typography sx={{ fontSize: 14, textTransform: 'none', fontWeight: 500 }}>
-            Show all {amenities.length} amenities
+            Show all {selectedAmenities.length} amenities
           </Typography>
         </Button>
       </Box>

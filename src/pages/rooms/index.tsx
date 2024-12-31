@@ -4,6 +4,8 @@ import RoomDetails from './components/RoomDetails';
 import Ratings from './components/Ratings';
 import GuestReviews from './components/GuestReviews';
 import ThingsToKnow from './components/ThingsToKnow';
+import { useParams } from 'react-router-dom';
+import { useGetRoomDetailByIdQuery } from '../../apis/roomApi';
 import {
   ChatBubbleOutlineRounded,
   CheckCircleOutline,
@@ -12,65 +14,141 @@ import {
   MapOutlined,
   VpnKeyOutlined,
 } from '@mui/icons-material';
-
-const imageData = [
-  {
-    src: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1080728363869690124/original/3263146e-6189-465a-95ac-1ec882fa3e8b.jpeg?im_w=1200&im_format=avif',
-    alt: 'Image 1',
-    featured: true,
-  },
-  {
-    src: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1080728363869690124/original/0f38a827-8d1d-4bf1-a2eb-978fafb84492.jpeg?im_w=720&im_format=avif',
-    alt: 'Image 2',
-  },
-  {
-    src: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1080728363869690124/original/1dc1f040-af48-4149-b297-4dca1c72e256.jpeg?im_w=720&im_format=avif',
-    alt: 'Image 3',
-  },
-  {
-    src: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1080728363869690124/original/8de3fc0c-174e-47a8-82e4-37458c85b273.jpeg?im_w=720&im_format=avif',
-    alt: 'Image 4',
-  },
-  {
-    src: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1080728363869690124/original/becd79b0-bc25-49af-90f0-dfa6edec90f8.jpeg?im_w=720&im_format=avif',
-    alt: 'Image 5',
-  },
-];
+import RoomDetailSkeleton from './components/RoomDetailSkeleton';
 
 const Rooms = () => {
-  const detailedRatings = [
-    { label: 'Cleanliness', value: 4.8, icon: CleaningServicesOutlined },
-    { label: 'Accuracy', value: 4.9, icon: CheckCircleOutline },
-    { label: 'Check-in', value: 4.7, icon: VpnKeyOutlined },
-    { label: 'Communication', value: 5.0, icon: ChatBubbleOutlineRounded },
-    { label: 'Location', value: 4.6, icon: MapOutlined },
-    { label: 'Value', value: 4.9, icon: LocalOfferOutlined },
-  ];
-  const averageRating = 4.82;
+  const { id } = useParams<{ id: string }>();
+  const { data: roomDetail, isLoading } = useGetRoomDetailByIdQuery(id ?? '', {
+    skip: !id,
+  });
 
-  const totalReviews = 134;
+  const averageRating = roomDetail?.ratings
+    ? roomDetail.ratings.reduce((acc, rating) => acc + rating.average, 0) / (roomDetail.ratings.length || 1)
+    : 0;
+
+  const ratingCounts = roomDetail?.ratings
+    ? roomDetail.ratings.reduce(
+      (counts, rating) => {
+        if (rating.average === 5) {
+          counts.fiveStars++;
+        } else if (rating.average >= 4) {
+          counts.fourStars++;
+        } else if (rating.average >= 3) {
+          counts.threeStars++;
+        } else if (rating.average >= 2) {
+          counts.twoStars++;
+        } else if (rating.average >= 1) {
+          counts.oneStar++;
+        }
+        return counts;
+      },
+      {
+        oneStar: 0,
+        twoStars: 0,
+        threeStars: 0,
+        fourStars: 0,
+        fiveStars: 0,
+      },
+    )
+    : {
+      oneStar: 0,
+      twoStars: 0,
+      threeStars: 0,
+      fourStars: 0,
+      fiveStars: 0,
+    };
+
+  const averageScores = roomDetail?.averageScores || {
+    cleanliness: 0,
+    accuracy: 0,
+    checkIn: 0,
+    communication: 0,
+    location: 0,
+    value: 0,
+  };
+
+  const totalReviews = roomDetail?.ratings.length || 1;
 
   const overallRatings = [
-    { label: '5', value: 4.9 },
-    { label: '4', value: 4.5 },
-    { label: '3', value: 3.2 },
-    { label: '2', value: 2.1 },
-    { label: '1', value: 1.5 },
+    { label: '5', value: (ratingCounts.fiveStars / totalReviews) * 5 || 0 },
+    { label: '4', value: (ratingCounts.fourStars / totalReviews) * 5 || 0 },
+    { label: '3', value: (ratingCounts.threeStars / totalReviews) * 5 || 0 },
+    { label: '2', value: (ratingCounts.twoStars / totalReviews) * 5 || 0 },
+    { label: '1', value: (ratingCounts.oneStar / totalReviews) * 5 || 0 },
+  ];
+
+  const detailedRatings = [
+    { label: 'Cleanliness', value: averageScores.cleanliness, icon: CleaningServicesOutlined },
+    { label: 'Accuracy', value: averageScores.accuracy, icon: CheckCircleOutline },
+    { label: 'Check-in', value: averageScores.checkIn, icon: VpnKeyOutlined },
+    {
+      label: 'Communication',
+      value: averageScores.communication,
+      icon: ChatBubbleOutlineRounded,
+    },
+    { label: 'Location', value: averageScores.location, icon: MapOutlined },
+    { label: 'Value', value: averageScores.value, icon: LocalOfferOutlined },
   ];
 
   return (
-    <Container>
-      <PhotoGallery images={imageData} />
-      <RoomDetails />
-      <Ratings detailedRatings={detailedRatings} />
-      <GuestReviews
-        detailedRatings={detailedRatings}
-        averageRating={averageRating}
-        totalReviews={totalReviews}
-        overallRatings={overallRatings}
-      />
-      <ThingsToKnow />
-    </Container>
+    <>
+      {isLoading ? (
+        <RoomDetailSkeleton />
+      ) : (
+        <Container>
+          <PhotoGallery images={roomDetail?.room.images || []} />
+          <RoomDetails
+            ratings={roomDetail?.ratings || []}
+            roomType={
+              roomDetail?.roomType ?? {
+                id: '',
+                typeName: '',
+                description: '',
+                basePrice: 0,
+                guestAmount: 0,
+                bedAmount: 0,
+                bedroomAmount: 0,
+                sharedBathAmount: 0,
+                amenities: [],
+                keyFeatures: [],
+              }
+            }
+          />
+          <Ratings
+            detailedRatings={detailedRatings}
+            averageScores={
+              roomDetail?.averageScores ?? {
+                cleanliness: 0,
+                accuracy: 0,
+                checkIn: 0,
+                communication: 0,
+                location: 0,
+                value: 0,
+              }
+            }
+            ratingCounts={
+              roomDetail?.ratingCounts ?? {
+                oneStar: 0,
+                twoStars: 0,
+                threeStars: 0,
+                fourStars: 0,
+                fiveStars: 0,
+              }
+            }
+            averageRating={averageRating}
+            ratingCount={roomDetail?.ratingCount || 0}
+          />
+          <GuestReviews
+            detailedRatings={detailedRatings}
+            averageRating={averageRating}
+            totalReviews={totalReviews}
+            overallRatings={overallRatings}
+            ratings={roomDetail?.ratings || []}
+          />
+          <ThingsToKnow />
+        </Container>
+      )}
+    </>
   );
 };
 

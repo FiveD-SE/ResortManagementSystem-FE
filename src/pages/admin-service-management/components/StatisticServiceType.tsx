@@ -1,23 +1,38 @@
 import { Circle, Settings } from '@mui/icons-material'
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { PieChart } from '@mui/x-charts/PieChart';
+import { IServiceApiResponse, IServiceTypeApiResponse } from '../../../types';
 
 interface StatisticServiceTypeProps {
     onManageServiceType: () => void;
+    serviceData: IServiceApiResponse | undefined;
+    serviceTypeData: IServiceTypeApiResponse | undefined;
 }
 
-const data = [
-    { label: 'Type 1', value: 400, color: '#FF385C' },
-    { label: 'Type 2', value: 300, color: '#324155' },
-    { label: 'Type 3', value: 300, color: '#43B75D' },
-    { label: 'Type 4', value: 200, color: '#EE443F' },
-    { label: 'Type 5', value: 200, color: '#FFAA00' },
-    { label: 'Type 6', value: 100, color: '#0095FF' },
-];
+const StatisticServiceType = ({ onManageServiceType, serviceData, serviceTypeData }: StatisticServiceTypeProps) => {
+    const colors = ['#FF385C', '#324155', '#43B75D', '#EE443F', '#FFAA00', '#0095FF'];
 
-const colors = ['#FF385C', '#324155', '#43B75D', '#EE443F', '#FFAA00', '#0095FF'];
+    const serviceTypeMap = serviceTypeData?.docs.reduce((acc, curr, index) => {
+        acc[curr.id] = {
+            label: curr.typeName,
+            color: colors[index % colors.length],
+        };
+        return acc;
+    }, {} as { [key: string]: { label: string; color: string } });
 
-const StatisticServiceType = ({ onManageServiceType }: StatisticServiceTypeProps) => {
+    const serviceCounts = serviceData?.docs.reduce((acc, service) => {
+        if (serviceTypeMap && serviceTypeMap[service.serviceTypeId]) {
+            const typeName = serviceTypeMap[service.serviceTypeId].label;
+            acc[typeName] = (acc[typeName] || 0) + 1;
+        }
+        return acc;
+    }, {} as { [key: string]: number });
+
+    const data = serviceCounts ? Object.entries(serviceCounts).map(([label, value]) => {
+        const color = Object.values(serviceTypeMap || {}).find((type) => type.label === label)?.color || '';
+        return { label, value, color };
+    }) : [];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -50,7 +65,7 @@ const StatisticServiceType = ({ onManageServiceType }: StatisticServiceTypeProps
                             }}
                         />
                     </Box>
-                    <Box sx={{ flex: 1, height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Box sx={{ flex: 1, height: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
                         <TableContainer>
                             <Table>
                                 <TableHead>
@@ -64,7 +79,7 @@ const StatisticServiceType = ({ onManageServiceType }: StatisticServiceTypeProps
                                     {data.map((row, index) => (
                                         <TableRow key={index}>
                                             <TableCell sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
-                                                <Circle sx={{ color: colors[index], height: 15, width: 15 }} />
+                                                <Circle sx={{ color: row.color, height: 15, width: 15 }} />
                                                 {row.label}
                                             </TableCell>
                                             <TableCell>{row.value}</TableCell>

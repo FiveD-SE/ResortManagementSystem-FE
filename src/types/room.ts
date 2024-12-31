@@ -1,4 +1,5 @@
 import { RoomStatus } from './enums';
+import { IRating } from './rating';
 
 export interface IRoom {
   id: string;
@@ -57,4 +58,44 @@ export interface IRoomTypeApiResponse {
   totalPages: number | null;
   pagingCounter: number | null;
   docs: IRoomType[];
+}
+export interface IRoomDetailApiResponse {
+  room: IRoom;
+  roomType: IRoomType;
+  ratings: IRating[];
+  averageScores: {
+    cleanliness: number;
+    accuracy: number;
+    checkIn: number;
+    communication: number;
+    location: number;
+    value: number;
+  };
+  ratingCount: number;
+  ratingCounts: {
+    oneStar: number;
+    twoStars: number;
+    threeStars: number;
+    fourStars: number;
+    fiveStars: number;
+  };
+}
+
+export interface IBookingRoom {
+  _id: string;
+  roomNumber: string;
+  roomTypeId: {
+    _id: string;
+    typeName: string;
+    id: string;
+  };
+  status: string;
+  pricePerNight: number;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  averageRating: number;
+  ratings: string[];
+  id: string;
 }
