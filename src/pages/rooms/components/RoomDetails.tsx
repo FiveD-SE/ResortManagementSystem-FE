@@ -5,13 +5,15 @@ import Amenities from './Amenities';
 import ReservationCard from './ReservationCard';
 import { IRating } from '../../../types/rating';
 import { IRoomType } from '../../../types';
+import { Dayjs } from 'dayjs';
 
 interface IRoomDetailsProps {
   ratings: IRating[];
   roomType: IRoomType;
+  occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
 }
 
-const RoomDetails = ({ ratings, roomType }: IRoomDetailsProps) => {
+const RoomDetails = ({ ratings, roomType, occupiedDates }: IRoomDetailsProps) => {
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
       <Grid item xs={8}>
@@ -20,7 +22,7 @@ const RoomDetails = ({ ratings, roomType }: IRoomDetailsProps) => {
         <Amenities amenities={roomType.amenities} />
       </Grid>
       <Grid item xs={4}>
-        <ReservationCard roomType={roomType} />
+        <ReservationCard roomType={roomType} occupiedDates={occupiedDates} />
       </Grid>
     </Grid>
   );
