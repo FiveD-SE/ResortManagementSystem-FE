@@ -1,10 +1,11 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 
 interface IProps {
   amount: number;
   type: string;
+  isLoading?: boolean;
 }
 
 const TotalCard = (props: IProps) => {
@@ -16,9 +17,13 @@ const TotalCard = (props: IProps) => {
         ) : (
           <CheckCircleIcon sx={{ color: '#4CAF50' }} />
         )}
-        <Typography variant="h4" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
-          {props.amount}
-        </Typography>
+        {props.isLoading ? (
+          <CircularProgress sx={{ borderColor: 'gray' }} size={20} />
+        ) : (
+          <Typography variant="h4" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
+            {props.amount}
+          </Typography>
+        )}
         <Typography variant="h4" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
           {props.type}
         </Typography>

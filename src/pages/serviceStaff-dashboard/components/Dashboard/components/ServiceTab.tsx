@@ -129,13 +129,13 @@ const ServiceTab = () => {
         </Tabs>
       </Box>
       <Box role="tabpanel" hidden={value !== 0} id={`simple-tabpanel-0`} aria-labelledby={`simple-tab-0`}>
-        <ServiceList services={filteredServices} type="All" />
+        <ServiceList />
       </Box>
       <Box role="tabpanel" hidden={value !== 1} id={`simple-tabpanel-1`} aria-labelledby={`simple-tab-1`}>
-        <ServiceList services={filteredServices} type="Pending" />
+        <ServiceList type="Pending" />
       </Box>
       <Box role="tabpanel" hidden={value !== 2} id={`simple-tabpanel-2`} aria-labelledby={`simple-tab-2`}>
-        <ServiceList services={filteredServices} type="Served" />
+        <ServiceList type="Served" />
       </Box>
     </Box>
   );

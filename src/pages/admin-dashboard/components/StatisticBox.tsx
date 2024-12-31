@@ -5,9 +5,10 @@ interface StatisticBoxProps {
     title: string;
     value: number;
     growth: number;
+    comparison?: string;
 }
 
-const StatisticBox = ({ title, value, growth }: StatisticBoxProps) => {
+const StatisticBox = ({ title, value, growth, comparison }: StatisticBoxProps) => {
     const setIcon = () => {
         if (title === 'Revenue') {
             return (
@@ -43,7 +44,11 @@ const StatisticBox = ({ title, value, growth }: StatisticBoxProps) => {
                 <Typography sx={{ fontSize: 28, fontWeight: 600 }}>{title === 'Revenue' && '$'}{formatValue(value)}</Typography>
                 <Typography sx={{ fontSize: 16, fontWeight: 600 }}>{title}</Typography>
             </Box>
-            <Typography sx={{ color: growth < 0 ? 'red.400' : 'green.400', fontSize: 12, fontWeight: 400 }}>{growth.toFixed(2)}% compared to yesterday</Typography>
+            {title === 'Available rooms' ? (
+                <Typography sx={{ color: 'black.200', fontSize: 12, fontWeight: 400 }}>{comparison} rooms's booking</Typography>
+            ) : (
+                <Typography sx={{ color: growth < 0 ? 'red.400' : 'green.400', fontSize: 12, fontWeight: 400 }}>{growth?.toFixed(1)}% compared to yesterday</Typography>
+            )}
         </Box>
     )
 }

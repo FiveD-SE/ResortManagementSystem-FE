@@ -80,3 +80,22 @@ export interface IRoomDetailApiResponse {
     fiveStars: number;
   };
 }
+
+export interface IBookingRoom {
+  _id: string;
+  roomNumber: string;
+  roomTypeId: {
+    _id: string;
+    typeName: string;
+    id: string;
+  };
+  status: string;
+  pricePerNight: number;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  averageRating: number;
+  ratings: string[];
+  id: string;
+}
