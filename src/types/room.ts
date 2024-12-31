@@ -1,3 +1,4 @@
+import { Dayjs } from 'dayjs';
 import { RoomStatus } from './enums';
 import { IRating } from './rating';
 
@@ -79,6 +80,7 @@ export interface IRoomDetailApiResponse {
     fourStars: number;
     fiveStars: number;
   };
+  occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
 }
 
 export interface IBookingRoom {

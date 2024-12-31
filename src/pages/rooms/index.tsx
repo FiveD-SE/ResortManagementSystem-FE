@@ -28,35 +28,35 @@ const Rooms = () => {
 
   const ratingCounts = roomDetail?.ratings
     ? roomDetail.ratings.reduce(
-      (counts, rating) => {
-        if (rating.average === 5) {
-          counts.fiveStars++;
-        } else if (rating.average >= 4) {
-          counts.fourStars++;
-        } else if (rating.average >= 3) {
-          counts.threeStars++;
-        } else if (rating.average >= 2) {
-          counts.twoStars++;
-        } else if (rating.average >= 1) {
-          counts.oneStar++;
-        }
-        return counts;
-      },
-      {
+        (counts, rating) => {
+          if (rating.average === 5) {
+            counts.fiveStars++;
+          } else if (rating.average >= 4) {
+            counts.fourStars++;
+          } else if (rating.average >= 3) {
+            counts.threeStars++;
+          } else if (rating.average >= 2) {
+            counts.twoStars++;
+          } else if (rating.average >= 1) {
+            counts.oneStar++;
+          }
+          return counts;
+        },
+        {
+          oneStar: 0,
+          twoStars: 0,
+          threeStars: 0,
+          fourStars: 0,
+          fiveStars: 0,
+        },
+      )
+    : {
         oneStar: 0,
         twoStars: 0,
         threeStars: 0,
         fourStars: 0,
         fiveStars: 0,
-      },
-    )
-    : {
-      oneStar: 0,
-      twoStars: 0,
-      threeStars: 0,
-      fourStars: 0,
-      fiveStars: 0,
-    };
+      };
 
   const averageScores = roomDetail?.averageScores || {
     cleanliness: 0,
@@ -113,6 +113,7 @@ const Rooms = () => {
                 keyFeatures: [],
               }
             }
+            occupiedDates={roomDetail?.occupiedDates || []}
           />
           <Ratings
             detailedRatings={detailedRatings}
