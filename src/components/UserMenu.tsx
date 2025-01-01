@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import { IAccount } from '../types';
 import useLogout from '../utils/useLogout';
+import PopupModal from './PopupModal';
 
 const menuStyles = {
   display: { xs: 'none', sm: 'flex' },
@@ -23,6 +24,7 @@ const menuStyles = {
 
 export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openPopupModal, setOpenPopupModal] = useState(false);
   const navigate = useNavigate();
 
   const logout = useLogout();
@@ -54,6 +56,7 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
     navigate(ROUTES.AUTH.LOGIN);
     logout();
     handleMenuClose();
+    setOpenPopupModal(false);
   }, [navigate, logout]);
 
   const avatarSrc = currentUser?.avatar || '/assets/avatar.png';
@@ -64,7 +67,7 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
       <MenuItem onClick={() => console.log('Go to My Favorites')}>My Favorites</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Reservations')}>My Reservations</MenuItem>
       <Divider />
-      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      <MenuItem onClick={() => setOpenPopupModal(true)}>Logout</MenuItem>
     </Fragment>
   ) : (
     <Fragment>
@@ -91,6 +94,14 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
       >
         {menuItems}
       </Menu>
+      <PopupModal
+        type={'confirm'}
+        open={openPopupModal}
+        title={'Logout'}
+        message={'Are you sure you want to logout?'}
+        onClose={() => { setOpenPopupModal(false); handleMenuClose() }}
+        onConfirm={handleLogout}
+      />
     </Box>
   );
 };
