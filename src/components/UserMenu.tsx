@@ -4,6 +4,7 @@ import { MenuRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import { IAccount } from '../types';
+import useLogout from '../utils/useLogout';
 
 const menuStyles = {
   display: { xs: 'none', sm: 'flex' },
@@ -24,6 +25,8 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
 
+  const logout = useLogout();
+
   const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   }, []);
@@ -34,15 +37,24 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
 
   const goToSignIn = useCallback(() => {
     navigate(ROUTES.AUTH.LOGIN);
+    handleMenuClose();
   }, [navigate]);
 
   const goToSignUp = useCallback(() => {
     navigate(ROUTES.AUTH.REGISTER);
+    handleMenuClose();
   }, [navigate]);
 
   const goToMyProfile = useCallback(() => {
     navigate(ROUTES.PROFILE);
+    handleMenuClose();
   }, [navigate]);
+
+  const handleLogout = useCallback(() => {
+    navigate(ROUTES.AUTH.LOGIN);
+    logout();
+    handleMenuClose();
+  }, [navigate, logout]);
 
   const avatarSrc = currentUser?.avatar || '/assets/avatar.png';
 
@@ -52,7 +64,7 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
       <MenuItem onClick={() => console.log('Go to My Favorites')}>My Favorites</MenuItem>
       <MenuItem onClick={() => console.log('Go to My Reservations')}>My Reservations</MenuItem>
       <Divider />
-      <MenuItem onClick={() => console.log('Logout')}>Logout</MenuItem>
+      <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </Fragment>
   ) : (
     <Fragment>
@@ -75,7 +87,7 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        PaperProps={{ sx: { width: '10%', borderRadius: '0.75rem' } }}
+        PaperProps={{ sx: { borderRadius: '0.75rem', mt: 1 } }}
       >
         {menuItems}
       </Menu>
