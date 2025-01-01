@@ -114,6 +114,7 @@ const Rooms = () => {
                 keyFeatures: [],
               }
             }
+            occupiedDates={roomDetail?.occupiedDates || []}
           />
           <Ratings
             detailedRatings={detailedRatings}

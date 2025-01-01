@@ -15,9 +15,10 @@ interface HandleClickEvent {
 interface ReservationCardProps {
   roomType: IRoomType;
   roomId: string;
+  occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
 }
 
-const ReservationCard = ({ roomType, roomId }: ReservationCardProps) => {
+const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: ReservationCardProps) => {
   const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [checkInDate, setCheckInDate] = useState<Dayjs | null>(dayjs());
@@ -26,6 +27,21 @@ const ReservationCard = ({ roomType, roomId }: ReservationCardProps) => {
     adults: 1,
     children: 0,
   });
+
+  const occupiedDates: Dayjs[] =
+    roomOccupiedDate && roomOccupiedDate.length > 0
+      ? roomOccupiedDate
+          .map((dateRange) =>
+            Array.from({ length: dayjs(dateRange.checkoutDate).diff(dayjs(dateRange.checkinDate), 'day') + 1 }).map(
+              (_, index) => dayjs(dateRange.checkinDate).add(index, 'day'),
+            ),
+          )
+          .flat()
+      : [];
+
+  const shouldDisableDate = (date: Dayjs) => {
+    return occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day'));
+  };
 
   const handleGuestSelectionChange = (newGuests: { adults: number; children: number }) => {
     setSelectedGuests(newGuests);
@@ -126,6 +142,7 @@ const ReservationCard = ({ roomType, roomId }: ReservationCardProps) => {
               label="Check-in"
               value={checkInDate}
               onChange={handleCheckInChange}
+              shouldDisableDate={shouldDisableDate}
               minDate={dayjs()}
               format="DD/MM/YYYY"
               slotProps={{
@@ -170,6 +187,7 @@ const ReservationCard = ({ roomType, roomId }: ReservationCardProps) => {
               label="Checkout"
               value={checkOutDate}
               onChange={handleCheckOutChange}
+              shouldDisableDate={shouldDisableDate}
               minDate={checkInDate ? checkInDate.add(1, 'day') : dayjs().add(1, 'day')}
               format="DD/MM/YYYY"
               slotProps={{
@@ -220,7 +238,7 @@ const ReservationCard = ({ roomType, roomId }: ReservationCardProps) => {
             <IconButton>
               <ExpandMoreRounded
                 sx={{
-                  transition: 'transform 0.2s ease-in-out',
+                  transition: 'transform 0.3s',
                   transform: isGuestMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                 }}
               />
