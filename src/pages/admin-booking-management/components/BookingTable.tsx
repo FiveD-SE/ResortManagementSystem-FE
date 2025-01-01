@@ -10,6 +10,7 @@ dayjs.extend(isBetween);
 import { SelectChangeEvent } from '@mui/material';
 import { DateRange } from 'react-date-range';
 import { IBooking, IBookingApiResponse } from '../../../types';
+import { formatPrice } from '../../../utils';
 
 const tabTextStyle = {
     color: 'gray.200',
@@ -368,7 +369,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                 </Box>
             </Box>
 
-            <Box sx={{ height: "85vh", borderRadius: 2, border: "1px solid rgb(222, 222, 222)" }}>
+            <Box sx={{ minHeight: "85vh", borderRadius: 2, border: "1px solid rgb(222, 222, 222)" }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -399,7 +400,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                                         <TableCell>{row.customerId}</TableCell>
                                         <TableCell>{row.checkInDate}</TableCell>
                                         <TableCell>{row.checkOutDate}</TableCell>
-                                        <TableCell>{row.totalAmount}</TableCell>
+                                        <TableCell>{formatPrice(row.totalAmount)}</TableCell>
                                         <TableCell>{row.status}</TableCell>
                                     </TableRow>
                                 ))

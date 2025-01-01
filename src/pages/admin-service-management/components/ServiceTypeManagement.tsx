@@ -127,7 +127,7 @@ const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageCha
                 </Button>
             </Box>
 
-            <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
+            <Box sx={{ minHeight: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -140,7 +140,7 @@ const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageCha
                         </TableHead>
                         <TableBody>
                             {filterServiceTypes.map((row, index) => (
-                                <TableRow key={index}>
+                                <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{row.typeName}</TableCell>
                                     <TableCell>{row.description}</TableCell>

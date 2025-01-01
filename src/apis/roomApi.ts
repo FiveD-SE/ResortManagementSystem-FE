@@ -84,5 +84,6 @@ export const {
   useCreateRoomMutation,
   useUpdateRoomMutation,
   useDeleteRoomMutation,
+  useLazyGetRoomsQuery,
 } = roomApi;
 export const resetRoomsState = roomApi.util.resetApiState;

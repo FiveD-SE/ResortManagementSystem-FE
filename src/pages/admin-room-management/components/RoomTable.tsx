@@ -24,6 +24,7 @@ import { IRoom, IRoomApiResponse, IRoomTypeApiResponse } from '../../../types/ro
 import { useDeleteRoomMutation } from '../../../apis/roomApi';
 import PopupModal from '../../../components/PopupModal';
 import toast from 'react-hot-toast';
+import { formatPrice } from '../../../utils';
 
 const tabTextStyle = {
   color: 'gray.200',
@@ -42,10 +43,9 @@ const tabIconStyle = {
 interface RoomTableProps {
   roomsData: IRoomApiResponse | undefined;
   roomTypesData: IRoomTypeApiResponse | undefined;
-  onPageChange?: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) => {
+const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
   const [openAddNewRoomModal, setOpenAddNewRoomModal] = React.useState(false);
   const [openEditRoomModal, setOpenEditRoomModal] = React.useState(false);
   const [tabSelected, setTabSelected] = React.useState<number>(0);
@@ -53,6 +53,7 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRoom, setSelectedRoom] = React.useState<IRoom | undefined>();
   const [openDeleteRoomModal, setOpenDeleteRoomModal] = React.useState(false);
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const [deleteRoomMutation, { isLoading }] = useDeleteRoomMutation();
 
@@ -70,20 +71,23 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
     return roomType ? roomType.typeName : 'Unknown';
   };
 
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+  };
+
   const getFilteredRows = React.useCallback(() => {
+    const docsInCurrentPage = roomsData?.docs.slice((currentPage - 1) * 10, currentPage * 10);
     const tabFilter =
       tabSelected === 0
-        ? roomsData?.docs
-        : roomsData?.docs.filter((room) =>
-            tabSelected === 1
-              ? room.status.toLowerCase() === 'available'
-              : tabSelected === 2
-                ? room.status.toLowerCase() === 'occupied'
-                : room.status.toLowerCase() === 'under maintenance',
-          );
-
+        ? docsInCurrentPage
+        : docsInCurrentPage?.filter((room) =>
+          tabSelected === 1
+            ? room.status.toLowerCase() === 'available'
+            : tabSelected === 2
+              ? room.status.toLowerCase() === 'occupied'
+              : room.status.toLowerCase() === 'under maintenance',
+        );
     if (!tabFilter) return [];
-
     return tabFilter.filter((room) => {
       const searchLower = search.toLowerCase();
       const roomTypeName = getRoomTypeName(room.roomTypeId).toLowerCase();
@@ -93,7 +97,7 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
         room.pricePerNight.toString().includes(searchLower)
       );
     });
-  }, [roomsData, tabSelected, search]);
+  }, [roomsData, tabSelected, search, currentPage]);
 
   const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows, roomsData, tabSelected, search]);
 
@@ -213,7 +217,7 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
           </Button>
         </Box>
       </Box>
-      <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
+      <Box sx={{ minHeight: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
         <TableContainer>
           <Table>
             <TableHead>
@@ -235,7 +239,7 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
                 </TableRow>
               ) : (
                 filteredRows.map((room, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{room.roomNumber}</TableCell>
                     <TableCell>{getRoomTypeName(room.roomTypeId)}</TableCell>
@@ -250,7 +254,12 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
                       >
                         <FiberManualRecord
                           sx={{
-                            color: room.status.toLowerCase() === 'available' ? 'success' : 'gray.200',
+                            color:
+                              room.status.toLowerCase() === 'available'
+                                ? 'green.400'
+                                : room.status.toLowerCase() === 'occupied'
+                                  ? 'primary.400'
+                                  : 'gray.200',
                             height: 15,
                             width: 15,
                           }}
@@ -258,7 +267,7 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
                         {room.status}
                       </Typography>
                     </TableCell>
-                    <TableCell>{`$${room.pricePerNight}`}</TableCell>
+                    <TableCell>{formatPrice(room.pricePerNight)}</TableCell>
                     <TableCell>
                       <IconButton onClick={(event) => handleMenuOpen(event, room)}>
                         <MoreHoriz />
@@ -307,12 +316,14 @@ const RoomTable = ({ roomsData, roomTypesData, onPageChange }: RoomTableProps) =
       </Box>
 
       <Pagination
-        count={roomsData?.totalPages ?? 0}
+        count={Math.ceil((roomsData?.totalDocs || 0) / 10)}
         variant="outlined"
         shape="rounded"
         sx={{ marginTop: 2, alignSelf: 'flex-end' }}
-        onChange={onPageChange}
+        page={currentPage}
+        onChange={handlePageChange}
       />
+
 
       <AddNewRoomModal
         open={openAddNewRoomModal}

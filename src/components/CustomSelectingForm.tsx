@@ -17,14 +17,14 @@ const CustomSelectingForm = ({ label, placeholder, value, onChange, options }: C
             </Typography>
 
             <Autocomplete
-                freeSolo
                 options={options}
                 value={value}
-                onInputChange={(_event, newInputValue) => {
+                onChange={(_event, newValue) => {
                     onChange({
-                        target: { value: newInputValue } as HTMLInputElement,
+                        target: { value: newValue || '' } as HTMLInputElement,
                     } as React.ChangeEvent<HTMLInputElement>);
                 }}
+                disableClearable
                 renderInput={(params) => (
                     <TextField
                         {...params}
@@ -54,4 +54,4 @@ const CustomSelectingForm = ({ label, placeholder, value, onChange, options }: C
     );
 }
 
-export default CustomSelectingForm
+export default CustomSelectingForm;
