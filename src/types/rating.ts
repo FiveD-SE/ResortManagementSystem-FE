@@ -12,4 +12,5 @@ export interface IRating {
   createdAt: Date;
   updatedAt: Date;
   average: number;
+  fullName: string;
 }

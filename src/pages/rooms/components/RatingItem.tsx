@@ -21,7 +21,9 @@ const RatingItem: React.FC<RatingItemProps> = ({ label, value, icon: Icon, orien
             flex: 1,
           }}
         >
-          <Typography variant="h6">{label}</Typography>
+          <Typography variant="h6" sx={{ whiteSpace: 'nowrap' }}>
+            {label}
+          </Typography>
           <Typography variant="h5">{value}</Typography>
           <Icon />
         </Box>
@@ -36,7 +38,7 @@ const RatingItem: React.FC<RatingItemProps> = ({ label, value, icon: Icon, orien
           }}
         >
           <Icon />
-          <Typography variant="subtitle1" sx={{ flex: 1, ml: 1, fontWeight: 500 }}>
+          <Typography variant="subtitle1" sx={{ flex: 1, ml: 1, fontWeight: 500, whiteSpace: 'nowrap' }}>
             {label}
           </Typography>
           <Typography variant="h6">{value}</Typography>

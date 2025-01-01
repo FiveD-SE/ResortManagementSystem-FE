@@ -12,7 +12,7 @@ import {
   StairsOutlined,
   SvgIconComponent,
 } from '@mui/icons-material';
-import { Box, Grid, Link, Typography } from '@mui/material';
+import { Box, Grid, IconButton, Link, Typography } from '@mui/material';
 import { useState } from 'react';
 import ThingsToKnowDialog from './ThingsToKnowDialog';
 
@@ -131,17 +131,44 @@ const ThingsToKnow = () => {
       </Box>
       <Grid container spacing={2}>
         {thingsToKnowData.map((item, index) => (
-          <Grid item xs={4} key={index}>
+          <Grid item xs={12} md={4} key={index}>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'black.500' }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, color: 'black.500', display: 'flex', alignItems: 'center' }}
+              >
                 {item.title}
+                <IconButton
+                  size="small"
+                  onClick={() => handleOpenDialog(item)}
+                  sx={{
+                    display: {
+                      xs: 'flex',
+                      md: 'none',
+                    },
+                  }}
+                >
+                  <ChevronRightRounded />
+                </IconButton>
               </Typography>
               {item.summary.map((summaryItem, summaryIndex) => (
                 <Typography key={summaryIndex} variant="body2" sx={{ color: 'black.500' }}>
                   {summaryItem}
                 </Typography>
               ))}
-              <Box sx={{ display: 'flex', alignItems: 'center', pt: 3 }}>
+              <Box
+                sx={{
+                  display: {
+                    xs: 'none',
+                    md: 'flex',
+                  },
+                  alignItems: 'center',
+                  pt: {
+                    xs: 2,
+                    md: 0,
+                  },
+                }}
+              >
                 <Link onClick={() => handleOpenDialog(item)} underline="hover" sx={{ color: 'black.500', fontWeight: 500 }}>
                   Show more
                 </Link>
