@@ -4,6 +4,7 @@ import { ChevronLeftRounded, ChevronRightRounded, TuneRounded } from '@mui/icons
 import { useEffect, useRef, useState } from 'react';
 import { useGetRoomTypesQuery } from '../../../apis/roomTypeApi';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import FilterDialog from './FilterDialog';
 
 function Categories() {
   const location = useLocation();
@@ -12,6 +13,7 @@ function Categories() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const { data: roomTypesData } = useGetRoomTypesQuery({ page: 1, limit: 10 });
 
@@ -61,6 +63,14 @@ function Categories() {
     } else if (direction === 'right') {
       container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
+  };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   return (
@@ -178,12 +188,14 @@ function Categories() {
           },
           transition: 'border-color 0.3s, background-color 0.3s',
         }}
+        onClick={handleOpenDialog}
       >
         <TuneRounded />
         <Typography variant="body2" sx={{ color: 'black.900' }}>
           Filters
         </Typography>
       </Box>
+      <FilterDialog open={openDialog} onClose={handleCloseDialog} />
     </Box>
   );
 }
