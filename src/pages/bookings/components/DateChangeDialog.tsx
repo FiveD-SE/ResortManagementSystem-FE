@@ -1,7 +1,7 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 import CustomDialog from '../../../components/CustomDialog';
 import { DatePicker } from '@mui/x-date-pickers';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -10,14 +10,25 @@ interface DateChangeDialogProps {
   onClose: () => void;
   selectedCheckInDate: dayjs.Dayjs | null;
   selectedCheckOutDate: dayjs.Dayjs | null;
+  shouldDisableDate: (date: dayjs.Dayjs) => boolean;
 }
 
-const DateChangeDialog = ({ open, onClose, selectedCheckInDate, selectedCheckOutDate }: DateChangeDialogProps) => {
+const DateChangeDialog = ({
+  open,
+  onClose,
+  selectedCheckInDate,
+  selectedCheckOutDate,
+  shouldDisableDate,
+}: DateChangeDialogProps) => {
   const [currentCheckInDate, setCurrentCheckInDate] = useState<dayjs.Dayjs | null>(selectedCheckInDate);
   const [currentCheckOutDate, setCurrentCheckOutDate] = useState<dayjs.Dayjs | null>(selectedCheckOutDate);
   const [searchParams, setSearchParams] = useSearchParams();
-  const handleCheckInChange = (date: dayjs.Dayjs | null) => {
+
+  const handleCheckInChange = (date: Dayjs | null) => {
     setCurrentCheckInDate(date);
+    if (currentCheckOutDate && date && date.isAfter(currentCheckOutDate.subtract(1, 'day'))) {
+      setCurrentCheckOutDate(date.add(1, 'day'));
+    }
   };
 
   const handleCheckOutChange = (date: dayjs.Dayjs | null) => {
@@ -95,6 +106,7 @@ const DateChangeDialog = ({ open, onClose, selectedCheckInDate, selectedCheckOut
               label="Check-in"
               value={currentCheckInDate}
               onChange={handleCheckInChange}
+              shouldDisableDate={shouldDisableDate}
               minDate={dayjs()}
               format="DD/MM/YYYY"
               slotProps={{

@@ -17,7 +17,7 @@ const PaymentDropdownMenu = ({ anchorEl, open, onClose, onSelect }: PaymentDropd
     },
     {
       icon: <AccountBalanceRounded sx={{ color: 'black.500' }} />,
-      text: 'Pay via Bank Transfer',
+      text: 'Transfer',
     },
   ];
 

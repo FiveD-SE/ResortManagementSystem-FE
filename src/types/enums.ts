@@ -28,3 +28,8 @@ export enum Role {
   Receptionist = 'receptionist',
   ServiceStaff = 'service_staff',
 }
+
+export enum PaymentMethod {
+  PayOnArrival = 'Pay on arrival',
+  Transfer = 'Transfer',
+}

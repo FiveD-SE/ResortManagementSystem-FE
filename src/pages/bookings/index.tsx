@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Grid, Typography } from '@mui/material';
 import Header from './components/Header';
 import TripDetails from './components/TripDetails';
 import Payment from './components/Payment';
@@ -10,13 +10,18 @@ import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { PaymentsRounded } from '@mui/icons-material';
 import { useGetRoomDetailByIdQuery } from '../../apis/roomApi';
-import { IPromotion, IService } from '../../types';
+import { IPromotion, IService, PaymentMethod } from '../../types';
+import { useCreateBookingMutation } from '../../apis/bookingApi';
+import toast from 'react-hot-toast';
+import { ICreateBookingRequest } from '../../types/booking';
 
 const Bookings = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { data: roomDetail } = useGetRoomDetailByIdQuery(roomId ?? '', {
     skip: !roomId,
   });
+
+  const [createBooking, { isLoading: isCreateBookingLoading }] = useCreateBookingMutation();
 
   const [searchParams] = useSearchParams();
   const checkInDateFromParams = searchParams.get('checkin');
@@ -67,7 +72,35 @@ const Bookings = () => {
   const [selectedPromotion, setSelectedPromotion] = useState<IPromotion | null>(null);
 
   const handleSelectPromotion = (promotion: IPromotion): void => {
-    setSelectedPromotion(promotion);
+    setSelectedPromotion((prev) => (prev?.id === promotion.id ? null : promotion));
+  };
+
+  const handleCreateBooking = async () => {
+    if (!roomId || !checkInDate || !checkOutDate) {
+      toast.error('Room ID, check-in date, and check-out date are required.');
+      return;
+    }
+
+    const bookingData: Partial<ICreateBookingRequest> = {
+      checkinDate: checkInDate.toDate(),
+      checkoutDate: checkOutDate.toDate(),
+      guests: guests,
+      paymentMethod: selectedPaymentMethod.text as PaymentMethod,
+      serviceIds: selectedServices.map((service) => service.id),
+    };
+
+    if (selectedPromotion) {
+      bookingData.promotionId = selectedPromotion.id;
+    }
+
+    try {
+      const response = await createBooking({ roomId, data: bookingData as ICreateBookingRequest }).unwrap();
+      console.log('Booking created:', response);
+      toast.success('Booking created successfully!');
+    } catch (error) {
+      console.error('Failed to create booking:', error);
+      toast.error('Failed to create booking. Please try again.');
+    }
   };
 
   return (
@@ -81,6 +114,7 @@ const Bookings = () => {
               checkInDate={checkInDate}
               checkOutDate={checkOutDate}
               guestAmount={roomDetail?.roomType.guestAmount || 1}
+              occupiedDates={roomDetail?.occupiedDates || []}
             />
             <Payment selectedPaymentMethod={selectedPaymentMethod} handlePaymentMethodSelect={handlePaymentMethodSelect} />
             <Voucher selectedPromotion={selectedPromotion} handleSelectPromotion={handleSelectPromotion} />
@@ -107,8 +141,14 @@ const Bookings = () => {
                   backgroundColor: 'primary.500',
                   borderRadius: 3,
                 }}
+                onClick={handleCreateBooking}
+                disabled={isCreateBookingLoading}
               >
                 <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>Request to book</Typography>
+                <CircularProgress
+                  size={20}
+                  sx={{ color: 'primary.500', display: isCreateBookingLoading ? 'block' : 'none', ml: 2 }}
+                />
               </Button>
             </Box>
           </Grid>

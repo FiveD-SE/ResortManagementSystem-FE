@@ -21,8 +21,6 @@ interface ReservationCardProps {
 const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: ReservationCardProps) => {
   const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
-  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(dayjs());
-  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs().add(5, 'day'));
   const [selectedGuests, setSelectedGuests] = useState<{ adults: number; children: number }>({
     adults: 1,
     children: 0,
@@ -38,6 +36,28 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
           )
           .flat()
       : [];
+
+  const getMinCheckInDate = () => {
+    if (!roomOccupiedDate.length) {
+      return dayjs();
+    }
+
+    let minDate = dayjs();
+    const sortedOccupiedDates = [...roomOccupiedDate].sort((a, b) => dayjs(a.checkinDate).diff(dayjs(b.checkinDate)));
+
+    for (const dateRange of sortedOccupiedDates) {
+      const checkoutDate = dayjs(dateRange.checkoutDate);
+
+      if (minDate.isBefore(dayjs(dateRange.checkinDate))) {
+        break;
+      }
+      minDate = checkoutDate.add(1, 'day');
+    }
+
+    return minDate;
+  };
+  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(getMinCheckInDate());
+  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs(checkInDate).add(5, 'day'));
 
   const shouldDisableDate = (date: Dayjs) => {
     return occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day'));
@@ -79,6 +99,8 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
 
   const formattedCheckInDate = checkInDate ? checkInDate.format('YYYY-MM-DD') : '';
   const formattedCheckOutDate = checkOutDate ? checkOutDate.format('YYYY-MM-DD') : '';
+
+  const minCheckInDate = getMinCheckInDate();
 
   return (
     <Box
@@ -143,7 +165,7 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
               value={checkInDate}
               onChange={handleCheckInChange}
               shouldDisableDate={shouldDisableDate}
-              minDate={dayjs()}
+              minDate={minCheckInDate}
               format="DD/MM/YYYY"
               slotProps={{
                 field: {

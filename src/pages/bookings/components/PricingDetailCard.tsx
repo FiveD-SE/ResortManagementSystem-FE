@@ -2,6 +2,7 @@ import { StarRounded } from '@mui/icons-material';
 import { Avatar, Box, Divider, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import { IRoomDetailApiResponse, IService } from '../../../types';
+import { formatPrice } from '../../../utils';
 
 interface PricingDetailCardProps {
   roomDetail: IRoomDetailApiResponse | null;
@@ -59,10 +60,10 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            {roomDetail?.roomType.basePrice} x {nights} nights
+            {formatPrice(Number.parseFloat(roomDetail?.roomType.basePrice?.toString() || '0'))} x {nights} nights
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            ${roomPrice}
+            {formatPrice(roomPrice)}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -70,7 +71,7 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
             Discount
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            -${discountAmount}
+            -{formatPrice(discountAmount)}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -78,7 +79,7 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
             Service fee
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            ${serviceFee}
+            {formatPrice(serviceFee)}
           </Typography>
         </Box>
         <Divider orientation="horizontal" flexItem sx={{ my: 1 }} />
@@ -87,7 +88,7 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
             Total
           </Typography>
           <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
-            ${totalPrice.toFixed(2)}
+            {formatPrice(totalPrice)}
           </Typography>
         </Box>
       </Box>

@@ -2,6 +2,7 @@ import { Box, Checkbox, FormControl, List, ListItem, Paper, Skeleton, Typography
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGetServicesQuery } from '../../../apis/serviceApi';
 import { IService, IServiceApiResponse } from '../../../types';
+import { formatPrice } from '../../../utils';
 
 interface ObserverEntry {
   isIntersecting: boolean;
@@ -128,7 +129,7 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
                     {service.description}
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'primary.500' }}>
-                    ${service.price}
+                    {formatPrice(service.price)}
                   </Typography>
                 </Box>
               </Paper>

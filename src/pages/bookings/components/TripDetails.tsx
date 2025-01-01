@@ -3,7 +3,7 @@ import { useState } from 'react';
 import DateChangeDialog from './DateChangeDialog';
 import GuestChangeDialog from './GuestChangeDialog';
 import { formatDateRange } from '../../../utils';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface TripDetailsProps {
   guests: {
@@ -13,9 +13,16 @@ interface TripDetailsProps {
   checkInDate: Dayjs | null;
   checkOutDate: Dayjs | null;
   guestAmount: number;
+  occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
 }
 
-const TripDetails = ({ guests, checkInDate, checkOutDate, guestAmount }: TripDetailsProps) => {
+const TripDetails = ({
+  guests,
+  checkInDate,
+  checkOutDate,
+  guestAmount,
+  occupiedDates: roomOccupiedDate,
+}: TripDetailsProps) => {
   const [openDateChangeDialog, setOpenDateChangeDialog] = useState(false);
   const [openGuestChangeDialog, setOpenGuestChangeDialog] = useState(false);
 
@@ -33,6 +40,21 @@ const TripDetails = ({ guests, checkInDate, checkOutDate, guestAmount }: TripDet
 
   const handleCloseGuestChangeDialog = () => {
     setOpenGuestChangeDialog(false);
+  };
+
+  const occupiedDates: Dayjs[] =
+    roomOccupiedDate && roomOccupiedDate.length > 0
+      ? roomOccupiedDate
+          .map((dateRange) =>
+            Array.from({ length: dayjs(dateRange.checkoutDate).diff(dayjs(dateRange.checkinDate), 'day') + 1 }).map(
+              (_, index) => dayjs(dateRange.checkinDate).add(index, 'day'),
+            ),
+          )
+          .flat()
+      : [];
+
+  const shouldDisableDate = (date: Dayjs) => {
+    return occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day'));
   };
 
   const totalGuests = guests.adults + guests.children;
@@ -73,6 +95,7 @@ const TripDetails = ({ guests, checkInDate, checkOutDate, guestAmount }: TripDet
           onClose={handleCloseDateChangeDialog}
           selectedCheckInDate={checkInDate}
           selectedCheckOutDate={checkOutDate}
+          shouldDisableDate={shouldDisableDate}
         />
       </Grid>
       <Grid container sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
