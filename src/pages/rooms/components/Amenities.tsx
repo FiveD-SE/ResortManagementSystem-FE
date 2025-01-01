@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import AmenityItem from './AmenitiyItem';
 import { amenities, getRandomIcon } from '../../../constants/amenities';
 
@@ -34,27 +34,6 @@ const Amenities = ({ amenities: selectedAmenities }: AmenitiesProps) => {
           return <AmenityItem key={index} icon={displayIcon} title={displayTitle} />;
         })}
       </Grid>
-      <Box>
-        <Button
-          variant="outlined"
-          sx={{
-            px: 3,
-            py: 1,
-            borderRadius: 3,
-            backgroundColor: 'white.50',
-            borderColor: 'black.500',
-            color: 'black.500',
-            border: '1px solid',
-            ':hover': {
-              backgroundColor: 'gray.50',
-            },
-          }}
-        >
-          <Typography sx={{ fontSize: 14, textTransform: 'none', fontWeight: 500 }}>
-            Show all {selectedAmenities.length} amenities
-          </Typography>
-        </Button>
-      </Box>
     </Box>
   );
 };
