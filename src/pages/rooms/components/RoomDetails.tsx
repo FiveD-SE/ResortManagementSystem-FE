@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Grid, useMediaQuery } from '@mui/material';
 import RoomOverview from './RoomOverview';
 import KeyFeatures from './KeyFeatures';
 import Amenities from './Amenities';
@@ -15,16 +15,19 @@ interface IRoomDetailsProps {
 }
 
 const RoomDetails = ({ ratings, roomType, roomId, occupiedDates }: IRoomDetailsProps) => {
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
-      <Grid item xs={8}>
+      <Grid item xs={12} md={8}>
         <RoomOverview roomType={roomType} ratings={ratings} />
         <KeyFeatures keyFeatures={roomType.keyFeatures} />
         <Amenities amenities={roomType.amenities} />
       </Grid>
-      <Grid item xs={4}>
-        <ReservationCard roomType={roomType} roomId={roomId} occupiedDates={occupiedDates} />
-      </Grid>
+      {!isSmallScreen && (
+        <Grid item xs={12} md={4}>
+          <ReservationCard roomType={roomType} roomId={roomId} occupiedDates={occupiedDates} />
+        </Grid>
+      )}
     </Grid>
   );
 };

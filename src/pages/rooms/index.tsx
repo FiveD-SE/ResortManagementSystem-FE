@@ -140,13 +140,15 @@ const Rooms = () => {
             averageRating={averageRating}
             ratingCount={roomDetail?.ratingCount || 0}
           />
-          <GuestReviews
-            detailedRatings={detailedRatings}
-            averageRating={averageRating}
-            totalReviews={totalReviews}
-            overallRatings={overallRatings}
-            ratings={roomDetail?.ratings || []}
-          />
+          {roomDetail?.ratings && roomDetail?.ratings.length > 0 && (
+            <GuestReviews
+              detailedRatings={detailedRatings}
+              averageRating={averageRating}
+              totalReviews={totalReviews}
+              overallRatings={overallRatings}
+              ratings={roomDetail?.ratings || []}
+            />
+          )}
           <ThingsToKnow />
         </Container>
       )}
