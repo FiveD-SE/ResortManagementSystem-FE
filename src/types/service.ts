@@ -57,4 +57,5 @@ export interface IBookingService {
   status: string;
   _id: string;
   id: string;
+  quantity: number;
 }

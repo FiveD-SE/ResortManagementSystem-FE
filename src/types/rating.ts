@@ -13,3 +13,14 @@ export interface IRating {
   updatedAt: Date;
   average: number;
 }
+
+export interface IRatingApiResquest {
+  cleanliness: number;
+  accuracy: number;
+  checkIn: number;
+  communication: number;
+  location: number;
+  value: number;
+  comment: string;
+  roomId: string;
+}
