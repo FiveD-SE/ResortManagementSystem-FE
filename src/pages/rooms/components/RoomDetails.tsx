@@ -10,10 +10,11 @@ import { Dayjs } from 'dayjs';
 interface IRoomDetailsProps {
   ratings: IRating[];
   roomType: IRoomType;
+  roomId: string;
   occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
 }
 
-const RoomDetails = ({ ratings, roomType, occupiedDates }: IRoomDetailsProps) => {
+const RoomDetails = ({ ratings, roomType, roomId, occupiedDates }: IRoomDetailsProps) => {
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
       <Grid item xs={8}>
@@ -22,7 +23,7 @@ const RoomDetails = ({ ratings, roomType, occupiedDates }: IRoomDetailsProps) =>
         <Amenities amenities={roomType.amenities} />
       </Grid>
       <Grid item xs={4}>
-        <ReservationCard roomType={roomType} occupiedDates={occupiedDates} />
+        <ReservationCard roomType={roomType} roomId={roomId} occupiedDates={occupiedDates} />
       </Grid>
     </Grid>
   );

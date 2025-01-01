@@ -1,7 +1,7 @@
 import { ICustomer } from './customer';
+import { PaymentMethod } from './enums';
 import { IPromotion } from './promotion';
 import { IBookingRoom } from './room';
-import { IBookingService } from './service';
 
 export interface IBooking {
   _id: string;
@@ -64,4 +64,16 @@ export interface IBookingServicesApiResponse {
   prevPage: number | null;
   pagingCounter: number | null;
   docs: IBookingService[];
+}
+
+export interface ICreateBookingRequest {
+  checkinDate: Date;
+  checkoutDate: Date;
+  guests: {
+    adults: number;
+    children: number;
+  };
+  serviceIds: string[];
+  promotionId: string;
+  paymentMethod: PaymentMethod;
 }
