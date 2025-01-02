@@ -46,27 +46,6 @@ function Search() {
 
   return (
     <>
-      {/* Desktop View */}
-      <Box display={{ xs: 'none', sm: 'flex' }}>
-        <DesktopSearchBox>
-          <Box display="flex" flexDirection="row" gap={2}>
-            <Typography sx={{ ...commonTypographyStyles, fontWeight: 600, color: 'black.900' }}>Any week</Typography>
-            <Divider orientation="vertical" flexItem />
-            <Typography sx={commonTypographyStyles}>Any guest</Typography>
-          </Box>
-          <IconButton
-            sx={{
-              backgroundColor: 'primary.500',
-              color: 'white',
-              ':hover': { backgroundColor: 'primary.600' },
-              transition: 'background-color 0.3s',
-            }}
-          >
-            <SearchRounded sx={{ color: 'white.50' }} />
-          </IconButton>
-        </DesktopSearchBox>
-      </Box>
-
       {/* Mobile View */}
       <Box display={{ xs: 'flex', sm: 'none' }} flexDirection="row" gap={2} alignItems="center" flex={1}>
         <SearchBox>
