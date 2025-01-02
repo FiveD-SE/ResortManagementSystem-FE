@@ -219,7 +219,7 @@ const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffT
                 </Box>
             </Box>
 
-            <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)', marginTop: 2 }}>
+            <Box sx={{ minHeight: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)', marginTop: 2 }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -241,7 +241,7 @@ const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffT
                                 </TableRow>
                             ) : (
                                 filteredRows.map((row, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} sx={{ '&last-child td, &last-child th': { border: 0 } }}>
                                         <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.name}</TableCell>
                                         <TableCell>{row.email}</TableCell>
