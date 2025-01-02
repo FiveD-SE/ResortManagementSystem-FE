@@ -143,13 +143,16 @@ function Categories() {
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: {
+          xs: 'column-reverse',
+          sm: 'row',
+        },
         alignItems: 'center',
         overflowX: 'hidden',
         transition: 'box-shadow 0.3s',
         gap: 2,
         px: { xs: 1, sm: 10 },
-        pt: { xs: 0, sm: 1 },
+        py: 1,
         flex: 1,
         width: '100%',
         boxShadow: { xs: '0px 2px 5px rgba(0, 0, 0, 0.1)', sm: 0 },
@@ -240,19 +243,27 @@ function Categories() {
 
       <Box
         sx={{
-          display: { xs: 'none', sm: 'flex' },
+          display: 'flex',
           gap: 1,
           p: 2,
           borderRadius: 4,
           border: '1px solid',
           borderColor: 'black.100',
           alignItems: 'center',
+          justifyContent: {
+            xs: 'center',
+            sm: 'flex-start',
+          },
           ':hover': {
             borderColor: 'black.200',
             cursor: 'pointer',
             backgroundColor: 'gray.50',
           },
           transition: 'border-color 0.3s, background-color 0.3s',
+          width: {
+            xs: '100%',
+            sm: 'fit-content',
+          },
         }}
         onClick={handleOpenDialog}
       >

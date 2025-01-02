@@ -59,7 +59,7 @@ const SortBySection = memo(
 
     return (
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600, py: 1 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, py: 1, fontSize: 'clamp( 1rem, 1.5vw, 1.25rem)' }}>
           Sort by
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
@@ -264,14 +264,14 @@ const GuestsSection = memo(
                   fontWeight: 500,
                   color: 'black.500',
                   width: {
-                    xs: 30,
-                    sm: 40,
-                    md: 50,
+                    xs: 50,
+                    sm: 60,
+                    md: 70,
                   },
                   textAlign: 'center',
                 }}
               >
-                {guestCount[type as 'adults' | 'children']}
+                {guestCount[type as 'adults' | 'children'] || 'Any'}
               </Typography>
               <IconButton
                 size="small"
@@ -318,7 +318,11 @@ const RoomsAndBedsSection = memo(
             <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'flex-end' }}>
               <IconButton
                 size="small"
-                sx={{ border: 1, borderColor: 'black.100' }}
+                sx={{
+                  border: 1,
+                  borderColor: 'black.100',
+                  opacity: selectedRooms[type as 'bedrooms' | 'beds' | 'bathrooms'] === 0 ? 0.2 : 1,
+                }}
                 onClick={() => handleRoomChange(type as 'bedrooms' | 'beds' | 'bathrooms', -1)}
                 disabled={selectedRooms[type as 'bedrooms' | 'beds' | 'bathrooms'] === 0}
               >
@@ -330,9 +334,9 @@ const RoomsAndBedsSection = memo(
                   fontWeight: 500,
                   color: 'black.500',
                   width: {
-                    xs: 30,
-                    sm: 40,
-                    md: 50,
+                    xs: 50,
+                    sm: 60,
+                    md: 70,
                   },
                   textAlign: 'center',
                 }}
@@ -341,7 +345,11 @@ const RoomsAndBedsSection = memo(
               </Typography>
               <IconButton
                 size="small"
-                sx={{ border: 1, borderColor: 'black.100' }}
+                sx={{
+                  border: 1,
+                  borderColor: 'black.100',
+                  opacity: selectedRooms[type as 'bedrooms' | 'beds' | 'bathrooms'] === 10 ? 0.2 : 1,
+                }}
                 onClick={() => handleRoomChange(type as 'bedrooms' | 'beds' | 'bathrooms', 1)}
               >
                 <AddRounded sx={{ color: 'black.500' }} />

@@ -140,8 +140,6 @@ const AccommodationList = () => {
                 roomTypeName={item.roomTypeName}
                 averageRating={item.averageRating}
                 images={item.images}
-                startDate={item.startDate}
-                endDate={item.endDate}
                 pricePerNight={item.pricePerNight}
                 onCardClick={() => handleCardClick(item.id)}
               />
