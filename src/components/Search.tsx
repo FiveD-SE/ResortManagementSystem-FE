@@ -1,5 +1,5 @@
 import { SearchRounded, TuneRounded } from '@mui/icons-material';
-import { IconButton, Box, Typography, Divider, styled } from '@mui/material';
+import { IconButton, Box, Typography, styled } from '@mui/material';
 
 const SearchBox = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -16,25 +16,6 @@ const SearchBox = styled(Box)(({ theme }) => ({
 const FilterButton = styled(IconButton)(({ theme }) => ({
   border: `1px solid ${theme.palette.grey[500]}`,
   height: 'fit-content',
-}));
-
-const DesktopSearchBox = styled(Box)(({ theme }) => ({
-  flex: 1,
-  width: 'fit-content',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  border: `1px solid ${theme.palette.grey[100]}`,
-  padding: '0.5rem 1rem',
-  paddingLeft: '1.5rem',
-  borderRadius: 50,
-  cursor: 'pointer',
-  backgroundColor: theme.palette.common.white,
-  gap: '0.5rem',
-  boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-  transition: 'box-shadow 0.3s',
-  '&:hover': { boxShadow: '0 4px 6px rgba(0,0,0,0.1)' },
 }));
 
 function Search() {

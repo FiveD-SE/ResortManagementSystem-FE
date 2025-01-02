@@ -52,6 +52,11 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
     handleMenuClose();
   }, [navigate]);
 
+  const goToMyReservation = useCallback(() => {
+    navigate(ROUTES.TRIPS.HOME);
+    handleMenuClose();
+  }, [navigate]);
+
   const handleLogout = useCallback(() => {
     navigate(ROUTES.AUTH.LOGIN);
     logout();
@@ -64,10 +69,11 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
   const menuItems = currentUser ? (
     <Fragment>
       <MenuItem onClick={goToMyProfile}>My Profile</MenuItem>
-      <MenuItem onClick={() => console.log('Go to My Favorites')}>My Favorites</MenuItem>
-      <MenuItem onClick={() => console.log('Go to My Reservations')}>My Reservations</MenuItem>
+      <MenuItem onClick={goToMyReservation}>My Reservations</MenuItem>
       <Divider />
-      <MenuItem onClick={() => setOpenPopupModal(true)}>Logout</MenuItem>
+      <MenuItem sx={{ color: 'red.500' }} onClick={() => setOpenPopupModal(true)}>
+        Logout
+      </MenuItem>
     </Fragment>
   ) : (
     <Fragment>
@@ -99,7 +105,10 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
         open={openPopupModal}
         title={'Logout'}
         message={'Are you sure you want to logout?'}
-        onClose={() => { setOpenPopupModal(false); handleMenuClose() }}
+        onClose={() => {
+          setOpenPopupModal(false);
+          handleMenuClose();
+        }}
         onConfirm={handleLogout}
       />
     </Box>
