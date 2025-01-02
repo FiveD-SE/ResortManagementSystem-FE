@@ -11,7 +11,7 @@ const BookingList = (props: IProps) => {
   return (
     <Box>
       {props.trips.map((trip: ITrip) => (
-        <BookingCard trip={trip} />
+        <BookingCard trip={trip} key={trip.id} />
       ))}
       <SearchButton />
     </Box>
