@@ -1,10 +1,12 @@
 import { Box, IconButton, Typography } from '@mui/material';
 import CategoryBox from './CatetoryBox';
 import { ChevronLeftRounded, ChevronRightRounded, TuneRounded } from '@mui/icons-material';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGetRoomTypesQuery } from '../../../apis/roomTypeApi';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import FilterDialog from './FilterDialog';
+import { resetRoomsState } from '../../../apis/roomApi';
+import { useDispatch } from 'react-redux';
 
 function Categories() {
   const location = useLocation();
@@ -14,7 +16,71 @@ function Categories() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const handleApplyFilters = useCallback(
+    (
+      sortBy: string | null,
+      sortOrder: 'asc' | 'desc' | null,
+      selectedRooms: { bedrooms: number; beds: number; bathrooms: number },
+      selectedAmenities: string[],
+      selectedDates: { checkInDate: Date | null; checkOutDate: Date | null },
+      guestCount: { adults: number; children: number },
+    ) => {
+      if (sortBy) {
+        searchParams.set('sortBy', sortBy);
+      } else {
+        searchParams.delete('sortBy');
+      }
 
+      if (sortOrder) {
+        searchParams.set('sortOrder', sortOrder);
+      } else {
+        searchParams.delete('sortOrder');
+      }
+
+      if (selectedDates.checkInDate) {
+        searchParams.set('checkinDate', selectedDates.checkInDate.toISOString());
+      }
+
+      if (selectedDates.checkOutDate) {
+        searchParams.set('checkoutDate', selectedDates.checkOutDate.toISOString());
+      }
+
+      if (guestCount.adults > 0 || guestCount.children > 0) {
+        searchParams.set('guestAmount', (guestCount.adults + guestCount.children).toString());
+      } else {
+        searchParams.delete('guestAmount');
+      }
+
+      if (selectedRooms.bedrooms > 0) {
+        searchParams.set('bedroomAmount', selectedRooms.bedrooms.toString());
+      } else {
+        searchParams.delete('bedroomAmount');
+      }
+
+      if (selectedRooms.beds > 0) {
+        searchParams.set('bedAmount', selectedRooms.beds.toString());
+      } else {
+        searchParams.delete('bedAmount');
+      }
+
+      if (selectedRooms.bathrooms > 0) {
+        searchParams.set('sharedBathAmount', selectedRooms.bathrooms.toString());
+      } else {
+        searchParams.delete('sharedBathAmount');
+      }
+
+      if (selectedAmenities.length > 0) {
+        searchParams.set('amenities', selectedAmenities.join(','));
+      } else {
+        searchParams.delete('amenities');
+      }
+
+      setSearchParams(searchParams, { replace: true });
+      dispatch(resetRoomsState());
+    },
+    [searchParams, setSearchParams, dispatch],
+  );
   const { data: roomTypesData } = useGetRoomTypesQuery({ page: 1, limit: 10 });
 
   const handleSelectRoomType = (selectedRoomTypeId: string) => {
@@ -195,7 +261,7 @@ function Categories() {
           Filters
         </Typography>
       </Box>
-      <FilterDialog open={openDialog} onClose={handleCloseDialog} />
+      <FilterDialog open={openDialog} onClose={handleCloseDialog} onApply={handleApplyFilters} />
     </Box>
   );
 }

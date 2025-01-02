@@ -101,3 +101,15 @@ export interface IBookingRoom {
   ratings: string[];
   id: string;
 }
+
+export interface IRoomFilterApiRequest {
+  guestAmount?: number;
+  bedAmount?: number;
+  bedroomAmount?: number;
+  searchKeyFeature?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  limit: number;
+  page: number;
+  amenities?: string[];
+}
