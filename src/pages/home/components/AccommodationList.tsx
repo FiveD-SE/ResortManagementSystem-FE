@@ -1,7 +1,7 @@
 import { Box, Grid2 as Grid, Typography } from '@mui/material';
 import AccommodationCard from './AccommodationCard';
 import AccommodationCardSkeleton from './AccommodationCardSkeleton';
-import { resetRoomsState, useFilterQuery, useGetRoomsByRoomTypeIdQuery } from '../../../apis/roomApi';
+import { resetRoomsState, useFilterQuery } from '../../../apis/roomApi';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -33,49 +33,33 @@ const AccommodationList = () => {
     isFetching: isAllRoomsFetching,
     error: allRoomsError,
     refetch: refetchAllRooms,
-  } = useFilterQuery(
-    {
-      page,
-      limit: 12,
-      ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
-      ...(checkinDate ? { checkinDate } : {}),
-      ...(checkoutDate ? { checkoutDate } : {}),
-      ...(guestAmount ? { guestAmount: parseInt(guestAmount, 10) } : {}),
-      ...(bedroomAmount ? { bedroomAmount: parseInt(bedroomAmount, 10) } : {}),
-      ...(bedAmount ? { bedAmount: parseInt(bedAmount, 10) } : {}),
-      ...(sharedBathAmount ? { sharedBathAmount: parseInt(sharedBathAmount, 10) } : {}),
-      ...(amenitiesArray ? { amenities: amenitiesArray } : {}),
-    },
-    {
-      skip: !!roomTypeId,
-    },
-  );
-
-  const {
-    data: roomTypeData,
-    isLoading: isRoomTypeLoading,
-    isFetching: isRoomTypeFetching,
-    error: roomTypeError,
-    refetch: refetchRoomType,
-  } = useGetRoomsByRoomTypeIdQuery({ roomTypeId: roomTypeId as string, page, limit: 12 }, { skip: !roomTypeId });
+  } = useFilterQuery({
+    page,
+    limit: 12,
+    ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+    ...(checkinDate ? { checkinDate } : {}),
+    ...(checkoutDate ? { checkoutDate } : {}),
+    ...(roomTypeId ? { roomTypeId } : {}),
+    ...(guestAmount ? { guestAmount: parseInt(guestAmount, 10) } : {}),
+    ...(bedroomAmount ? { bedroomAmount: parseInt(bedroomAmount, 10) } : {}),
+    ...(bedAmount ? { bedAmount: parseInt(bedAmount, 10) } : {}),
+    ...(sharedBathAmount ? { sharedBathAmount: parseInt(sharedBathAmount, 10) } : {}),
+    ...(amenitiesArray ? { amenities: amenitiesArray } : {}),
+  });
 
   const loader = useRef(null);
   const navigate = useNavigate();
   const [currentData, setCurrentData] = useState<IRoomApiResponse | null>(null);
-  const isLoading = roomTypeId ? isRoomTypeLoading : isAllRoomsLoading;
-  const isFetching = roomTypeId ? isRoomTypeFetching : isAllRoomsFetching;
-  const error = roomTypeId ? roomTypeError : allRoomsError;
+  const isLoading = isAllRoomsLoading;
+  const isFetching = isAllRoomsFetching;
+  const error = allRoomsError;
 
   const hasNextPage = currentData?.hasNextPage;
   const totalPages = currentData?.totalPages;
 
   useEffect(() => {
-    if (roomTypeId) {
-      setCurrentData(roomTypeData ?? null);
-    } else {
-      setCurrentData(allRoomsData ?? null);
-    }
-  }, [roomTypeData, allRoomsData, roomTypeId]);
+    setCurrentData(allRoomsData ?? null);
+  }, [allRoomsData]);
 
   const handleCardClick = useCallback(
     (roomId: string) => {
@@ -115,13 +99,22 @@ const AccommodationList = () => {
   useEffect(() => {
     setCurrentData(null);
     dispatch(resetRoomsState());
-    if (roomTypeId) {
-      refetchRoomType();
-    } else {
-      refetchAllRooms();
-    }
+    refetchAllRooms();
     setPage(1);
-  }, [roomTypeId, refetchAllRooms, refetchRoomType, dispatch]);
+  }, [
+    roomTypeId,
+    sortBy,
+    sortOrder,
+    checkinDate,
+    checkoutDate,
+    guestAmount,
+    bedroomAmount,
+    bedAmount,
+    sharedBathAmount,
+    amenities,
+    refetchAllRooms,
+    dispatch,
+  ]);
 
   if (error) {
     console.error('Error fetching rooms:', error);
@@ -140,6 +133,8 @@ const AccommodationList = () => {
                 roomTypeName={item.roomTypeName}
                 averageRating={item.averageRating}
                 images={item.images}
+                startDate={item.nextAvailableWeek.start}
+                endDate={item.nextAvailableWeek.end}
                 pricePerNight={item.pricePerNight}
                 onCardClick={() => handleCardClick(item.id)}
               />
