@@ -24,6 +24,7 @@ export const roomApi = createApi({
       forceRefetch({ currentArg, previousArg }) {
         return currentArg !== previousArg;
       },
+      keepUnusedDataFor: 1,
     }),
     getRoomsByRoomTypeId: builder.query<IRoomApiResponse, IRoomApiRequest>({
       query: ({ roomTypeId, page = 1, limit = 10, sort }) => ({
