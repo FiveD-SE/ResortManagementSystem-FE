@@ -1,8 +1,7 @@
-import { Box, Button, Divider, Stack, TextField, Typography } from '@mui/material';
-
-import PaymentIcon from '@mui/icons-material/Payment';
+import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 import { TRIPS_FORM } from '../../constant';
-import { IBooking } from '../../../../types';
+import { IBooking } from '../../../../types/booking';
+import PaidIcon from '@mui/icons-material/Paid';
 
 interface IProps {
   booking: IBooking | null;
@@ -16,9 +15,7 @@ const TripForm = (props: IProps) => {
   const { booking } = props;
   return (
     <Stack gap={4}>
-      <Typography variant="h1" sx={{ fontFamily: 'Be Vietnam Pro', mb: 2 }}>
-        Your booking
-      </Typography>
+      <Typography sx={{ fontFamily: 'Be Vietnam Pro', mb: 2, fontSize: 40, fontWeight: 'bold' }}>Your booking</Typography>
       <Box>
         <Typography variant="h3" sx={{ fontFamily: 'Be Vietnam Pro', mb: 1 }}>
           Booking Date
@@ -40,17 +37,33 @@ const TripForm = (props: IProps) => {
         <Typography variant="h3" sx={{ fontFamily: 'Be Vietnam Pro', mb: 1 }}>
           Payment
         </Typography>
-        <Box sx={{ border: '1px solid #E0E0E0', borderRadius: 3, padding: 2 }}>
-          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro' }}>
+        <Box
+          sx={{
+            border: '1px solid #E0E0E0',
+            borderRadius: 3,
+            padding: 2,
+            flexDirection: 'row',
+            display: 'flex',
+            alignContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <PaidIcon sx={{ width: 40, height: 40 }} />
+          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 24, fontWeight: 'bold', ml: 2 }}>
             {booking?.paymentMethod}
           </Typography>
         </Box>
       </Box>
       <Box>
-        <Box sx={{ border: '1px solid #E0E0E0', borderRadius: 3, padding: 2 }}>
-          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro' }}>
-            {/* {booking?.paymentMethod} */}
-            Voucher
+        <Box sx={{ border: '1px solid #E0E0E0', borderRadius: 3, padding: 2, backgroundColor: '#FF7A92' }}>
+          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro', color: '#fff', fontWeight: 'bold', fontSize: 24 }}>
+            Voucher: {booking?.promotionId.promotionName}
+          </Typography>
+          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro', color: '#fff', fontWeight: 'bold', fontSize: 24 }}>
+            Due date: {convertDateTime(booking?.promotionId.endDate || new Date())}
+          </Typography>
+          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro', color: '#fff', fontWeight: 'bold', fontSize: 24 }}>
+            Discount: {booking?.promotionId.discount}%
           </Typography>
         </Box>
       </Box>

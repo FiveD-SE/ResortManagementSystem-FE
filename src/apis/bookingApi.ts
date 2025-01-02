@@ -102,4 +102,6 @@ export const {
   useGetBookingServicesQuery,
   useGetBookingServicesCountQuery,
   useCreateBookingMutation,
+  useGetBookingByIdQuery,
+  useGetBookingsByUserIdQuery,
 } = bookingApi;

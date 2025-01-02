@@ -5,6 +5,8 @@ import TripForm from './Detail/TripForm';
 import PricingCard from './Detail/PricingCard';
 import { useParams } from 'react-router-dom';
 import { useGetBookingByIdQuery } from '../../../apis/bookingApi';
+import { CardLoading, TextLoading } from './Skeleton';
+
 const TripDetail = () => {
   const { id } = useParams<{ id: string }>();
   console.log(id);
@@ -16,10 +18,10 @@ const TripDetail = () => {
       <Box sx={{ flexGrow: 1, paddingX: 4 }}>
         <Grid container spacing={4}>
           <Grid size={6} sx={{ padding: 4 }}>
-            <TripForm booking={data || null} />
+            {isFetching ? <TextLoading /> : <TripForm booking={data || null} />}
           </Grid>
           <Grid size={6} sx={{ padding: 4 }}>
-            <PricingCard data={data || null} />
+            {isFetching ? <CardLoading /> : <PricingCard data={data || null} />}
           </Grid>
         </Grid>
       </Box>
