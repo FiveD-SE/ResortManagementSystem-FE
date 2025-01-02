@@ -324,7 +324,6 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
         onChange={handlePageChange}
       />
 
-
       <AddNewRoomModal
         open={openAddNewRoomModal}
         onClose={() => setOpenAddNewRoomModal(false)}

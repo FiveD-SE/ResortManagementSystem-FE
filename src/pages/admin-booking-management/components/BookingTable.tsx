@@ -44,10 +44,9 @@ interface BookingTableProps {
     pendingBookingData: IBookingApiResponse | undefined;
     checkedInBookingData: IBookingApiResponse | undefined;
     checkedOutBookingData: IBookingApiResponse | undefined;
-    onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
-const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBookingData, onPageChange }: BookingTableProps) => {
+const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBookingData }: BookingTableProps) => {
     const [bookingDate, setBookingDate] = React.useState('monthly');
     const [open, setOpen] = React.useState(false);
     const [openCalendar, setOpenCalendar] = React.useState(false);
@@ -58,7 +57,13 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
     const [tabSelected, setTabSelected] = React.useState(0);
     const [search, setSearch] = React.useState('');
     const [selectedBooking, setSelectedBooking] = React.useState<IBooking>();
-    const [count, setCount] = React.useState(0);
+    const [count, setCount] = React.useState({
+        all: 0,
+        pending: 0,
+        checkedIn: 0,
+        checkedOut: 0
+    });
+    const [currentPage, setCurrentPage] = React.useState<number>(1);
 
     const handleSelectBooking = (id: string, status: string) => {
         if (status === 'Pending') {
@@ -106,6 +111,18 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
             status: booking.status,
         }));
 
+        const totalAll = (pendingBookings?.length || 0) + (checkedInBookings?.length || 0) + (checkedOutBookings?.length || 0);
+        const totalPending = pendingBookings?.length || 0;
+        const totalCheckedIn = checkedInBookings?.length || 0;
+        const totalCheckedOut = checkedOutBookings?.length || 0;
+
+        setCount({
+            all: Math.ceil(totalAll / 10),
+            pending: Math.ceil(totalPending / 10),
+            checkedIn: Math.ceil(totalCheckedIn / 10),
+            checkedOut: Math.ceil(totalCheckedOut / 10),
+        });
+
         return [
             ...(pendingBookings || []),
             ...(checkedInBookings || []),
@@ -114,14 +131,16 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
     }, [pendingBookingData, checkedInBookingData, checkedOutBookingData]);
 
     const getFilteredRows = React.useCallback(() => {
+        const docsInCurrentPage = allBookings.slice((currentPage - 1) * 10, currentPage * 10);
         const tabFilter = tabSelected === 0
-            ? allBookings
-            : allBookings.filter((booking) =>
+            ? docsInCurrentPage
+            : docsInCurrentPage.filter((booking) =>
                 tabSelected === 1
                     ? booking.status.toLowerCase() === 'pending'
                     : tabSelected === 2
                         ? booking.status.toLowerCase() === 'checked in'
                         : booking.status.toLowerCase() === 'checked out');
+
         const dateFilter = tabFilter.filter((row) => {
             const checkInDate = dayjs(row.checkInDate);
             const checkOutDate = dayjs(row.checkOutDate);
@@ -164,8 +183,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                 return row.status.toLowerCase().includes(search.toLowerCase());
             }
         });
-    }, [tabSelected, search, bookingDate, selectedDateRange, selectedMonth, selectedSearch]);
-
+    }, [tabSelected, search, bookingDate, selectedDateRange, selectedMonth, selectedSearch, currentPage]);
 
     const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
 
@@ -193,21 +211,9 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
         setOpenCalendar(false);
     };
 
-    React.useEffect(() => {
-        const filteredRows = getFilteredRows();
-
-        const totalItems = filteredRows.length;
-        const itemsPerPage = 10;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-        if (count > totalPages) {
-            setCount(totalPages);
-        }
-
-        if (totalPages === 0) {
-            setCount(1);
-        }
-    }, [tabSelected, search, bookingDate, selectedDateRange, selectedMonth, selectedSearch, getFilteredRows]);
+    const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+        setCurrentPage(value);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -393,7 +399,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                                 </TableRow>
                             ) : (
                                 filteredRows.map((row, index) => (
-                                    <TableRow key={index} sx={{ cursor: 'pointer', ":hover": { bgcolor: 'gray.50' } }} onClick={() => { setOpen(true); handleSelectBooking(row.id, row.status) }}>
+                                    <TableRow key={index} sx={{ cursor: 'pointer', ":hover": { bgcolor: 'gray.50' }, '&:last-child td, &:last-child th': { border: 0 } }} onClick={() => { setOpen(true); handleSelectBooking(row.id, row.status) }}>
                                         <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.roomType}</TableCell>
                                         <TableCell>{row.roomNumber}</TableCell>
@@ -411,12 +417,20 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
             </Box>
 
             <Pagination
-                count={Math.ceil(filteredRows.length / 10) || 1}
+                count={
+                    tabSelected === 0
+                        ? count.all
+                        : tabSelected === 1
+                            ? count.pending
+                            : tabSelected === 2
+                                ? count.checkedIn
+                                : count.checkedOut
+                }
                 variant="outlined"
                 shape="rounded"
                 sx={{ marginTop: 2, alignSelf: 'flex-end' }}
-                page={count}
-                onChange={(event, value) => onPageChange(event, value)}
+                page={currentPage}
+                onChange={handlePageChange}
             />
 
             <BookingInformationModal open={open} onClose={() => setOpen(false)} selectedBooking={selectedBooking} />
