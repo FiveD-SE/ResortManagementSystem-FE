@@ -2,12 +2,14 @@ import { ChevronLeftRounded, ChevronRightRounded, StarRounded } from '@mui/icons
 import { Card, CardContent, CardMedia, Typography, Box } from '@mui/material';
 import { useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
-import { formatPrice } from '../../../utils';
+import { formatDateRange, formatPrice } from '../../../utils';
 import { IRoom } from '../../../types';
 
 interface AccommodationCardProps extends Omit<IRoom, 'id' | 'createdAt' | 'updatedAt' | 'status'> {
   roomTypeName: string;
   averageRating: number;
+  startDate: string;
+  endDate: string;
   onCardClick?: () => void;
 }
 
@@ -16,6 +18,8 @@ const AccommodationCard = ({
   roomNumber,
   roomTypeName,
   averageRating,
+  startDate,
+  endDate,
   pricePerNight,
   onCardClick = () => {},
 }: AccommodationCardProps) => {
@@ -92,6 +96,9 @@ const AccommodationCard = ({
               </Typography>
             </Box>
           </Box>
+          <Typography variant="body2" sx={{ fontWeight: 400, color: 'gray.500' }}>
+            {formatDateRange(startDate, endDate)}
+          </Typography>
           <Typography variant="body2">
             <strong>{formatPrice(pricePerNight)}</strong> / night
           </Typography>
