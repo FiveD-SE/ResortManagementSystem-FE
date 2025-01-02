@@ -46,3 +46,10 @@ export const clearTokens = () => {
   Cookies.remove('accessToken');
   Cookies.remove('refreshToken');
 };
+
+export const getUserIdFromRefreshToken = () => {
+  const token = getRefreshToken();
+  if (!token) return null;
+  const decoded = decodeToken(token);
+  return decoded ? decoded.userID || null : null;
+}
