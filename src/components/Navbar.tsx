@@ -1,4 +1,4 @@
-import { AppBar, Box, Toolbar, useTheme, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Toolbar, useMediaQuery } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Logo from './Logo';
@@ -10,8 +10,7 @@ const Navbar = ({ currentUser }: { currentUser?: IAccount | null }) => {
   const location = useLocation();
   const [isAuthPage, setIsAuthPage] = useState(false);
 
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
   useEffect(() => {
     setIsAuthPage(location.pathname.includes('login') || location.pathname.includes('register'));

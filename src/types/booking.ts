@@ -1,4 +1,5 @@
 import { ICustomer } from './customer';
+import { PaymentMethod } from './enums';
 import { IPromotion } from './promotion';
 import { IBookingRoom } from './room';
 import { IBookingService } from './service';
@@ -120,4 +121,15 @@ export interface ITrip {
   updatedAt: Date;
   __v: number;
   id: string;
+}
+export interface ICreateBookingRequest {
+  checkinDate: Date;
+  checkoutDate: Date;
+  guests: {
+    adults: number;
+    children: number;
+  };
+  serviceIds: string[];
+  promotionId: string;
+  paymentMethod: PaymentMethod;
 }

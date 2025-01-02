@@ -12,7 +12,7 @@ const AmenityItem = ({ icon: Icon, title, lineThrough }: AmenityItemProps) => {
     <Grid item xs={12} sm={6}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         {Icon && <Icon sx={{ fontSize: 24 }} />}
-        <Typography variant="body2" sx={{ textDecoration: lineThrough ? 'line-through' : 'none' }}>
+        <Typography variant="body2" sx={{ textDecoration: lineThrough ? 'line-through' : 'none', whiteSpace: 'nowrap' }}>
           {title}
         </Typography>
       </Box>

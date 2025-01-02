@@ -24,6 +24,7 @@ const BookingManagement = lazy(() => import('../pages/admin-booking-management')
 const AdminProfile = lazy(() => import('../pages/admin-profile'));
 const ServiceStaffDashboard = lazy(() => import('../pages/serviceStaff-dashboard/ServiceStaffDashboard'));
 const ReceptionistDashboard = lazy(() => import('../pages/receptionist-dashboard/ReceptionistDashboard'));
+const Bookings = lazy(() => import('../pages/bookings'));
 
 const Routing = () => {
   return (
@@ -50,6 +51,7 @@ const Routing = () => {
       <Route path={ROUTES.ROOMS} element={<Rooms />} />
       <Route element={<PrivateRoute allowedRoles={[Role.User]} />}>
         <Route element={<Trips />} path={ROUTES.TRIPS.HOME} />
+        <Route path={ROUTES.BOOKINGS} element={<Bookings />} />
         <Route element={<TripDetail />} path={ROUTES.TRIPS.DETAIL} />
         <Route element={<TripReview />} path={ROUTES.TRIPS.REVIEW} />
         <Route path={ROUTES.PROFILE} element={<Profile />} />

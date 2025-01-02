@@ -1,5 +1,5 @@
 import { SearchRounded, TuneRounded } from '@mui/icons-material';
-import { IconButton, Box, Typography, Divider, styled } from '@mui/material';
+import { IconButton, Box, Typography, styled } from '@mui/material';
 
 const SearchBox = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -18,25 +18,6 @@ const FilterButton = styled(IconButton)(({ theme }) => ({
   height: 'fit-content',
 }));
 
-const DesktopSearchBox = styled(Box)(({ theme }) => ({
-  flex: 1,
-  width: 'fit-content',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  border: `1px solid ${theme.palette.grey[100]}`,
-  padding: '0.5rem 1rem',
-  paddingLeft: '1.5rem',
-  borderRadius: 50,
-  cursor: 'pointer',
-  backgroundColor: theme.palette.common.white,
-  gap: '0.5rem',
-  boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-  transition: 'box-shadow 0.3s',
-  '&:hover': { boxShadow: '0 4px 6px rgba(0,0,0,0.1)' },
-}));
-
 function Search() {
   const commonTypographyStyles = {
     fontSize: '0.875rem',
@@ -46,27 +27,6 @@ function Search() {
 
   return (
     <>
-      {/* Desktop View */}
-      <Box display={{ xs: 'none', sm: 'flex' }}>
-        <DesktopSearchBox>
-          <Box display="flex" flexDirection="row" gap={2}>
-            <Typography sx={{ ...commonTypographyStyles, fontWeight: 600, color: 'black.900' }}>Any week</Typography>
-            <Divider orientation="vertical" flexItem />
-            <Typography sx={commonTypographyStyles}>Any guest</Typography>
-          </Box>
-          <IconButton
-            sx={{
-              backgroundColor: 'primary.500',
-              color: 'white',
-              ':hover': { backgroundColor: 'primary.600' },
-              transition: 'background-color 0.3s',
-            }}
-          >
-            <SearchRounded sx={{ color: 'white.50' }} />
-          </IconButton>
-        </DesktopSearchBox>
-      </Box>
-
       {/* Mobile View */}
       <Box display={{ xs: 'flex', sm: 'none' }} flexDirection="row" gap={2} alignItems="center" flex={1}>
         <SearchBox>

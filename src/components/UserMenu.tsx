@@ -4,6 +4,8 @@ import { MenuRounded } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import { IAccount } from '../types';
+import useLogout from '../utils/useLogout';
+import PopupModal from './PopupModal';
 
 const menuStyles = {
   display: { xs: 'none', sm: 'flex' },
@@ -22,7 +24,10 @@ const menuStyles = {
 
 export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [openPopupModal, setOpenPopupModal] = useState(false);
   const navigate = useNavigate();
+
+  const logout = useLogout();
 
   const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -34,25 +39,41 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
 
   const goToSignIn = useCallback(() => {
     navigate(ROUTES.AUTH.LOGIN);
+    handleMenuClose();
   }, [navigate]);
 
   const goToSignUp = useCallback(() => {
     navigate(ROUTES.AUTH.REGISTER);
+    handleMenuClose();
   }, [navigate]);
 
   const goToMyProfile = useCallback(() => {
     navigate(ROUTES.PROFILE);
+    handleMenuClose();
   }, [navigate]);
+
+  const goToMyReservation = useCallback(() => {
+    navigate(ROUTES.TRIPS.HOME);
+    handleMenuClose();
+  }, [navigate]);
+
+  const handleLogout = useCallback(() => {
+    navigate(ROUTES.AUTH.LOGIN);
+    logout();
+    handleMenuClose();
+    setOpenPopupModal(false);
+  }, [navigate, logout]);
 
   const avatarSrc = currentUser?.avatar || '/assets/avatar.png';
 
   const menuItems = currentUser ? (
     <Fragment>
       <MenuItem onClick={goToMyProfile}>My Profile</MenuItem>
-      <MenuItem onClick={() => console.log('Go to My Favorites')}>My Favorites</MenuItem>
-      <MenuItem onClick={() => console.log('Go to My Reservations')}>My Reservations</MenuItem>
+      <MenuItem onClick={goToMyReservation}>My Reservations</MenuItem>
       <Divider />
-      <MenuItem onClick={() => console.log('Logout')}>Logout</MenuItem>
+      <MenuItem sx={{ color: 'red.500' }} onClick={() => setOpenPopupModal(true)}>
+        Logout
+      </MenuItem>
     </Fragment>
   ) : (
     <Fragment>
@@ -75,10 +96,21 @@ export const UserMenu = ({ currentUser }: { currentUser?: IAccount | null }) => 
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        PaperProps={{ sx: { width: '10%', borderRadius: '0.75rem' } }}
+        PaperProps={{ sx: { borderRadius: '0.75rem', mt: 1 } }}
       >
         {menuItems}
       </Menu>
+      <PopupModal
+        type={'confirm'}
+        open={openPopupModal}
+        title={'Logout'}
+        message={'Are you sure you want to logout?'}
+        onClose={() => {
+          setOpenPopupModal(false);
+          handleMenuClose();
+        }}
+        onConfirm={handleLogout}
+      />
     </Box>
   );
 };
