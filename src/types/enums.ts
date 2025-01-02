@@ -42,3 +42,8 @@ export enum Gender {
   Female = 'female',
   Other = 'other',
 }
+
+export enum PaymentMethod {
+  PayOnArrival = 'Pay on arrival',
+  Transfer = 'Transfer',
+}

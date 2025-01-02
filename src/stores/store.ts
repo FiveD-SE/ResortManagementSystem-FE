@@ -10,6 +10,7 @@ import { bookingApi } from '../apis/bookingApi';
 import { serviceApi } from '../apis/serviceApi';
 import { serviceTypeApi } from '../apis/serviceTypeApi';
 import { promotionApi } from '../apis/promotionApi';
+import { adminDashboardApi } from '../apis/adminDashboardApi';
 
 const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ const store = configureStore({
     [serviceTypeApi.reducerPath]: serviceTypeApi.reducer,
     [promotionApi.reducerPath]: promotionApi.reducer,
     [adminUserApi.reducerPath]: adminUserApi.reducer,
+    [adminDashboardApi.reducerPath]: adminDashboardApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware().concat(
@@ -35,6 +37,7 @@ const store = configureStore({
       serviceTypeApi.middleware,
       promotionApi.middleware,
       adminUserApi.middleware,
+      adminDashboardApi.middleware,
     );
   },
 });

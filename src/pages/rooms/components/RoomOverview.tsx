@@ -1,13 +1,21 @@
 import { FavoriteBorderRounded, ShareRounded, StarRounded } from '@mui/icons-material';
-import { Box, IconButton, Stack, Typography } from '@mui/material';
-import { IReview, IRoomType } from '../../../types';
+import { Box, IconButton, Link, Stack, Typography } from '@mui/material';
+import { IRoomType } from '../../../types';
+import { IRating } from '../../../types/rating';
 
 interface IRoomOverviewProps {
-  roomType: Pick<IRoomType, 'typeName' | 'guestAmount' | 'bedroomAmount' | 'bedAmount' | 'sharedBathAmount'>;
-  reviews: Pick<IReview, 'rating' | 'createdAt'>[];
+  roomType: Pick<
+    IRoomType,
+    'typeName' | 'guestAmount' | 'bedroomAmount' | 'bedAmount' | 'sharedBathAmount' | 'amenities' | 'keyFeatures'
+  >;
+  ratings: Pick<IRating, 'average'>[];
+  ratingsRef?: React.RefObject<HTMLDivElement>;
 }
 
-const RoomOverview = ({ roomType, reviews }: IRoomOverviewProps) => {
+const RoomOverview = ({ roomType, ratings, ratingsRef }: IRoomOverviewProps) => {
+  const scrollToGuestReviews = () => {
+    ratingsRef?.current?.scrollIntoView({ behavior: 'smooth' });
+  };
   return (
     <Box sx={{ py: 2 }}>
       <Typography variant="h5" component="h1" sx={{ fontWeight: 700, color: 'black.500' }}>
@@ -21,11 +29,13 @@ const RoomOverview = ({ roomType, reviews }: IRoomOverviewProps) => {
         <Stack direction="row" sx={{ alignItems: 'center', mt: 1 }} spacing={1}>
           <StarRounded sx={{ fontSize: 14, color: 'black.500' }} />
           <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500' }}>
-            {reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length}
+            {ratings.reduce((acc, rating) => acc + rating.average, 0) / ratings.length || 0}
           </Typography>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500', textDecoration: 'underline' }}>
-            {reviews.length} reviews
-          </Typography>
+          <Link onClick={scrollToGuestReviews}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500', textDecoration: 'underline' }}>
+              {ratings.length} reviews
+            </Typography>
+          </Link>
         </Stack>
       </Box>
       <Stack direction="row" spacing={2} sx={{ mt: 2 }}>

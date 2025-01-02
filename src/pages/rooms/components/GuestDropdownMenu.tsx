@@ -1,5 +1,5 @@
-import { Box, Menu, Divider } from '@mui/material';
-import { useState } from 'react';
+import { Box, Menu, Divider, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import GuestControl from './GuestControl';
 
 import { MenuProps } from '@mui/material';
@@ -7,24 +7,58 @@ import { MenuProps } from '@mui/material';
 interface GuestDropdownMenuProps {
   anchorEl: MenuProps['anchorEl'];
   open: boolean;
+  guestAmount: number;
   onClose: () => void;
+  onGuestChange: (guests: Guests) => void;
 }
 
 interface Guests {
   adults: number;
   children: number;
-  infants: number;
 }
 
-const GuestDropdownMenu = ({ anchorEl, open, onClose }: GuestDropdownMenuProps) => {
-  const [guests, setGuests] = useState({ adults: 1, children: 0, infants: 0 });
+const GuestDropdownMenu = ({ anchorEl, open, onClose, guestAmount, onGuestChange }: GuestDropdownMenuProps) => {
+  const [guests, setGuests] = useState<Guests>({ adults: 1, children: 0 });
+
+  useEffect(() => {
+    onGuestChange(guests);
+  }, [guests, onGuestChange]);
 
   const handleGuestChange = (type: keyof Guests, delta: number) => {
-    setGuests((prevGuests: Guests) => ({
-      ...prevGuests,
-      [type]: Math.max(type === 'adults' ? 1 : 0, prevGuests[type] + delta),
-    }));
+    setGuests((prevGuests) => {
+      const newGuests = { ...prevGuests };
+      if (type === 'adults') {
+        newGuests.adults = Math.max(1, newGuests.adults + delta);
+      } else if (type === 'children') {
+        newGuests.children = Math.max(0, newGuests.children + delta);
+      }
+
+      const totalGuests = newGuests.adults + newGuests.children;
+
+      if (totalGuests > guestAmount) {
+        const excess = totalGuests - guestAmount;
+        if (type === 'adults') {
+          newGuests.children = Math.max(0, newGuests.children - excess);
+        } else if (type === 'children') {
+          newGuests.adults = Math.max(1, newGuests.adults - excess);
+        }
+      }
+
+      while (newGuests.adults + newGuests.children > guestAmount) {
+        if (newGuests.children > 0) {
+          newGuests.children--;
+        } else if (newGuests.adults > 1) {
+          newGuests.adults--;
+        } else {
+          break;
+        }
+      }
+
+      return newGuests;
+    });
   };
+
+  const totalGuests = guests.adults + guests.children;
 
   const handleClose = () => {
     onClose();
@@ -52,6 +86,7 @@ const GuestDropdownMenu = ({ anchorEl, open, onClose }: GuestDropdownMenuProps) 
           value={guests.adults}
           onIncrement={() => handleGuestChange('adults', 1)}
           onDecrement={() => handleGuestChange('adults', -1)}
+          disabledIncrement={totalGuests >= guestAmount}
         />
         <Divider orientation="horizontal" flexItem />
         <GuestControl
@@ -60,15 +95,14 @@ const GuestDropdownMenu = ({ anchorEl, open, onClose }: GuestDropdownMenuProps) 
           value={guests.children}
           onIncrement={() => handleGuestChange('children', 1)}
           onDecrement={() => handleGuestChange('children', -1)}
+          disabledIncrement={totalGuests >= guestAmount}
         />
-        <Divider orientation="horizontal" flexItem />
-        <GuestControl
-          label="Infants"
-          description="Under 2"
-          value={guests.infants}
-          onIncrement={() => handleGuestChange('infants', 1)}
-          onDecrement={() => handleGuestChange('infants', -1)}
-        />
+
+        {totalGuests > guestAmount && (
+          <Typography variant="body2" color="error">
+            The total number of guests cannot exceed {guestAmount}.
+          </Typography>
+        )}
       </Box>
     </Menu>
   );

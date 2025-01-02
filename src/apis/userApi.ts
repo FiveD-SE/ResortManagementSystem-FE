@@ -10,12 +10,6 @@ export const userApi = createApi({
     baseUrl: USER_ENDPOINT,
   }),
   endpoints: (builder) => ({
-    getUserById: builder.query<any, string>({
-      query: (id) => ({
-        url: `/${id}`,
-        method: 'GET',
-      }),
-    }),
     createUser: builder.mutation<any, { firstName: string; lastName: string; email: string; password: string; role: Role; serviceTypeId: string }>({
       query: (body) => ({
         url: '/',
@@ -23,9 +17,31 @@ export const userApi = createApi({
         data: body,
       }),
     }),
+    getUserById: builder.query<IUser, string>({
+      query: (id) => ({ url: `/${id}` }),
+    }),
+    changeAvatar: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: `/change-avatar`,
+        method: 'POST',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
+    }),
+    changeProfile: builder.mutation<any, { firstName: string; lastName: string }>({
+      query: ({ firstName, lastName }) => ({
+        url: `/change-profile`,
+        method: 'PATCH',
+        data: {
+          firstName,
+          lastName,
+        },
+      }),
+    }),
   }),
 });
-
 
 export const adminUserApi = createApi({
   reducerPath: 'adminUserApi',
@@ -34,7 +50,7 @@ export const adminUserApi = createApi({
   }),
   endpoints: (builder) => ({
     adminGetUsersByRole: builder.query<IUserApiResponse, IUserApiRequest>({
-      query: (params: IUserApiRequest) => ({
+      query: (params) => ({
         url: `/${params.role}`,
         method: 'GET',
         params: {
@@ -51,7 +67,7 @@ export const adminUserApi = createApi({
         method: 'DELETE',
       }),
     }),
-    updateUser: builder.mutation<any, Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email'>>({
+    updateUser: builder.mutation<any, Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email'> & { id: string }>({
       query: (data) => ({
         url: `/${data.id}`,
         method: 'PATCH',
@@ -63,14 +79,25 @@ export const adminUserApi = createApi({
         },
       }),
     }),
-    getStaffStatistic: builder.query<{ total: number, receptionist: number, service_staff: number }, void>({
+    getStaffStatistic: builder.query<{ total: number; receptionist: number; service_staff: number }, void>({
       query: () => ({
         url: '/staff-count',
         method: 'GET',
       }),
-    })
+    }),
   }),
 });
 
-export const { useGetUserByIdQuery, useCreateUserMutation } = userApi;
-export const { useAdminGetUsersByRoleQuery, useDeleteUserMutation, useUpdateUserMutation, useGetStaffStatisticQuery } = adminUserApi;
+export const {
+  useGetUserByIdQuery,
+  useCreateUserMutation,
+  useChangeAvatarMutation,
+  useChangeProfileMutation,
+} = userApi;
+
+export const {
+  useAdminGetUsersByRoleQuery,
+  useDeleteUserMutation,
+  useUpdateUserMutation,
+  useGetStaffStatisticQuery,
+} = adminUserApi;

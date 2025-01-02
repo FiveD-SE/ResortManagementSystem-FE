@@ -2,8 +2,9 @@ import { AccountCircleRounded, DiscountRounded, FactCheck, GridView, HailRounded
 import { Box, Divider, Drawer, IconButton, List, Typography } from "@mui/material"
 import { useState } from "react";
 import SidebarItem from "./SidebarItem";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PopupModal from "./PopupModal";
+import useLogout from "../utils/useLogout";
 
 const MENUS = {
     LOGOUT: 'logout',
@@ -56,12 +57,14 @@ const SidebarItems = [
 ];
 
 const Sidebar = () => {
+    const location = useLocation();
     const [openSideBar, setOpenSideBar] = useState<boolean>(true);
-    const [selectedMenu, setSelectedMenu] = useState<string>('/admin/dashboard');
+    const [selectedMenu, setSelectedMenu] = useState<string>(location.pathname.split('/admin/')[1] || '');
     const [openPopupModal, setOpenPopupModal] = useState<boolean>(false);
     const drawerWidth = openSideBar ? '20rem' : '5rem';
     const drawerTransition = '0.2s ease';
     const navigate = useNavigate();
+    const logout = useLogout();
 
     const handleSelectMenu = (menu: { name: string; href?: string }) => {
         if (menu.name === MENUS.LOGOUT) {
@@ -187,7 +190,7 @@ const Sidebar = () => {
                 title={'Logout'}
                 message={'Are you sure you want to logout?'}
                 onClose={() => (setOpenPopupModal(false))}
-                onConfirm={() => (setOpenPopupModal(false))}
+                onConfirm={logout}
             />
         </Drawer>
     )

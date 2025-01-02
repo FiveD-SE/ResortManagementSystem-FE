@@ -9,3 +9,4 @@ export const SERVICE_ENDPOINT = `${API_BASE_URL}/services`;
 export const SERVICE_TYPE_ENDPOINT = `${API_BASE_URL}/service-types`;
 export const PROMOTION_ENDPOINT = `${API_BASE_URL}/promotions`;
 export const ADMIN_USER_ENDPOINT = `${API_BASE_URL}/admin/users`;
+export const ADMIN_DASHBOARD_ENDPOINT = `${API_BASE_URL}/admin-dashboard`;

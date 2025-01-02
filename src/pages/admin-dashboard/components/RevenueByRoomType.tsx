@@ -9,41 +9,25 @@ import {
     TableRow,
 } from '@mui/material';
 import React from 'react';
+import { IRoomTypeRevenue } from '../../../types/statistic';
 
-const data = [
-    {
-        index: 1,
-        type: "Standard Room",
-        rates: 80,
-        firgures: "70%",
-    },
-    {
-        index: 2,
-        type: "Deluxe Room",
-        rates: 50,
-        firgures: "85%",
-    },
-    {
-        index: 3,
-        type: "Suite Room",
-        rates: 20,
-        firgures: "50%",
-    },
-    {
-        index: 4,
-        type: "Family Room",
-        rates: 60,
-        firgures: "40%",
-    },
-    {
-        index: 5,
-        type: "Penthouse",
-        rates: 70,
-        firgures: "15%",
-    },
-];
+interface RevenueByRoomTypeProps {
+    roomTypeRevenue: IRoomTypeRevenue[] | undefined;
+}
 
-const RevenueByRoomType = () => {
+const RevenueByRoomType = ({ roomTypeRevenue }: RevenueByRoomTypeProps) => {
+    if (!roomTypeRevenue || roomTypeRevenue.length === 0) return null;
+
+    const totalRevenue = roomTypeRevenue.reduce((total, item) => total + item.revenue, 0);
+
+    const formattedData = roomTypeRevenue.map((item, index) => ({
+        index: index + 1,
+        type: item.roomType,
+        rates: totalRevenue > 0 ? (item.revenue / totalRevenue) * 100 : 0,
+    }));
+
+    const displayData = formattedData.slice(0, 5);
+
     return (
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", height: '100%', justifyContent: 'center' }}>
             {/* Title */}
@@ -60,12 +44,12 @@ const RevenueByRoomType = () => {
                                 <TableCell sx={{ fontSize: 16, fontWeight: 600 }}>#</TableCell>
                                 <TableCell sx={{ fontSize: 16, fontWeight: 600 }}>Room types</TableCell>
                                 <TableCell sx={{ fontSize: 16, fontWeight: 600 }}>Rates</TableCell>
-                                <TableCell sx={{ fontSize: 16, fontWeight: 600 }}>Firgures</TableCell>
+                                <TableCell sx={{ fontSize: 16, fontWeight: 600 }}>Figures</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {data?.map((room) => (
-                                <React.Fragment key={room.index}>
+                            {displayData.map((room, index) => (
+                                <React.Fragment key={index}>
                                     <TableRow>
                                         <TableCell sx={{ fontWeight: 600 }}>{room.index}</TableCell>
                                         <TableCell>{room.type}</TableCell>
@@ -87,7 +71,7 @@ const RevenueByRoomType = () => {
                                                     justifyContent: 'center',
                                                 }}
                                             >
-                                                {room.firgures}
+                                                {room.rates.toFixed(0)}%
                                             </Box>
                                         </TableCell>
                                     </TableRow>

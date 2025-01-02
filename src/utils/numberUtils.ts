@@ -1,5 +1,5 @@
 export const formatPrice = (price: number): string => {
-  return `$${price.toFixed(0)}`;
+  return `$${new Intl.NumberFormat('en-US').format(price)}`;
 };
 
 export const formatQuantity = (quantity: number): string => {

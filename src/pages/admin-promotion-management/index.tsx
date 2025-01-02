@@ -4,13 +4,15 @@ import Statistic from "./components/Statistic"
 import PromotionTable from "./components/PromotionTable"
 import { useGetPromotionsQuery } from "../../apis/promotionApi"
 import React from "react"
+import PromotionTableSkeleton from "./components/PromotionTableSkeleton"
 
 const PromotionManagement = () => {
     const [page, setPage] = React.useState(1)
-    const { data: promotionData } = useGetPromotionsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' })
+    const { data: promotionData, isLoading } = useGetPromotionsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' })
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value)
     }
+
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 4 }}>
@@ -22,10 +24,14 @@ const PromotionManagement = () => {
             </Box>
 
             {/* Statistic */}
-            <Statistic />
+            <Statistic promotionData={promotionData} />
 
             {/* Promotion Table */}
-            <PromotionTable promotionData={promotionData} onPageChange={handlePageChange} />
+            {!isLoading ? (
+                <PromotionTable promotionData={promotionData} onPageChange={handlePageChange} />
+            ) : (
+                <PromotionTableSkeleton />
+            )}
         </Box>
     )
 }

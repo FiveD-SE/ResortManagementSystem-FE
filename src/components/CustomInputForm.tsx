@@ -9,9 +9,10 @@ interface CustomInputFormProps {
     type: string;
     error?: boolean;
     helperText?: string;
+    disabled?: boolean;
 }
 
-const CustomInputForm = ({ label, placeholder, value, onChange, type, error = false, helperText = '' }: CustomInputFormProps) => {
+const CustomInputForm = ({ label, placeholder, value, onChange, type, error = false, helperText = '', disabled }: CustomInputFormProps) => {
     const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = e.target;
         if (type === 'number' && Number(value) < 0) e.target.value = '';
@@ -37,6 +38,7 @@ const CustomInputForm = ({ label, placeholder, value, onChange, type, error = fa
                 helperText={helperText}
                 onInput={handleInput}
                 onWheel={handleWheel}
+                disabled={disabled}
                 sx={{
                     '& .MuiInputBase-root': {
                         borderRadius: 2,

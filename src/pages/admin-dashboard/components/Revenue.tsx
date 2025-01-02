@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Typography, Divider } from "@mui/material";
 import {
     AreaChart,
@@ -9,6 +8,7 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
+import { IYearlyRevenue } from "../../../types/statistic";
 
 interface RevenueData {
     month: string;
@@ -16,27 +16,29 @@ interface RevenueData {
     thisYear: number;
 }
 
-const Revenue: React.FC = () => {
-    const fakeData: RevenueData[] = [
-        { month: "January", lastYear: 500000000, thisYear: 600000000 },
-        { month: "February", lastYear: 450000000, thisYear: 580000000 },
-        { month: "March", lastYear: 470000000, thisYear: 620000000 },
-        { month: "April", lastYear: 520000000, thisYear: 650000000 },
-        { month: "May", lastYear: 480000000, thisYear: 700000000 },
-        { month: "June", lastYear: 510000000, thisYear: 730000000 },
-        { month: "July", lastYear: 490000000, thisYear: 750000000 },
-        { month: "August", lastYear: 530000000, thisYear: 770000000 },
-        { month: "September", lastYear: 550000000, thisYear: 800000000 },
-        { month: "October", lastYear: 560000000, thisYear: 820000000 },
-        { month: "November", lastYear: 570000000, thisYear: 850000000 },
-        { month: "December", lastYear: 600000000, thisYear: 900000000 },
+interface RevenueProps {
+    yearlyRevenue: IYearlyRevenue | undefined;
+}
+
+const Revenue = ({ yearlyRevenue }: RevenueProps) => {
+    if (!yearlyRevenue) return null;
+
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
     ];
+
+    const data: RevenueData[] = months.map((month, index) => ({
+        month,
+        lastYear: yearlyRevenue.lastYearMonthlyRevenue[index],
+        thisYear: yearlyRevenue.currentYearMonthlyRevenue[index]
+    }));
 
     const formatValue = (value: number): string => {
         if (value >= 1_000_000_000) {
-            return `${(value / 1_000_000_000)} bilion`;
+            return `${(value / 1_000_000_000)} billion`;
         } else if (value >= 1_000_000) {
-            return `${(value / 1_000_000)} milion`;
+            return `${(value / 1_000_000)} million`;
         } else if (value >= 1_000) {
             return `${(value / 1_000)} thousand`;
         }
@@ -50,7 +52,7 @@ const Revenue: React.FC = () => {
             </Typography>
             <Box sx={{ flexGrow: 1, width: "100%", height: 400 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={fakeData}>
+                    <AreaChart data={data}>
                         <defs>
                             <linearGradient
                                 id="colorUv"
@@ -152,7 +154,7 @@ const Revenue: React.FC = () => {
                                             />
 
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                <Typography variant="body1" color="#000000" fontWeight={600}>$125.900</Typography>
+                                                <Typography variant="body1" color="#000000" fontWeight={600}>${formatValue(yearlyRevenue?.currentYearRevenue)}</Typography>
                                                 <Typography variant="body2" color="#C2C2C2">This year</Typography>
                                             </Box>
                                         </Box>
@@ -186,7 +188,7 @@ const Revenue: React.FC = () => {
                                                 }}
                                             />
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                <Typography variant="body1" color="#000000" fontWeight={600}>$125.900</Typography>
+                                                <Typography variant="body1" color="#000000" fontWeight={600}>${formatValue(yearlyRevenue?.lastYearRevenue)}</Typography>
                                                 <Typography variant="body2" color="#C2C2C2">Last year</Typography>
                                             </Box>
                                         </Box>
