@@ -118,10 +118,19 @@ const Voucher = ({ selectedPromotion, handleSelectPromotion }: VoucherProps) => 
                   <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
                     {promotion.promotionName}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'black.300' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'black.300',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 200,
+                    }}
+                  >
                     {promotion.description}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'primary.500' }}>
+                  <Typography variant="caption" sx={{ color: 'primary.500', fontWeight: 500 }}>
                     {promotion.discount}%
                   </Typography>
                 </Box>

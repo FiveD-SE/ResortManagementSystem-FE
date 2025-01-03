@@ -20,14 +20,17 @@ const App = () => {
           </Box>
         </Box>
       ) : (
-        <Box>
+        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <Navbar currentUser={user} />
-          <Routing />
+          <Box sx={{ flexGrow: 1 }}>
+            <Routing />
+          </Box>
           <Footer currentUser={user} />
           <ScrollToTopButton />
           <SpeedDialMenu />
         </Box>
-      )};
+      )}
+      ;
     </>
   );
 };

@@ -24,7 +24,6 @@ export enum ReportType {
 export enum Role {
   User = 'user',
   Admin = 'admin',
-  Staff = 'staff',
   Receptionist = 'receptionist',
   ServiceStaff = 'service_staff',
 }

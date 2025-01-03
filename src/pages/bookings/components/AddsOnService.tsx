@@ -125,10 +125,19 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
                   <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
                     {service.serviceName}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'black.300', whiteSpace: 'nowrap' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'black.300',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 200,
+                    }}
+                  >
                     {service.description}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'primary.500' }}>
+                  <Typography variant="caption" sx={{ color: 'primary.500', fonwtWeight: 500 }}>
                     {formatPrice(service.price)}
                   </Typography>
                 </Box>

@@ -6,7 +6,6 @@ const Footer = ({ currentUser }: { currentUser?: IAccount | null }) => {
   return (
     <Box
       sx={{
-        position: 'absolute',
         width: '100%',
         display: currentUser?.role === Role.Admin ? 'none' : 'flex',
         flexDirection: 'column',

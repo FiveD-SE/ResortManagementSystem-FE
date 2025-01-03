@@ -1,9 +1,13 @@
 import { Box, keyframes, Typography } from '@mui/material';
 import '../../main.css';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
 import { useMeQuery } from '../../apis/authApi';
+import { ROUTES } from '../../constants/routes';
+import { Role } from '../../types';
+import { useAppDispatch } from '../../stores/store';
+import { loginSuccess } from '../../stores/slices/userSlice';
 
 const pulse = keyframes`
   0% {
@@ -20,7 +24,8 @@ const pulse = keyframes`
 const ThirdParty = () => {
   const [searchParams] = useSearchParams();
   const { data: user, isSuccess, refetch } = useMeQuery({});
-
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     const accessToken = searchParams.get('accessToken');
     const refreshToken = searchParams.get('refreshToken');
@@ -41,9 +46,22 @@ const ThirdParty = () => {
   useEffect(() => {
     if (isSuccess && user) {
       Cookies.set('user', JSON.stringify(user));
-      window.location.href = '/';
+      dispatch(loginSuccess(user));
+      switch (user.role) {
+        case Role.Admin:
+          navigate(ROUTES.ADMIN.HOME);
+          break;
+        case Role.Receptionist:
+          navigate(ROUTES.RECEPTIONIST.HOME);
+          break;
+        case Role.ServiceStaff:
+          navigate(ROUTES.SERVICE_STAFF.HOME);
+          break;
+        default:
+          navigate('/');
+      }
     }
-  }, [isSuccess, user]);
+  }, [isSuccess, user, navigate]);
 
   return (
     <Box
