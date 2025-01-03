@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, Divider, Link, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Divider, Link, Typography } from '@mui/material';
 import CustomTextField from '../../../components/TextFieldCustom';
 import { Google } from '@mui/icons-material';
 import ForgotPasswordModal from './ForgotPasswordModal';
@@ -162,7 +162,7 @@ const SignInCard = () => {
           disabled={isLoading}
           onClick={handleLogin}
         >
-          Sign in
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign in'}
         </Button>
         <Box
           sx={{
