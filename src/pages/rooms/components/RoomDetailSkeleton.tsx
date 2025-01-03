@@ -3,11 +3,6 @@ import { Box, Skeleton } from '@mui/material';
 const RoomDetailSkeleton = () => {
   return (
     <Box display="flex" flexDirection="column" padding={4} gap={4}>
-      <Box display={'flex'} flexDirection={'row'} justifyContent={'space-between'} alignItems={'center'}>
-        <Skeleton width="40%" height="50px" />
-        <Skeleton width="10%" height="50px" />
-      </Box>
-
       <Box display="flex" flexDirection="row" gap={2}>
         <Skeleton variant="rectangular" width="60%" height="300px" sx={{ borderRadius: 1 }} />
 
