@@ -82,7 +82,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
         return matchTab && matchSearch;
     });
 
-    const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+    const handleTabChange = (_event: React.ChangeEvent<unknown>, newValue: number) => {
         setTabSelected(newValue);
     };
 
@@ -95,7 +95,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
             await deletePromotionMutation(selectedPromotion.id).unwrap();
             try {
                 toast.success("Promotion deleted successfully");
-            } catch (error) {
+            } catch {
                 toast.error("Failed to delete promotion");
             } finally {
                 setOpenDeleteModal(false);

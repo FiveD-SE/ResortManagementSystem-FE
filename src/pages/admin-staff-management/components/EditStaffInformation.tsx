@@ -22,7 +22,7 @@ const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData 
     const [role, setRole] = React.useState('');
     const [serviceType, setServiceType] = React.useState('');
 
-    const { data } = useGetUserByIdQuery(selectedStaffId);
+    const { data } = useGetUserByIdQuery(selectedStaffId, { skip: !open });
 
     const [updateUser, { isLoading }] = useUpdateUserMutation();
 
@@ -79,20 +79,21 @@ const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData 
 
         const selectedRole = role === 'Receptionist' ? Role.Receptionist : Role.ServiceStaff;
 
-        const data = {
+        const updatedUserData = {
             id: selectedStaffId,
             firstName: name.split(' ')[0],
             lastName: name.split(' ').slice(1).join(' '),
             role: selectedRole,
             serviceTypeId: serviceTypeId || '',
+            phone: data?.phone || '',
         };
 
         try {
-            await updateUser(data).unwrap();
+            await updateUser(updatedUserData).unwrap();
             toast.success('User updated successfully');
             onClose();
             resetForm();
-        } catch (error) {
+        } catch {
             toast.error('Failed to update user');
         }
     };

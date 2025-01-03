@@ -83,7 +83,7 @@ const AddNewRoomType = ({ onAddNewRoomType }: AddNewRoomTypeProps) => {
             await postRoomType(data).unwrap();
             toast.success('Add new room type successfully');
             onAddNewRoomType();
-        } catch (error) {
+        } catch {
             toast.error('Add new room type failed');
         }
     }

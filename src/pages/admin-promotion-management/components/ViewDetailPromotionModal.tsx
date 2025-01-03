@@ -1,4 +1,4 @@
-import { Box, Modal, Typography, IconButton, TextField, Button } from '@mui/material';
+import { Box, Modal, Typography, IconButton, TextField } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import React from 'react'
 import CustomInputForm from '../../../components/CustomInputForm';
@@ -10,12 +10,24 @@ interface ViewDetailPromotionModalProps {
     onClose: () => void;
 }
 
-const ViewDetailPromotionModal = ({ open, onClose }: ViewDetailPromotionModalProps) => {
+const ViewDetailPromotionModal = ({ open, onClose, selectedPromotion }: ViewDetailPromotionModalProps) => {
     const [name, setName] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [discount, setDiscount] = React.useState('');
     const [startDate, setStartDate] = React.useState('');
     const [endDate, setEndDate] = React.useState('');
+    const [amount, setAmount] = React.useState('');
+
+    React.useEffect(() => {
+        if (selectedPromotion) {
+            setName(selectedPromotion.promotionName)
+            setDescription(selectedPromotion.description || '')
+            setDiscount(selectedPromotion.discount.toString())
+            setStartDate(new Date(selectedPromotion.startDate).toISOString().split('T')[0])
+            setEndDate(new Date(selectedPromotion.endDate).toISOString().split('T')[0])
+            setAmount(selectedPromotion.amount.toString())
+        }
+    }, [selectedPromotion])
 
     return (
         <Modal
@@ -57,14 +69,13 @@ const ViewDetailPromotionModal = ({ open, onClose }: ViewDetailPromotionModalPro
                         />
 
                         <CustomInputForm
-                            label="Discount"
+                            label="Discount (%)"
                             placeholder='Enter discount'
                             value={discount}
                             onChange={(e) => setDiscount(e.target.value)}
                             type='number'
                         />
                     </Box>
-
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
                         <CustomInputForm
                             label="Start date"
@@ -80,6 +91,15 @@ const ViewDetailPromotionModal = ({ open, onClose }: ViewDetailPromotionModalPro
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
                             type='date'
+                        />
+                    </Box>
+                    <Box sx={{ gap: 2, mt: 2 }}>
+                        <CustomInputForm
+                            label="Amount"
+                            placeholder='Enter amount'
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            type='number'
                         />
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
@@ -113,16 +133,6 @@ const ViewDetailPromotionModal = ({ open, onClose }: ViewDetailPromotionModalPro
                             }}
                         />
                     </Box>
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 4 }}>
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2 }}>
-                        Cancel
-                    </Button>
-
-                    <Button sx={{ fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2 }}>
-                        Confirm
-                    </Button>
                 </Box>
             </Box>
         </Modal>

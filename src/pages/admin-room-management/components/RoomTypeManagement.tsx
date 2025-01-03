@@ -43,7 +43,7 @@ const RoomTypeManagement = ({
 
   const [deleteRoomType, { isLoading }] = useDeleteRoomTypeMutation();
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: any) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: IRoomType) => {
     setAnchorEl(event.currentTarget);
     setSelectedRoomType(row);
   };
@@ -61,7 +61,7 @@ const RoomTypeManagement = ({
     try {
       await deleteRoomType(selectedRoomType.id);
       toast.success('Room type deleted successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete room type');
     } finally {
       setOpenDeleteModal(false);

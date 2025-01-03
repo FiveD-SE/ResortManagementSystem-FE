@@ -84,7 +84,7 @@ const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps)
             toast.success('Room added successfully');
             resetForm();
             onClose();
-        } catch (error) {
+        } catch {
             toast.error('Failed to add room');
         }
     };

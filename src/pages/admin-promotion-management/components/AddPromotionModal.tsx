@@ -66,7 +66,7 @@ const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
             toast.success('Create promotion successfully');
             onClose();
             resetForm();
-        } catch (error) {
+        } catch {
             toast.error('Create promotion failed');
         }
     }
