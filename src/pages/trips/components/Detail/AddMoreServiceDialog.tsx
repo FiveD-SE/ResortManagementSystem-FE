@@ -188,7 +188,9 @@ const AddMoreServiceDialog = ({ open, onClose, refetchBooking }: IAddMoreService
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ color: 'black.300', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    sx={{
+                      color: 'black.300',
+                    }}
                   >
                     {service.description}
                   </Typography>

@@ -101,7 +101,16 @@ const TripForm = (props: IProps) => {
               <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
                 {booking?.promotionId?.promotionName}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'black.300' }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'black.300',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 200,
+                }}
+              >
                 {booking?.promotionId?.description}
               </Typography>
               <Box
@@ -125,67 +134,74 @@ const TripForm = (props: IProps) => {
         </Box>
       )}
 
-      {booking?.services && booking?.services.length > 0 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            Adds-on service
-            <IconButton
-              size="medium"
-              sx={{ p: 0, ml: 1, borderColor: 'black.100', border: 1 }}
-              onClick={handleOpenAddServiceDialog}
-            >
-              <AddRounded sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Typography>
-          <List
-            dense
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: 2,
-              overflowX: 'auto',
-              width: '100%',
-              padding: 0,
-            }}
+      <Box>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Adds-on service
+          <IconButton
+            size="medium"
+            sx={{ p: 0, ml: 1, borderColor: 'black.100', border: 1 }}
+            onClick={handleOpenAddServiceDialog}
           >
-            {booking?.services?.map((service) => (
-              <ListItem key={service.id} sx={{ width: 'auto', p: 0 }}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    p: 1.5,
-                    borderRadius: 2,
-                    border: 1,
-                    borderColor: 'black.100',
-                    minWidth: 200,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
-                      {service.serviceId.serviceName}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'black.300', whiteSpace: 'nowrap' }}>
-                      {service.serviceId.description}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'primary.500' }}>
-                      {formatPrice(Number.parseFloat(service.serviceId.price.toString()))}
-                    </Typography>
-                  </Box>
-                </Paper>
-              </ListItem>
-            ))}
-          </List>
-          <AddMoreServiceDialog
-            open={isAddServiceDialogOpen}
-            onClose={handleCloseAddServiceDialog}
-            refetchBooking={refetchBooking}
-          />
-        </Box>
-      )}
+            <AddRounded sx={{ fontSize: 16 }} />
+          </IconButton>
+        </Typography>
+        <List
+          dense
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 2,
+            overflowX: 'auto',
+            width: '100%',
+            padding: 0,
+          }}
+        >
+          {booking?.services?.map((service) => (
+            <ListItem key={service.id} sx={{ width: 'auto', p: 0 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'black.100',
+                  minWidth: 200,
+                  cursor: 'pointer',
+                }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
+                    {service.serviceId.serviceName}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'black.300',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 200,
+                    }}
+                  >
+                    {service.serviceId.description}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'primary.500' }}>
+                    {formatPrice(Number.parseFloat(service.serviceId.price.toString()))}
+                  </Typography>
+                </Box>
+              </Paper>
+            </ListItem>
+          ))}
+        </List>
+        <AddMoreServiceDialog
+          open={isAddServiceDialogOpen}
+          onClose={handleCloseAddServiceDialog}
+          refetchBooking={refetchBooking}
+        />
+      </Box>
 
       <Box sx={{ pb: 2 }}>
         <Button
