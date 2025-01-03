@@ -70,7 +70,7 @@ const Voucher = ({ selectedPromotion, handleSelectPromotion }: VoucherProps) => 
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: promotionData?.docs.length === 0 ? 'none' : 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',

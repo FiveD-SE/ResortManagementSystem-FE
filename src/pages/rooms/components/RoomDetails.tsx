@@ -12,10 +12,14 @@ interface IRoomDetailsProps {
   roomType: IRoomType;
   room?: IRoom;
   occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
+  nextAvailableWeek: {
+    checkinDate: string;
+    checkoutDate: string;
+  };
   ratingsRef?: React.RefObject<HTMLDivElement>;
 }
 
-const RoomDetails = ({ ratings, roomType, room, occupiedDates, ratingsRef }: IRoomDetailsProps) => {
+const RoomDetails = ({ ratings, roomType, room, occupiedDates, ratingsRef, nextAvailableWeek }: IRoomDetailsProps) => {
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
@@ -26,7 +30,12 @@ const RoomDetails = ({ ratings, roomType, room, occupiedDates, ratingsRef }: IRo
       </Grid>
       {!isSmallScreen && (
         <Grid item xs={12} md={4}>
-          <ReservationCard roomType={roomType} room={room} occupiedDates={occupiedDates} />
+          <ReservationCard
+            roomType={roomType}
+            room={room}
+            occupiedDates={occupiedDates}
+            nextAvailableWeek={nextAvailableWeek}
+          />
         </Grid>
       )}
     </Grid>
