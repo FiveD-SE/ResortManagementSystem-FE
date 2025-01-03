@@ -1,5 +1,5 @@
-import { FavoriteBorderRounded, ShareRounded, StarRounded } from '@mui/icons-material';
-import { Box, IconButton, Link, Stack, Typography } from '@mui/material';
+import { StarRounded } from '@mui/icons-material';
+import { Box, Link, Stack, Typography } from '@mui/material';
 import { IRoomType } from '../../../types';
 import { IRating } from '../../../types/rating';
 
@@ -29,33 +29,15 @@ const RoomOverview = ({ roomType, ratings, ratingsRef }: IRoomOverviewProps) => 
         <Stack direction="row" sx={{ alignItems: 'center', mt: 1 }} spacing={1}>
           <StarRounded sx={{ fontSize: 14, color: 'black.500' }} />
           <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500' }}>
-            {ratings.reduce((acc, rating) => acc + rating.average, 0) / ratings.length || 0}
+            {(ratings.reduce((acc, rating) => acc + rating.average, 0) / ratings.length).toFixed(1) || 0}
           </Typography>
           <Link onClick={scrollToGuestReviews}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500', textDecoration: 'underline' }}>
-              {ratings.length} reviews
+              {ratings.length} {ratings.length > 1 ? 'reviews' : 'review'}
             </Typography>
           </Link>
         </Stack>
       </Box>
-      <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <IconButton>
-            <ShareRounded sx={{ fontSize: 24, color: 'black.500' }} />
-          </IconButton>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500' }}>
-            Share
-          </Typography>
-        </Stack>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <IconButton>
-            <FavoriteBorderRounded sx={{ fontSize: 24, color: 'black.500' }} />
-          </IconButton>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500' }}>
-            Save
-          </Typography>
-        </Stack>
-      </Stack>
     </Box>
   );
 };

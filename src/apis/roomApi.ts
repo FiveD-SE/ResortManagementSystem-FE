@@ -106,6 +106,7 @@ export const roomApi = createApi({
       forceRefetch({ currentArg, previousArg }) {
         return currentArg !== previousArg;
       },
+      keepUnusedDataFor: 3600 * 1000,
     }),
   }),
 });

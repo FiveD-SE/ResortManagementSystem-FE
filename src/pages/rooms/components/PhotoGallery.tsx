@@ -9,14 +9,12 @@ import {
   ImageList,
   ImageListItem,
   Slide,
-  Stack,
-  Typography,
   useMediaQuery,
 } from '@mui/material';
 import ShowAllPhotosButton from './ShowAllPhotosButton';
 import { TransitionProps } from '@mui/material/transitions';
 import React, { useState } from 'react';
-import { ChevronLeftRounded, ChevronRightRounded, FavoriteBorderRounded, ShareRounded } from '@mui/icons-material';
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material';
 import Carousel from 'react-material-ui-carousel';
 interface PhotoGalleryProps {
   images: string[];
@@ -149,24 +147,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
             <IconButton size="large" edge="start" color="inherit" onClick={handleCloseDialog} aria-label="close" sx={{}}>
               <ChevronLeftRounded fontSize="large" />
             </IconButton>
-            <Stack direction="row" spacing={2}>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                <IconButton>
-                  <ShareRounded sx={{ fontSize: 24, color: 'black.500' }} />
-                </IconButton>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500' }}>
-                  Share
-                </Typography>
-              </Stack>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                <IconButton>
-                  <FavoriteBorderRounded sx={{ fontSize: 24, color: 'black.500' }} />
-                </IconButton>
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.500' }}>
-                  Save
-                </Typography>
-              </Stack>
-            </Stack>
           </Box>
         </DialogTitle>
         <DialogContent>

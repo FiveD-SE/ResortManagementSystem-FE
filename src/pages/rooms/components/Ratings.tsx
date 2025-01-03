@@ -37,7 +37,8 @@ const Ratings = ({ detailedRatings, ratingCounts, averageRating, ratingCount }: 
         px: 0,
         py: 4,
         borderTop: 1,
-        borderColor: 'black.100',
+        borderColor: 'black.50',
+        mt: 4,
       }}
     >
       <Box sx={{ width: '100%' }}>
