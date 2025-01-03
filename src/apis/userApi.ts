@@ -10,7 +10,10 @@ export const userApi = createApi({
     baseUrl: USER_ENDPOINT,
   }),
   endpoints: (builder) => ({
-    createUser: builder.mutation<any, { firstName: string; lastName: string; email: string; password: string; role: Role; serviceTypeId: string }>({
+    createUser: builder.mutation<
+      any,
+      { firstName: string; lastName: string; email: string; password: string; role: Role; serviceTypeId: string }
+    >({
       query: (body) => ({
         url: '/',
         method: 'POST',
@@ -30,13 +33,14 @@ export const userApi = createApi({
         },
       }),
     }),
-    changeProfile: builder.mutation<any, { firstName: string; lastName: string }>({
-      query: ({ firstName, lastName }) => ({
+    changeProfile: builder.mutation<any, { firstName: string; lastName: string; phoneNumber: string }>({
+      query: ({ firstName, lastName, phoneNumber }) => ({
         url: `/change-profile`,
         method: 'PATCH',
         data: {
           firstName,
           lastName,
+          phoneNumber,
         },
       }),
     }),
@@ -67,7 +71,10 @@ export const adminUserApi = createApi({
         method: 'DELETE',
       }),
     }),
-    updateUser: builder.mutation<any, Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email'> & { id: string }>({
+    updateUser: builder.mutation<
+      any,
+      Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email'> & { id: string }
+    >({
       query: (data) => ({
         url: `/${data.id}`,
         method: 'PATCH',
@@ -88,16 +95,7 @@ export const adminUserApi = createApi({
   }),
 });
 
-export const {
-  useGetUserByIdQuery,
-  useCreateUserMutation,
-  useChangeAvatarMutation,
-  useChangeProfileMutation,
-} = userApi;
+export const { useGetUserByIdQuery, useCreateUserMutation, useChangeAvatarMutation, useChangeProfileMutation } = userApi;
 
-export const {
-  useAdminGetUsersByRoleQuery,
-  useDeleteUserMutation,
-  useUpdateUserMutation,
-  useGetStaffStatisticQuery,
-} = adminUserApi;
+export const { useAdminGetUsersByRoleQuery, useDeleteUserMutation, useUpdateUserMutation, useGetStaffStatisticQuery } =
+  adminUserApi;
