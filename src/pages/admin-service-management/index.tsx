@@ -1,5 +1,5 @@
 import { Notifications } from "@mui/icons-material"
-import { Box, IconButton, Typography, Skeleton } from "@mui/material"
+import { Box, IconButton, Typography } from "@mui/material"
 import StatisticServiceType from "./components/StatisticServiceType"
 import ServiceTable from "./components/ServiceTable"
 import ServiceTypeManagement from "./components/ServiceTypeManagement"
@@ -8,6 +8,7 @@ import { useGetServicesQuery } from "../../apis/serviceApi"
 import { useGetServiceTypesQuery } from "../../apis/serviceTypeApi"
 import StatisticServiceTypeSkeleton from "./components/StatisticServiceTypeSkeleton"
 import ServiceTableSkeleton from "./components/ServiceTableSkeleton"
+import { useGetServiceCountByServiceTypeQuery } from "../../apis/adminDashboardApi"
 
 const ServiceManagement = () => {
     const [disable, setDisable] = React.useState(false);
@@ -18,7 +19,7 @@ const ServiceManagement = () => {
         limit: 10,
         sort: 'asc'
     });
-    const { data: serviceTypeData, isLoading: serviceTypeLoading } = useGetServiceTypesQuery({
+    const { data: serviceTypeData } = useGetServiceTypesQuery({
         page: serviceTypePage,
         limit: 10,
         sort: 'asc'
@@ -32,6 +33,8 @@ const ServiceManagement = () => {
         setServiceTypePage(value);
     }
 
+    const { data: serviceTypesStatistic, isLoading: serviceTypesStatisticLoading } = useGetServiceCountByServiceTypeQuery();
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -43,11 +46,10 @@ const ServiceManagement = () => {
 
             {!disable ? (
                 <Box>
-                    {!serviceTypeLoading ? (
+                    {!serviceTypesStatisticLoading ? (
                         <StatisticServiceType
                             onManageServiceType={() => setDisable(!disable)}
-                            serviceData={serviceData}
-                            serviceTypeData={serviceTypeData}
+                            serviceTypesStatistic={serviceTypesStatistic}
                         />
                     ) : (
                         <StatisticServiceTypeSkeleton />

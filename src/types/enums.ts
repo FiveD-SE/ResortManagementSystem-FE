@@ -37,12 +37,6 @@ export enum UserSortBy {
   UpdatedAt = 'updatedAt',
 }
 
-export enum Gender {
-  Male = 'male',
-  Female = 'female',
-  Other = 'other',
-}
-
 export enum PaymentMethod {
   PayOnArrival = 'Pay on arrival',
   Transfer = 'Transfer',

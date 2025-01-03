@@ -5,6 +5,8 @@ import SidebarItem from "./SidebarItem";
 import { useLocation, useNavigate } from "react-router-dom";
 import PopupModal from "./PopupModal";
 import useLogout from "../utils/useLogout";
+import { useSelector } from "react-redux"
+import { RootState } from '../stores/store';
 
 const MENUS = {
     LOGOUT: 'logout',
@@ -65,6 +67,9 @@ const Sidebar = () => {
     const drawerTransition = '0.2s ease';
     const navigate = useNavigate();
     const logout = useLogout();
+    const { user } = useSelector((state: RootState) => state.user);
+    console.log(user?.avatar);
+    //https://i.imgur.com/oIP9o92.jpeg
 
     const handleSelectMenu = (menu: { name: string; href?: string }) => {
         if (menu.name === MENUS.LOGOUT) {
@@ -174,7 +179,23 @@ const Sidebar = () => {
                     />
 
                     <SidebarItem
-                        icon={<AccountCircleRounded />}
+                        icon={
+                            user?.avatar ? (
+                                <Box
+                                    component="img"
+                                    src={user.avatar}
+                                    alt="User Avatar"
+                                    sx={{
+                                        width: 24,
+                                        height: 24,
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                    }}
+                                />
+                            ) : (
+                                <AccountCircleRounded />
+                            )
+                        }
                         name={MENUS.PROFILE}
                         title={'Profile'}
                         selectedMenu={selectedMenu}

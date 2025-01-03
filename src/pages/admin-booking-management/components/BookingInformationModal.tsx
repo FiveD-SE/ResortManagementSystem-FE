@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Modal, Typography, IconButton, Divider } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { IBooking } from '../../../types';
+import { IBooking } from '../../../types/booking';
 import { formatPrice } from '../../../utils';
 
 interface BookingInformationModalProps {
@@ -13,7 +13,7 @@ interface BookingInformationModalProps {
 const BookingInformationModal = ({ open, onClose, selectedBooking }: BookingInformationModalProps) => {
     const [formattedData, setFormattedData] = React.useState({
         customerName: '',
-        customerId: '',
+        phoneNumber: '',
         checkinDate: '',
         checkoutDate: '',
         issuedDate: '',
@@ -38,7 +38,7 @@ const BookingInformationModal = ({ open, onClose, selectedBooking }: BookingInfo
         const issuedDate = selectedBooking.createdAt ? new Date(selectedBooking.createdAt).toDateString() : 'N/A';
 
         const customerName = `${selectedBooking.customerId.firstName} ${selectedBooking.customerId.lastName}`;
-        const customerId = selectedBooking.customerId.id;
+        const phoneNumber = selectedBooking.customerId.phoneNumber || '';
         const roomType = selectedBooking.roomId.roomTypeId.typeName;
         const status = selectedBooking.status;
         const roomNumber = selectedBooking.roomId.roomNumber;
@@ -89,7 +89,7 @@ const BookingInformationModal = ({ open, onClose, selectedBooking }: BookingInfo
 
         setFormattedData({
             customerName,
-            customerId,
+            phoneNumber,
             checkinDate,
             checkoutDate,
             issuedDate,
@@ -187,7 +187,7 @@ const BookingInformationModal = ({ open, onClose, selectedBooking }: BookingInfo
                             {formattedData.customerName}
                         </Typography>
                         <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
-                            ID: {formattedData.customerId}
+                            Tel: {formattedData.phoneNumber}
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '50%' }}>

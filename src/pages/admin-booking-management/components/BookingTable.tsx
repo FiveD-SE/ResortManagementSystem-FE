@@ -9,7 +9,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 import { SelectChangeEvent } from '@mui/material';
 import { DateRange } from 'react-date-range';
-import { IBooking, IBookingApiResponse } from '../../../types';
+import { IBooking, IBookingApiResponse } from '../../../types/booking';
 import { formatPrice } from '../../../utils';
 
 const tabTextStyle = {
@@ -82,7 +82,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
             id: booking.id,
             roomType: booking.roomId.roomTypeId.typeName,
             roomNumber: booking.roomId.roomNumber,
-            customerId: booking.customerId.id,
+            customerName: booking.customerId.firstName + ' ' + booking.customerId.lastName,
             checkInDate: dayjs(booking.checkinDate).format('YYYY/MM/DD'),
             checkOutDate: dayjs(booking.checkoutDate).format('YYYY/MM/DD'),
             totalAmount: booking.totalAmount,
@@ -93,7 +93,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
             id: booking.id,
             roomType: booking.roomId.roomTypeId.typeName,
             roomNumber: booking.roomId.roomNumber,
-            customerId: booking.customerId.id,
+            customerName: booking.customerId.firstName + ' ' + booking.customerId.lastName,
             checkInDate: dayjs(booking.checkinDate).format('YYYY/MM/DD'),
             checkOutDate: dayjs(booking.checkoutDate).format('YYYY/MM/DD'),
             totalAmount: booking.totalAmount,
@@ -104,7 +104,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
             id: booking.id,
             roomType: booking.roomId.roomTypeId.typeName,
             roomNumber: booking.roomId.roomNumber,
-            customerId: booking.customerId.id,
+            customerName: booking.customerId.firstName + ' ' + booking.customerId.lastName,
             checkInDate: dayjs(booking.checkinDate).format('YYYY/MM/DD'),
             checkOutDate: dayjs(booking.checkoutDate).format('YYYY/MM/DD'),
             totalAmount: booking.totalAmount,
@@ -383,7 +383,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                                 <TableCell>ID</TableCell>
                                 <TableCell>Room Type</TableCell>
                                 <TableCell>Room Number</TableCell>
-                                <TableCell>Customer ID</TableCell>
+                                <TableCell>Customer Name</TableCell>
                                 <TableCell>Check In Date</TableCell>
                                 <TableCell>Check Out Date</TableCell>
                                 <TableCell>Total Amount</TableCell>
@@ -403,7 +403,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                                         <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.roomType}</TableCell>
                                         <TableCell>{row.roomNumber}</TableCell>
-                                        <TableCell>{row.customerId}</TableCell>
+                                        <TableCell>{row.customerName}</TableCell>
                                         <TableCell>{row.checkInDate}</TableCell>
                                         <TableCell>{row.checkOutDate}</TableCell>
                                         <TableCell>{formatPrice(row.totalAmount)}</TableCell>

@@ -20,6 +20,7 @@ const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps)
     const [roomType, setRoomType] = React.useState('');
     const [status, setStatus] = React.useState('');
     const [roomPictures, setRoomPictures] = React.useState<File[]>([]);
+    const [basePrice, setBasePrice] = React.useState({ under: 0, upper: 0 });
 
     const roomTypeNameOptions = roomTypesData?.docs.map((roomType) => roomType.typeName) || [];
     const statuses = [RoomStatus.Available, RoomStatus.Occupied, RoomStatus.Under_Maintenance];
@@ -85,6 +86,20 @@ const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps)
             onClose();
         } catch (error) {
             toast.error('Failed to add room');
+        }
+    };
+
+    const handleRoomTypeChange = (selectedRoomType: string) => {
+        setRoomType(selectedRoomType);
+
+        const selectedType = roomTypesData?.docs.find((roomType) => roomType.typeName === selectedRoomType);
+        if (selectedType) {
+            const { basePrice } = selectedType;
+            const under = basePrice * 0.5; // -50%
+            const upper = basePrice * 1.5; // +50%
+            setBasePrice({ under, upper });
+        } else {
+            setBasePrice({ under: 0, upper: 0 });
         }
     };
 
@@ -191,21 +206,21 @@ const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps)
                             onChange={(e) => setRoomNumber(e.target.value)}
                             type="number"
                         />
-                        <CustomInputForm
-                            label="Price"
-                            placeholder="Enter price"
-                            value={pricePerNight}
-                            onChange={(e) => setPricePerNight(e.target.value)}
-                            type="number"
-                        />
-                    </Box>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
                         <CustomSelectingForm
                             label="Room type"
                             placeholder="Select room type"
                             value={roomType}
-                            onChange={(e) => setRoomType(e.target.value)}
+                            onChange={(e) => handleRoomTypeChange(e.target.value)}
                             options={roomTypeNameOptions}
+                        />
+                    </Box>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
+                        <CustomInputForm
+                            label={`Price ($${basePrice.under.toFixed(2)} - $${basePrice.upper.toFixed(2)})`}
+                            placeholder="Enter price"
+                            value={pricePerNight}
+                            onChange={(e) => setPricePerNight(e.target.value)}
+                            type="number"
                         />
                         <CustomSelectingForm
                             label="Status"

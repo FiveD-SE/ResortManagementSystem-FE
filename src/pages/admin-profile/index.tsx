@@ -1,75 +1,81 @@
 import { Avatar, Box, Button, CircularProgress, Typography } from "@mui/material"
 import CustomInputForm from "../../components/CustomInputForm"
 import React from "react"
-import { useSelector } from "react-redux"
-import { RootState } from '../../stores/store';
 import { useChangeAvatarMutation, useChangeProfileMutation } from "../../apis/userApi";
 import toast from "react-hot-toast";
+import { useMeQuery } from "../../apis/authApi";
+import { useLocation } from "react-router-dom";
 
 const AdminProfile = () => {
-    const [firstName, setFirstName] = React.useState<string>('')
-    const [lastName, setLastName] = React.useState<string>('')
-    const [email, setEmail] = React.useState<string>('')
-    const [avatar, setAvatar] = React.useState<File>()
+    const [firstName, setFirstName] = React.useState<string>('');
+    const [lastName, setLastName] = React.useState<string>('');
+    const [email, setEmail] = React.useState<string>('');
+    const [avatar, setAvatar] = React.useState<File>();
 
-    const { user } = useSelector((state: RootState) => state.user);
-
+    const location = useLocation();
+    const { data: user, refetch } = useMeQuery({});
     const [changeProfileMutation, { isLoading }] = useChangeProfileMutation();
     const [changeAvatarMutation] = useChangeAvatarMutation();
 
     React.useEffect(() => {
         if (user) {
-            setFirstName(user.firstName)
-            setLastName(user.lastName)
-            setEmail(user.email)
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+            setEmail(user.email);
 
             fetch(user.avatar)
-                .then(response => response.blob())
-                .then(blob => {
-                    const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+                .then((response) => response.blob())
+                .then((blob) => {
+                    const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
                     setAvatar(file);
                 });
         }
-    }, [user])
+    }, [user]);
+
+    // Refetch user data whenever the screen is navigated to
+    React.useEffect(() => {
+        refetch();
+    }, [location.pathname, refetch]);
 
     const handleChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setAvatar(e.target.files[0])
+            setAvatar(e.target.files[0]);
         }
 
         const formData = new FormData();
-        formData.append('avatarFile', e.target.files![0]);
+        formData.append("avatarFile", e.target.files![0]);
 
         changeAvatarMutation(formData);
-    }
+        toast.success("Change avatar successfully");
+    };
 
     const validateProfile = () => {
         if (!firstName) {
-            toast.error('First name and last name are required');
+            toast.error("First name and last name are required");
             return false;
         }
         if (!lastName) {
-            toast.error('First name and last name are required');
+            toast.error("First name and last name are required");
             return false;
         }
         return true;
-    }
+    };
 
     const handleUpdateProfile = async () => {
         if (!validateProfile()) return;
 
         try {
             await changeProfileMutation({ firstName: firstName, lastName: lastName });
-            toast.success('Update profile successfully');
+            toast.success("Update profile successfully");
         } catch (error) {
-            toast.error('Update profile failed');
+            toast.error("Update profile failed");
         }
-    }
+    };
 
     const handleCancel = () => {
-        setFirstName(user?.firstName || '');
-        setLastName(user?.lastName || '');
-    }
+        setFirstName(user?.firstName || "");
+        setLastName(user?.lastName || "");
+    };
 
     const disabled = !firstName || !lastName || isLoading || (firstName === user?.firstName && lastName === user?.lastName);
 

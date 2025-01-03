@@ -133,3 +133,16 @@ export interface ICreateBookingRequest {
   promotionId: string;
   paymentMethod: PaymentMethod;
 }
+
+export interface IBookingApiResponse {
+  page: number;
+  limit: number;
+  totalDocs: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  nextPage: number | null;
+  prevPage: number | null;
+  totalPages: number | null;
+  pagingCounter: number | null;
+  docs: IBooking[];
+}
