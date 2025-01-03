@@ -1,26 +1,30 @@
 import { useState } from 'react';
-import { Box, Button, Link, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Typography } from '@mui/material';
 import CustomTextField from '../../../components/TextFieldCustom';
 import { CheckBox, CheckBoxOutlineBlank } from '@mui/icons-material';
 import { useRegisterMutation } from '../../../apis/authApi';
-import { REGISTER_ERROR_MESSAGE } from '../../../constants/messages';
+import { REGISTER_ERROR_MESSAGE, REGISTER_SUCCESS_MESSAGE } from '../../../constants/messages';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const SignUpCard = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
-  const disabled = name === '' || email === '' || password === '' || confirmPassword === '' || !isChecked;
-
-  const [register] = useRegisterMutation();
+  const [register, { isLoading }] = useRegisterMutation();
+  const disabled = name === '' || email === '' || password === '' || confirmPassword === '' || !isChecked || isLoading;
 
   const handleRegister = async () => {
     if (email === '' || name === '' || password === '' || confirmPassword === '') {
       toast.error(REGISTER_ERROR_MESSAGE.PLEASE_FILL_ALL_FIELDS);
+      return;
+    }
+    if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
+      toast.error(REGISTER_ERROR_MESSAGE.PHONE_NUMBER_ERROR);
       return;
     }
     if (password !== confirmPassword) {
@@ -30,8 +34,17 @@ const SignUpCard = () => {
     const nameParts = name.trim().split(' ');
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ') || '';
-    console.log({ email, password, firstName, lastName });
-    register({ email, password, firstName, lastName });
+    console.log({ email, password, firstName, lastName, phoneNumber });
+    try {
+      await register({ email, password, firstName, lastName, phoneNumber });
+      toast.success(REGISTER_SUCCESS_MESSAGE);
+    } catch (error) {
+      toast.error((error as { message: string }).message);
+    }
+
+    setTimeout(() => {
+      navigate('/login');
+    }, 1000);
   };
 
   return (
@@ -111,8 +124,16 @@ const SignUpCard = () => {
       />
 
       <CustomTextField
-        title={'Username'}
-        placeholder={'Enter your username'}
+        title={'Phone Number'}
+        placeholder={'Enter your phone number'}
+        value={phoneNumber}
+        onChange={(e) => setPhoneNumber(e.target.value)}
+        type={'tel'}
+      />
+
+      <CustomTextField
+        title={'Full Name'}
+        placeholder={'Enter your name'}
         value={name}
         onChange={(e) => setName(e.target.value)}
         type={'text'}
@@ -212,7 +233,7 @@ const SignUpCard = () => {
           disabled={disabled}
           onClick={() => handleRegister()}
         >
-          Sign up
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
         </Button>
       </Box>
     </Box>
