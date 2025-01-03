@@ -1,20 +1,21 @@
 import { Box, IconButton, Typography } from '@mui/material';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import { ChevronLeftRounded } from '@mui/icons-material';
 
 interface IProps {
-  haveBackNav?: boolean;
   title: string;
 }
 
-const Header = (props: IProps) => {
+const Header = ({ title }: IProps) => {
   return (
-    <Box sx={{ display: 'flex', paddingY: 8, alignItems: 'center' }} gap={2}>
-      {props.haveBackNav && (
-        <IconButton onClick={() => window.history.back()} size="large">
-          <ArrowBackIosNewIcon />
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', pt: 6, pb: 6, width: '100%', alignItems: 'center', position: 'relative', gap: 2 }}>
+        <IconButton sx={{ p: 1 }} onClick={() => window.history.back()}>
+          <ChevronLeftRounded fontSize="large" />
         </IconButton>
-      )}
-      <Typography sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 48, fontWeight: 600 }}>{props.title}</Typography>
+        <Typography variant="h2" component="div" sx={{ fontWeight: 600, color: 'black.500' }}>
+          {title}
+        </Typography>
+      </Box>
     </Box>
   );
 };

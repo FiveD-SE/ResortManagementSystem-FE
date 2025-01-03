@@ -28,3 +28,8 @@ export const RESET_PASSWORD_ERROR_MESSAGE = 'Failed to reset password.';
 
 export const UPDATE_PROFILE_SUCCESS_MESSAGE = 'Profile updated successfully.';
 export const UPDATE_PROFILE_ERROR_MESSAGE = 'Failed to update profile.';
+
+export const BOOKING_SUCCESS_MESSAGE = 'Booking created successfully.';
+export const BOOKING_ERROR_MESSAGE = 'Failed to create booking. Please try again.';
+export const BOOKING_SYSTEM_ERROR_MESSAGE = 'Failed to create booking. Please try again later.';
+export const ADD_SERVICE_SUCCESS_MESSAGE = 'Service added successfully.';

@@ -4,11 +4,15 @@ export const formatDateRange = (startDate: string, endDate: string): string => {
   const end = new Date(endDate).toLocaleDateString('en-US', options);
   return `${start} - ${end}`;
 };
-
 export const formatDate = (date: Date | string): string => {
   const d = date instanceof Date ? date : new Date(date);
   if (isNaN(d.getTime())) return '';
-  return d.toISOString().split('T')[0];
+
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  const year = d.getFullYear();
+
+  return `${month}-${day}-${year}`;
 };
 
 export const formatDateTime = (date: Date | string): string => {

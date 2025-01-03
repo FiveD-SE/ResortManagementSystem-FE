@@ -2,7 +2,7 @@ import { Box, Button, Grid2 as Grid, Typography } from '@mui/material';
 import AccommodationCard from './AccommodationCard';
 import AccommodationCardSkeleton from './AccommodationCardSkeleton';
 import { resetRoomsState, useFilterQuery } from '../../../apis/roomApi';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { IRoomApiResponse } from '../../../types';
@@ -14,18 +14,35 @@ const AccommodationList = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState<number>(1);
   const [searchParams, setSearchParams] = useSearchParams();
-  const roomTypeId = searchParams.get('roomType');
-  const sortBy = searchParams.get('sortBy');
-  const sortOrder = searchParams.get('sortOrder');
-  const checkinDate = searchParams.get('checkinDate');
-  const checkoutDate = searchParams.get('checkoutDate');
-  const guestAmount = searchParams.get('guestAmount');
-  const bedroomAmount = searchParams.get('bedroomAmount');
-  const bedAmount = searchParams.get('bedAmount');
-  const sharedBathAmount = searchParams.get('sharedBathAmount');
-  const amenities = searchParams.get('amenities');
 
-  const amenitiesArray = amenities ? amenities.split(',') : undefined;
+  const queryParams = useMemo(() => {
+    const roomTypeId = searchParams.get('roomType');
+    const sortBy = searchParams.get('sortBy');
+    const sortOrder = searchParams.get('sortOrder');
+    const checkinDate = searchParams.get('checkinDate');
+    const checkoutDate = searchParams.get('checkoutDate');
+    const guestAmount = searchParams.get('guestAmount');
+    const bedroomAmount = searchParams.get('bedroomAmount');
+    const bedAmount = searchParams.get('bedAmount');
+    const sharedBathAmount = searchParams.get('sharedBathAmount');
+    const amenities = searchParams.get('amenities');
+
+    const amenitiesArray = amenities ? amenities.split(',') : undefined;
+
+    return {
+      page,
+      limit: 12,
+      ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
+      ...(checkinDate ? { checkinDate } : {}),
+      ...(checkoutDate ? { checkoutDate } : {}),
+      ...(roomTypeId ? { roomTypeId } : {}),
+      ...(guestAmount ? { guestAmount: parseInt(guestAmount, 10) } : {}),
+      ...(bedroomAmount ? { bedroomAmount: parseInt(bedroomAmount, 10) } : {}),
+      ...(bedAmount ? { bedAmount: parseInt(bedAmount, 10) } : {}),
+      ...(sharedBathAmount ? { sharedBathAmount: parseInt(sharedBathAmount, 10) } : {}),
+      ...(amenitiesArray ? { amenities: amenitiesArray } : {}),
+    };
+  }, [searchParams, page]);
 
   const {
     data: allRoomsData,
@@ -33,19 +50,7 @@ const AccommodationList = () => {
     isFetching: isAllRoomsFetching,
     error: allRoomsError,
     refetch: refetchAllRooms,
-  } = useFilterQuery({
-    page,
-    limit: 12,
-    ...(sortBy && sortOrder ? { sortBy, sortOrder } : {}),
-    ...(checkinDate ? { checkinDate } : {}),
-    ...(checkoutDate ? { checkoutDate } : {}),
-    ...(roomTypeId ? { roomTypeId } : {}),
-    ...(guestAmount ? { guestAmount: parseInt(guestAmount, 10) } : {}),
-    ...(bedroomAmount ? { bedroomAmount: parseInt(bedroomAmount, 10) } : {}),
-    ...(bedAmount ? { bedAmount: parseInt(bedAmount, 10) } : {}),
-    ...(sharedBathAmount ? { sharedBathAmount: parseInt(sharedBathAmount, 10) } : {}),
-    ...(amenitiesArray ? { amenities: amenitiesArray } : {}),
-  });
+  } = useFilterQuery(queryParams);
 
   const loader = useRef(null);
   const navigate = useNavigate();
@@ -58,8 +63,15 @@ const AccommodationList = () => {
   const totalPages = currentData?.totalPages;
 
   useEffect(() => {
-    setCurrentData(allRoomsData ?? null);
-  }, [allRoomsData]);
+    if (page > 1 && allRoomsData) {
+      setCurrentData((prevData) => ({
+        ...allRoomsData,
+        docs: [...(prevData?.docs || []), ...allRoomsData.docs],
+      }));
+    } else {
+      setCurrentData(allRoomsData ?? null);
+    }
+  }, [allRoomsData, page]);
 
   const handleCardClick = useCallback(
     (roomId: string) => {
@@ -102,23 +114,25 @@ const AccommodationList = () => {
   }, [setSearchParams]);
 
   useEffect(() => {
-    setCurrentData(null);
-    dispatch(resetRoomsState());
-    refetchAllRooms();
-    setPage(1);
+    if (page === 1) {
+      setCurrentData(null);
+      dispatch(resetRoomsState());
+      refetchAllRooms();
+    }
   }, [
-    roomTypeId,
-    sortBy,
-    sortOrder,
-    checkinDate,
-    checkoutDate,
-    guestAmount,
-    bedroomAmount,
-    bedAmount,
-    sharedBathAmount,
-    amenities,
+    queryParams.roomTypeId,
+    queryParams.sortBy,
+    queryParams.sortOrder,
+    queryParams.checkinDate,
+    queryParams.checkoutDate,
+    queryParams.guestAmount,
+    queryParams.bedroomAmount,
+    queryParams.bedAmount,
+    queryParams.sharedBathAmount,
+    queryParams.amenities,
     refetchAllRooms,
     dispatch,
+    page,
   ]);
 
   if (error) {

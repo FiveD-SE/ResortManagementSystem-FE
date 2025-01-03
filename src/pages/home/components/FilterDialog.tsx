@@ -364,7 +364,6 @@ const RoomsAndBedsSection = memo(
 
 const MemoizedAmenityItem = memo(AmenityItem);
 
-// Optimized and Memoized AmenitiesSection
 const AmenitiesSection = memo(
   ({
     selectedAmenities,
@@ -435,8 +434,8 @@ const FilterDialog = ({ open, onClose, onApply }: FilterDialogProps) => {
   const [selectedRooms, setSelectedRooms] = useState({ bedrooms: 0, beds: 0, bathrooms: 0 });
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [guestCount, setGuestCount] = useState<GuestCount>({ adults: 0, children: 0 });
-  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(dayjs());
-  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs().add(7, 'day'));
+  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(null);
+  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(null);
 
   const handleSortChange = useCallback((newSortBy: string | null, newSortOrder: 'asc' | 'desc' | null) => {
     setSortBy(newSortBy);

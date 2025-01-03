@@ -107,11 +107,12 @@ const DateChangeDialog = ({
               value={currentCheckInDate}
               onChange={handleCheckInChange}
               shouldDisableDate={shouldDisableDate}
-              minDate={dayjs()}
-              format="DD/MM/YYYY"
+              minDate={dayjs(currentCheckInDate || undefined)}
+              format="MM-DD-YYYY"
               slotProps={{
                 field: {
                   clearable: true,
+                  readOnly: true,
                 },
                 textField: {
                   size: 'small',
@@ -151,11 +152,13 @@ const DateChangeDialog = ({
               label="Checkout"
               value={currentCheckOutDate}
               onChange={handleCheckOutChange}
+              shouldDisableDate={shouldDisableDate}
               minDate={currentCheckInDate ? currentCheckInDate.add(1, 'day') : dayjs().add(1, 'day')}
-              format="DD/MM/YYYY"
+              format="MM-DD-YYYY"
               slotProps={{
                 field: {
                   clearable: true,
+                  readOnly: true,
                 },
                 textField: {
                   size: 'small',

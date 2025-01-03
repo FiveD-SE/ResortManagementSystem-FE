@@ -46,7 +46,7 @@ export interface IBookingService {
   serviceId: {
     _id: string;
     serviceName: string;
-    descriptin: string;
+    description: string;
     serviceTypedId: string;
     price: number;
     createdAt: Date;

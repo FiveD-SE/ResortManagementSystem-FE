@@ -154,7 +154,7 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate, next
               onChange={handleCheckInChange}
               shouldDisableDate={shouldDisableDate}
               minDate={dayjs(checkInDate || undefined)}
-              format="DD/MM/YYYY"
+              format="MM-DD-YYYY"
               slotProps={{
                 field: {
                   clearable: true,
@@ -199,8 +199,8 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate, next
               value={checkOutDate}
               onChange={handleCheckOutChange}
               shouldDisableDate={shouldDisableDate}
-              minDate={dayjs(checkOutDate)}
-              format="DD/MM/YYYY"
+              minDate={checkInDate ? checkInDate.add(1, 'day') : dayjs().add(1, 'day')}
+              format="MM-DD-YYYY"
               slotProps={{
                 field: {
                   clearable: true,

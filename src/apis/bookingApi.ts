@@ -84,7 +84,7 @@ export const bookingApi = createApi({
         method: 'GET',
       }),
     }),
-    createBooking: builder.mutation<IBookingApiResponse, { roomId: string; data: ICreateBookingRequest }>({
+    createBooking: builder.mutation<IBooking, { roomId: string; data: ICreateBookingRequest }>({
       query: ({ roomId, data }) => ({
         url: `/${roomId}`,
         method: 'POST',
@@ -109,6 +109,13 @@ export const bookingApi = createApi({
         method: 'PATCH',
       }),
     }),
+    addServicesToBooking: builder.mutation<IBooking, { bookingId: string; data: { serviceId: string[] } }>({
+      query: ({ bookingId, data }) => ({
+        url: `/${bookingId}/services`,
+        method: 'POST',
+        data,
+      }),
+    }),
   }),
 });
 
@@ -125,4 +132,5 @@ export const {
   useConfirmCheckInMutation,
   useConfirmCheckOutMutation,
   useForwardBookingServiceStatusMutation,
+  useAddServicesToBookingMutation,
 } = bookingApi;

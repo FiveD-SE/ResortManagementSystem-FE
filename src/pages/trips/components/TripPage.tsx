@@ -20,7 +20,7 @@ const TripPage = () => {
 
   return (
     <Box sx={{ width: '100%', paddingX: 8 }}>
-      <Header haveBackNav={false} title="Booking" />
+      <Header title="Booking" />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={value}
