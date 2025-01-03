@@ -7,7 +7,6 @@ import { Role } from '../types';
 import TripDetail from '../pages/trips/components/TripDetail';
 import TripReview from '../pages/trips/components/TripReview';
 import ThirdParty from '../pages/third-party';
-
 const Home = lazy(() => import('../pages/home'));
 const SignUp = lazy(() => import('../pages/signup'));
 const SignIn = lazy(() => import('../pages/signin'));
@@ -24,6 +23,8 @@ const BookingManagement = lazy(() => import('../pages/admin-booking-management')
 const AdminProfile = lazy(() => import('../pages/admin-profile'));
 const ServiceStaffDashboard = lazy(() => import('../pages/serviceStaff-dashboard/ServiceStaffDashboard'));
 const ReceptionistDashboard = lazy(() => import('../pages/receptionist-dashboard/ReceptionistDashboard'));
+const Bookings = lazy(() => import('../pages/bookings'));
+const ResetPassword = lazy(() => import('../pages/reset-password'));
 
 const Routing = () => {
   return (
@@ -46,10 +47,19 @@ const Routing = () => {
           </PublicRoute>
         }
       />
+      <Route
+        path={ROUTES.AUTH.RESET_PASSWORD}
+        element={
+          <PublicRoute>
+            <ResetPassword />
+          </PublicRoute>
+        }
+      />
 
       <Route path={ROUTES.ROOMS} element={<Rooms />} />
       <Route element={<PrivateRoute allowedRoles={[Role.User]} />}>
         <Route element={<Trips />} path={ROUTES.TRIPS.HOME} />
+        <Route path={ROUTES.BOOKINGS} element={<Bookings />} />
         <Route element={<TripDetail />} path={ROUTES.TRIPS.DETAIL} />
         <Route element={<TripReview />} path={ROUTES.TRIPS.REVIEW} />
         <Route path={ROUTES.PROFILE} element={<Profile />} />

@@ -1,57 +1,29 @@
-import { Box, Paper } from '@mui/material';
+import { Box, CircularProgress, Paper } from '@mui/material';
 import BookingList from './components/BookingList';
 import { NO_BOOKING_URL } from '../../constant';
-import { ITrip } from '../../../../types';
-
-const fakeData: ITrip[] = [
-  {
-    id: 1,
-    name: 'Trip 1',
-    startDate: 'Dec 1, 2021',
-    endDate: 'Dec 5, 2021',
-    status: 'Upcoming',
-    amount: 2,
-  },
-  {
-    id: 2,
-    name: 'Trip 2',
-    startDate: 'Nov 1, 2021',
-    endDate: 'Nov 5, 2021',
-    status: 'Upcoming',
-    amount: 3,
-  },
-  {
-    id: 3,
-    name: 'Trip 3',
-    startDate: 'July 22, 2021',
-    endDate: 'July 26, 2021',
-    status: 'Upcoming',
-    amount: 4,
-  },
-  {
-    id: 4,
-    name: 'Trip 4',
-    startDate: 'Janurary 1, 2021',
-    endDate: 'Janurary 5, 2021',
-    status: 'Upcoming',
-    amount: 5,
-  },
-];
+import { useGetBookingsByUserIdQuery } from '../../../../apis/bookingApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../stores/store';
 
 interface IProps {
-  trips: ITrip[];
-  type: string;
+  type: 'upcoming' | 'past' | 'staying';
 }
 
 const BookingTab = (props: IProps) => {
+  const { user } = useSelector((state: RootState) => state.user);
+  const { data, isFetching } = useGetBookingsByUserIdQuery({ userId: user?.id || '', filter: props.type });
   return (
     <Box sx={{ paddingX: 6, paddingY: 3 }}>
-      {props.trips.length === 0 ? (
+      {isFetching || data === undefined ? (
+        <Paper sx={{ display: 'flex' }} elevation={0}>
+          <CircularProgress />
+        </Paper>
+      ) : data?.docs.length === 0 ? (
         <Paper sx={{ display: 'flex' }} elevation={0}>
           <img src={NO_BOOKING_URL} />
         </Paper>
       ) : (
-        <BookingList trips={props.trips} />
+        <BookingList trips={data?.docs} />
       )}
     </Box>
   );

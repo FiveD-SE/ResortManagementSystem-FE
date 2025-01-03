@@ -5,8 +5,6 @@ import {
   IconButton,
   Typography,
   Box,
-  TextField,
-  InputAdornment,
   Divider,
   Slide,
   Grid,
@@ -15,7 +13,7 @@ import {
   MenuItem,
   Avatar,
 } from '@mui/material';
-import { Close, ExpandMoreRounded, Search, StarRounded, SvgIconComponent } from '@mui/icons-material';
+import { Close, ExpandMoreRounded, StarRounded, SvgIconComponent } from '@mui/icons-material';
 import RatingProgress from './RatingProgress';
 import RatingItem from './RatingItem';
 import { TransitionProps } from '@mui/material/transitions';
@@ -73,7 +71,10 @@ const GuestReviewsDialog: React.FC<GuestReviewsDialogProps> = ({
       sx={{
         '& .MuiDialog-paper': {
           borderRadius: 4,
-          overflowY: 'hidden',
+          overflowY: {
+            xs: 'auto',
+            md: 'hidden',
+          },
         },
       }}
     >
@@ -82,8 +83,22 @@ const GuestReviewsDialog: React.FC<GuestReviewsDialogProps> = ({
           <Close />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ p: 4, overflowY: 'hidden' }}>
-        <Grid container spacing={6}>
+      <DialogContent
+        sx={{
+          p: 4,
+          overflowY: {
+            xs: 'auto',
+            md: 'hidden',
+          },
+        }}
+      >
+        <Grid
+          container
+          spacing={{
+            xs: 1,
+            md: 6,
+          }}
+        >
           <Grid item xs={12} md={5}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <StarRounded sx={{ mr: 1, fontSize: 48 }} />
@@ -155,49 +170,17 @@ const GuestReviewsDialog: React.FC<GuestReviewsDialogProps> = ({
               </Menu>
             </Box>
 
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Search reviews"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start" sx={{ color: 'black.500', cursor: 'pointer' }}>
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-              size="small"
-              sx={{
-                mb: 4,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 10,
-                  backgroundColor: 'white.50',
-                  '& fieldset': {
-                    borderColor: 'black.100',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'black.500',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'black.500',
-                    borderWidth: 3,
-                  },
-                },
-                '& .MuiOutlinedInput-input': {
-                  borderRadius: 3,
-                  backgroundColor: 'white.50',
-                  color: 'black.500',
-                },
-              }}
-            />
-
             <Box sx={{ overflowY: 'auto', maxHeight: 800 }}>
               {ratings.map((rating, index) => (
-                <Box key={index} sx={{ mb: 3 }}>
+                <Box key={index} sx={{ mb: 3, overflow: 'hidden' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar sx={{ backgroundColor: 'gray.300', width: 40, height: 40 }} />
                     <Box>
-                      <Typography variant="subtitle1" fontWeight="bold">
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="bold"
+                        sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}
+                      >
                         {rating.userId}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">

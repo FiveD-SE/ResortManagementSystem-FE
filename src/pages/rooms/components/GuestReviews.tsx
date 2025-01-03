@@ -32,7 +32,7 @@ const GuestReviews = ({ overallRatings, detailedRatings, averageRating, totalRev
                 <Avatar sx={{ backgroundColor: 'gray.300', width: 40, height: 40 }} />
                 <Box>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                    {rating.userId} {/* Assuming userId is the user's name */}
+                    {rating.fullName}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {new Date(rating.createdAt).toLocaleString('default', {

@@ -53,3 +53,10 @@ export const getUserIdFromRefreshToken = () => {
   const decoded = decodeToken(token);
   return decoded ? decoded.userID || null : null;
 }
+
+export const getResetPasswordTokenFromUrl = (url: string) => {
+  const urlParams = new URLSearchParams(url);
+  const resetPasswordToken = urlParams.get('token');
+
+  return resetPasswordToken;
+}

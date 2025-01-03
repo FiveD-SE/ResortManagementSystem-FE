@@ -2,6 +2,10 @@ import { Box, Card, CardActionArea, Paper, Typography } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { ITrip } from '../../../../../types';
 
+const convertDateTime = (date: Date) => {
+  return new Date(date).toLocaleDateString('en-GB');
+};
+
 const BookingCard = ({ trip }: { trip: ITrip }) => {
   return (
     <Card variant="outlined" sx={{ marginY: 2 }}>
@@ -11,14 +15,14 @@ const BookingCard = ({ trip }: { trip: ITrip }) => {
       >
         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
           <Paper sx={{ display: 'flex' }}>
-            <img src="https://placehold.co/100/png" />
+            <img src={trip.roomId.images[0]} style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
           </Paper>
           <Box sx={{ paddingX: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="h6">{trip.name}</Typography>
+            <Typography variant="h6">{trip.roomId.roomNumber}</Typography>
             <Typography variant="body1">
-              {trip.startDate} - {trip.endDate}
+              {convertDateTime(trip.checkinDate)} - {convertDateTime(trip.checkoutDate)}
             </Typography>
-            <Typography variant="body1">Guest: {trip.amount}</Typography>
+            <Typography variant="body1">Status: {trip.status}</Typography>
           </Box>
         </Box>
         <ArrowForwardIosIcon />

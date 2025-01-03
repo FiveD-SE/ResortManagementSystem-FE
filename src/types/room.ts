@@ -41,7 +41,12 @@ export interface IRoomApiResponse {
   prevPage: number | null;
   totalPages: number | null;
   pagingCounter: number | null;
-  docs: IRoom[];
+  docs: (IRoom & {
+    nextAvailableWeek: {
+      start: string;
+      end: string;
+    };
+  })[];
 }
 
 export interface IRoomTypeApiRequest {
@@ -100,4 +105,19 @@ export interface IBookingRoom {
   averageRating: number;
   ratings: string[];
   id: string;
+}
+
+export interface IRoomFilterApiRequest {
+  guestAmount?: number;
+  bedAmount?: number;
+  bedroomAmount?: number;
+  searchKeyFeature?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  checkinDate?: string;
+  checkoutDate?: string;
+  roomTypeId?: string;
+  limit: number;
+  page: number;
+  amenities?: string[];
 }

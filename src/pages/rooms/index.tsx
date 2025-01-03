@@ -15,6 +15,7 @@ import {
   VpnKeyOutlined,
 } from '@mui/icons-material';
 import RoomDetailSkeleton from './components/RoomDetailSkeleton';
+import { useRef } from 'react';
 
 const Rooms = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,6 +91,8 @@ const Rooms = () => {
     { label: 'Value', value: averageScores.value, icon: LocalOfferOutlined },
   ];
 
+  const ratingsRef = useRef<HTMLDivElement>(null);
+
   return (
     <>
       {isLoading ? (
@@ -98,6 +101,7 @@ const Rooms = () => {
         <Container>
           <PhotoGallery images={roomDetail?.room.images || []} />
           <RoomDetails
+            roomId={id || ''}
             ratings={roomDetail?.ratings || []}
             roomType={
               roomDetail?.roomType ?? {
@@ -114,38 +118,43 @@ const Rooms = () => {
               }
             }
             occupiedDates={roomDetail?.occupiedDates || []}
+            ratingsRef={ratingsRef}
           />
-          <Ratings
-            detailedRatings={detailedRatings}
-            averageScores={
-              roomDetail?.averageScores ?? {
-                cleanliness: 0,
-                accuracy: 0,
-                checkIn: 0,
-                communication: 0,
-                location: 0,
-                value: 0,
+          <div ref={ratingsRef}>
+            <Ratings
+              detailedRatings={detailedRatings}
+              averageScores={
+                roomDetail?.averageScores ?? {
+                  cleanliness: 0,
+                  accuracy: 0,
+                  checkIn: 0,
+                  communication: 0,
+                  location: 0,
+                  value: 0,
+                }
               }
-            }
-            ratingCounts={
-              roomDetail?.ratingCounts ?? {
-                oneStar: 0,
-                twoStars: 0,
-                threeStars: 0,
-                fourStars: 0,
-                fiveStars: 0,
+              ratingCounts={
+                roomDetail?.ratingCounts ?? {
+                  oneStar: 0,
+                  twoStars: 0,
+                  threeStars: 0,
+                  fourStars: 0,
+                  fiveStars: 0,
+                }
               }
-            }
-            averageRating={averageRating}
-            ratingCount={roomDetail?.ratingCount || 0}
-          />
-          <GuestReviews
-            detailedRatings={detailedRatings}
-            averageRating={averageRating}
-            totalReviews={totalReviews}
-            overallRatings={overallRatings}
-            ratings={roomDetail?.ratings || []}
-          />
+              averageRating={averageRating}
+              ratingCount={roomDetail?.ratingCount || 0}
+            />
+          </div>
+          {roomDetail?.ratings && roomDetail?.ratings.length > 0 && (
+            <GuestReviews
+              detailedRatings={detailedRatings}
+              averageRating={averageRating}
+              totalReviews={totalReviews}
+              overallRatings={overallRatings}
+              ratings={roomDetail?.ratings || []}
+            />
+          )}
           <ThingsToKnow />
         </Container>
       )}

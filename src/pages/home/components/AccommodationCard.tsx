@@ -1,11 +1,5 @@
-import {
-  ChevronLeftRounded,
-  ChevronRightRounded,
-  FavoriteBorderRounded,
-  FavoriteRounded,
-  StarRounded,
-} from '@mui/icons-material';
-import { Card, CardContent, CardMedia, IconButton, Typography, Box } from '@mui/material';
+import { ChevronLeftRounded, ChevronRightRounded, StarRounded } from '@mui/icons-material';
+import { Card, CardContent, CardMedia, Typography, Box } from '@mui/material';
 import { useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { formatDateRange, formatPrice } from '../../../utils';
@@ -30,11 +24,6 @@ const AccommodationCard = ({
   onCardClick = () => {},
 }: AccommodationCardProps) => {
   const [isHover, setIsHover] = useState<boolean>(false);
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
-
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-  };
 
   return (
     <Card component="a" sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}>
@@ -94,20 +83,6 @@ const AccommodationCard = ({
           </div>
         ))}
       </Carousel>
-      <IconButton
-        onClick={toggleFavorite}
-        sx={{
-          position: 'absolute',
-          top: 10,
-          right: 8,
-          color: isFavorite ? 'primary.500' : 'white.50',
-          ':hover': { transform: 'scale(1.1)' },
-          transition: 'transform 0.3s',
-          zIndex: 2,
-        }}
-      >
-        {isFavorite ? <FavoriteRounded /> : <FavoriteBorderRounded />}
-      </IconButton>
       <CardContent sx={{ px: 0, cursor: 'pointer' }} onClick={onCardClick}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

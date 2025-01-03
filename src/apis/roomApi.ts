@@ -1,7 +1,8 @@
-import { IRoomApiRequest, IRoomApiResponse, IRoomDetailApiResponse } from './../types/room';
+import { IRoomApiRequest, IRoomApiResponse, IRoomDetailApiResponse, IRoomFilterApiRequest } from './../types/room';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { ROOM_ENDPOINT } from '../constants/endpoints';
 import { axiosBaseQuery } from './axiosInstance';
+import { IRatingApiResquest } from '../types/rating';
 
 export const roomApi = createApi({
   reducerPath: 'roomApi',
@@ -75,6 +76,37 @@ export const roomApi = createApi({
         method: 'DELETE',
       }),
     }),
+    ratingRoom: builder.mutation<void, IRatingApiResquest>({
+      query: (request) => ({
+        url: `/${request.roomId}/ratings`,
+        method: 'POST',
+        data: {
+          cleanliness: request.cleanliness,
+          accuracy: request.accuracy,
+          checkIn: request.checkIn,
+          communication: request.communication,
+          location: request.location,
+          value: request.value,
+          comment: request.comment,
+        },
+      }),
+    }),
+    filter: builder.query<IRoomApiResponse, IRoomFilterApiRequest>({
+      query: ({ page, limit, ...rest }) => ({
+        url: '/filter',
+        method: 'GET',
+        params: { page, limit, ...rest },
+      }),
+      serializeQueryArgs: ({ endpointName }) => {
+        return endpointName;
+      },
+      merge: (currentCache, newItems) => {
+        currentCache.docs.push(...newItems.docs);
+      },
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
+    }),
   }),
 });
 
@@ -86,5 +118,7 @@ export const {
   useUpdateRoomMutation,
   useDeleteRoomMutation,
   useLazyGetRoomsQuery,
+  useRatingRoomMutation,
+  useFilterQuery,
 } = roomApi;
 export const resetRoomsState = roomApi.util.resetApiState;

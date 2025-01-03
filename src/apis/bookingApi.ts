@@ -1,7 +1,15 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { BOOKING_ENDPOINT } from '../constants/endpoints';
 import { axiosBaseQuery } from './axiosInstance';
-import { IBookingApiRequest, IBookingApiResponse, IBookingServicesApiResponse } from '../types';
+import {
+  IBooking,
+  IBookingApiRequest,
+  IBookingApiResponse,
+  IBookingServicesApiResponse,
+  ICreateBookingRequest,
+  ITripRequest,
+  ITripResponse,
+} from '../types/booking';
 
 export const bookingApi = createApi({
   reducerPath: 'bookingApi',
@@ -57,6 +65,32 @@ export const bookingApi = createApi({
         method: 'GET',
       }),
     }),
+    getBookingsByUserId: builder.query<ITripResponse, ITripRequest>({
+      query: (request) => ({
+        url: `/user/${request.userId}`,
+        method: 'GET',
+        params: {
+          filter: request.filter,
+          page: request.page,
+          limit: request.limit,
+          sortBy: request.sortBy,
+          sortOrder: request.sortOrder,
+        },
+      }),
+    }),
+    getBookingById: builder.query<IBooking, string>({
+      query: (id) => ({
+        url: `/${id}`,
+        method: 'GET',
+      }),
+    }),
+    createBooking: builder.mutation<IBookingApiResponse, { roomId: string; data: ICreateBookingRequest }>({
+      query: ({ roomId, data }) => ({
+        url: `/${roomId}`,
+        method: 'POST',
+        data,
+      }),
+    }),
   }),
 });
 
@@ -67,4 +101,7 @@ export const {
   useGetBookingsStatusCountQuery,
   useGetBookingServicesQuery,
   useGetBookingServicesCountQuery,
+  useCreateBookingMutation,
+  useGetBookingByIdQuery,
+  useGetBookingsByUserIdQuery,
 } = bookingApi;
