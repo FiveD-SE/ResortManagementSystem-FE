@@ -11,4 +11,5 @@ export interface IAccount {
   updatedAt: Date;
   status: string;
   avatar: string;
+  phoneNumber: string;
 }

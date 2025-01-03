@@ -26,7 +26,11 @@ const AccommodationCard = ({
   const [isHover, setIsHover] = useState<boolean>(false);
 
   return (
-    <Card component="a" sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}>
+    <Card
+      component="a"
+      sx={{ position: 'relative', borderRadius: 2, boxShadow: 0, cursor: 'pointer' }}
+      onClick={onCardClick}
+    >
       <Carousel
         autoPlay={false}
         animation="slide"
@@ -83,7 +87,7 @@ const AccommodationCard = ({
           </div>
         ))}
       </Carousel>
-      <CardContent sx={{ px: 0, cursor: 'pointer' }} onClick={onCardClick}>
+      <CardContent sx={{ px: 0, cursor: 'pointer' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'black.900' }}>

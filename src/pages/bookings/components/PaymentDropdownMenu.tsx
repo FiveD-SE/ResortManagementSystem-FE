@@ -42,7 +42,7 @@ const PaymentDropdownMenu = ({ anchorEl, open, onClose, onSelect }: PaymentDropd
         sx: {
           width: {
             xs: '100%',
-            sm: '45%',
+            sm: '35%',
           },
           borderRadius: '0.75rem',
         },
