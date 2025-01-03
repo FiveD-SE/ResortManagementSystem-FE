@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Container, Divider, Stack, TextField, Typography } from '@mui/material';
 import Header from './Header';
 import Grid from '@mui/material/Grid2';
 import PricingCard from './Detail/PricingCard';
@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import { useGetBookingByIdQuery } from '../../../apis/bookingApi';
 import { useRatingRoomMutation } from '../../../apis/roomApi';
 import React from 'react';
+import { CardLoading } from './Skeleton';
 
 interface Rating {
   title: string;
@@ -27,9 +28,9 @@ const TripReview = () => {
   const { id } = useParams<{ id: string }>();
   const { data, isFetching } = useGetBookingByIdQuery(id || '');
   const [rateRoom] = useRatingRoomMutation();
-
   const [comment, setComment] = React.useState<string>('');
   const [rating, setRating] = React.useState<Rating[]>(initialRatings);
+
   const submitReview = () => {
     const ratings = {
       cleanliness: rating[0].value ?? 0,
@@ -42,20 +43,21 @@ const TripReview = () => {
     rateRoom({ roomId: data?.roomId.id || '', ...ratings, comment });
     window.location.href = '/';
   };
-  React.useEffect(() => {
-    console.log(rating);
-    console.log(comment);
-  }, [rating, comment]);
+
   return (
-    <Box sx={{ padding: 8, width: '100%' }}>
+    <Container>
       <Stack gap={4}>
-        <Header haveBackNav={true} title="Review" />
+        <Header title="Review" />
         <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={4}>
-            <Grid size={6}>
-              <PricingCard data={data || null} />
-            </Grid>
-            <Grid container size={6} sx={{ padding: 4 }}>
+          <Grid
+            container
+            spacing={{
+              xs: 2,
+              sm: 6,
+            }}
+          >
+            <Grid size={{ xs: 12, sm: 6 }}>{isFetching ? <CardLoading /> : <PricingCard data={data || null} />}</Grid>
+            <Grid container size={{ xs: 12, sm: 6 }}>
               {rating.map((item, index) => (
                 <Grid key={index} size={6}>
                   <RatingItem title={item.title} value={item.value ?? 0} onChange={setRating} />
@@ -79,21 +81,32 @@ const TripReview = () => {
             variant="outlined"
             multiline
             minRows={5}
+            maxRows={5}
             color="info"
             sx={{ width: '100%' }}
             onChange={(e) => setComment(e.target.value)}
           />
         </Stack>
       </Stack>
-      <Button
-        variant="contained"
-        sx={{ mt: 4, p: 2, textTransform: 'none', width: '10%', borderRadius: 3, backgroundColor: '#C72D65' }}
-      >
-        <Typography variant="h3" sx={{ fontFamily: 'Be Vietnam Pro' }} onClick={() => submitReview()}>
-          Review
-        </Typography>
-      </Button>
-    </Box>
+      <Box sx={{ pb: 2 }}>
+        <Button
+          variant="contained"
+          sx={{
+            mt: 4,
+            py: 1.5,
+            px: 3,
+            textTransform: 'none',
+            width: 'fit-content',
+            borderRadius: 3,
+            backgroundColor: 'primary.500',
+          }}
+        >
+          <Typography variant="h6" onClick={() => submitReview()}>
+            Leave your review
+          </Typography>
+        </Button>
+      </Box>
+    </Container>
   );
 };
 

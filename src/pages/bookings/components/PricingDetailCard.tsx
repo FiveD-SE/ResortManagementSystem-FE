@@ -25,7 +25,9 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
   const totalPrice = roomPrice - discountAmount + serviceFee;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 3, borderRadius: 2 }}>
+    <Box
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 3, borderRadius: 2, border: 1, borderColor: 'black.100' }}
+    >
       <Box sx={{ display: 'flex', gap: 2 }}>
         <Avatar
           variant="rounded"
