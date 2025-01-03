@@ -91,6 +91,24 @@ export const bookingApi = createApi({
         data,
       }),
     }),
+    confirmCheckIn: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/${id}/checkin`,
+        method: 'PATCH',
+      }),
+    }),
+    confirmCheckOut: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/${id}/checkout`,
+        method: 'POST',
+      }),
+    }),
+    forwardBookingServiceStatus: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/services/${id}`,
+        method: 'PATCH',
+      }),
+    }),
     addServicesToBooking: builder.mutation<IBooking, { bookingId: string; data: { serviceId: string[] } }>({
       query: ({ bookingId, data }) => ({
         url: `/${bookingId}/services`,
@@ -111,5 +129,8 @@ export const {
   useCreateBookingMutation,
   useGetBookingByIdQuery,
   useGetBookingsByUserIdQuery,
+  useConfirmCheckInMutation,
+  useConfirmCheckOutMutation,
+  useForwardBookingServiceStatusMutation,
   useAddServicesToBookingMutation,
 } = bookingApi;
