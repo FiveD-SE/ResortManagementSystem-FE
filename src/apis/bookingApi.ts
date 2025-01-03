@@ -84,7 +84,7 @@ export const bookingApi = createApi({
         method: 'GET',
       }),
     }),
-    createBooking: builder.mutation<IBookingApiResponse, { roomId: string; data: ICreateBookingRequest }>({
+    createBooking: builder.mutation<IBooking, { roomId: string; data: ICreateBookingRequest }>({
       query: ({ roomId, data }) => ({
         url: `/${roomId}`,
         method: 'POST',

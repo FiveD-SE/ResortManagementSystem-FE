@@ -15,7 +15,7 @@ export interface IBooking {
   promotionId: IPromotion;
   totalAmount: number;
   paymentMethod: string;
-  guest: {
+  guests: {
     adults: number;
     children: number;
     id: string;

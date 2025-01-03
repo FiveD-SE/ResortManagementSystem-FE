@@ -5,7 +5,7 @@ import Payment from './components/Payment';
 import Voucher from './components/Voucher';
 import AddsOnService from './components/AddsOnService';
 import PricingDetailCard from './components/PricingDetailCard';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { PaymentsRounded } from '@mui/icons-material';
@@ -14,13 +14,16 @@ import { IPromotion, IService, PaymentMethod } from '../../types';
 import { useCreateBookingMutation } from '../../apis/bookingApi';
 import toast from 'react-hot-toast';
 import { ICreateBookingRequest } from '../../types/booking';
+import { BOOKING_SUCCESS_MESSAGE, BOOKING_SYSTEM_ERROR_MESSAGE } from '../../constants/messages';
+import CustomDialog from '../../components/CustomDialog';
+import { ROUTES } from '../../constants/routes';
 
 const Bookings = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { data: roomDetail } = useGetRoomDetailByIdQuery(roomId ?? '', {
     skip: !roomId,
   });
-
+  const navigate = useNavigate();
   const [createBooking, { isLoading: isCreateBookingLoading }] = useCreateBookingMutation();
 
   const [searchParams] = useSearchParams();
@@ -77,7 +80,7 @@ const Bookings = () => {
 
   const handleCreateBooking = async () => {
     if (!roomId || !checkInDate || !checkOutDate) {
-      toast.error('Room ID, check-in date, and check-out date are required.');
+      toast.error(BOOKING_SYSTEM_ERROR_MESSAGE);
       return;
     }
 
@@ -96,19 +99,45 @@ const Bookings = () => {
     try {
       const response = await createBooking({ roomId, data: bookingData as ICreateBookingRequest }).unwrap();
       console.log('Booking created:', response);
-      toast.success('Booking created successfully!');
+      toast.success(BOOKING_SUCCESS_MESSAGE);
+
+      if (selectedPaymentMethod.text === 'Transfer') {
+        setShowPaymentDialog(true);
+      } else {
+        navigate(ROUTES.TRIPS.DETAIL.replace(':id', response.id));
+      }
     } catch (error) {
       console.error('Failed to create booking:', error);
-      toast.error('Failed to create booking. Please try again.');
+      toast.error(BOOKING_SYSTEM_ERROR_MESSAGE);
     }
   };
 
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [countdown, setCountdown] = useState(30);
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+    if (showPaymentDialog) {
+      timerId = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [showPaymentDialog]);
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      navigate(ROUTES.HOME);
+    }
+  }, [countdown, navigate]);
   return (
     <Container>
       <Header />
       <Box>
         <Grid container spacing={6}>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6} order={{ xs: 2, sm: 1 }}>
             <TripDetails
               guests={guests}
               checkInDate={checkInDate}
@@ -152,7 +181,7 @@ const Bookings = () => {
               </Button>
             </Box>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6} order={{ xs: 1, sm: 2 }}>
             <PricingDetailCard
               roomDetail={roomDetail ?? null}
               checkInDate={checkInDate}
@@ -163,6 +192,29 @@ const Bookings = () => {
           </Grid>
         </Grid>
       </Box>
+      <CustomDialog open={showPaymentDialog} onClose={() => setShowPaymentDialog(false)}>
+        <Box p={4} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Please check your email to complete the payment process.
+          </Typography>
+          <Typography variant="body1" color="text.secondary" textAlign="center" gutterBottom>
+            You have {countdown} seconds to continue exploring our resort.
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{
+              width: 'fit-content',
+              py: 2,
+              px: 4,
+              backgroundColor: 'primary.500',
+              borderRadius: 3,
+            }}
+            onClick={() => navigate(ROUTES.HOME)}
+          >
+            <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>Continue</Typography>
+          </Button>
+        </Box>
+      </CustomDialog>
     </Container>
   );
 };

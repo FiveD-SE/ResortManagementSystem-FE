@@ -1,89 +1,80 @@
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Divider, Stack, Typography } from '@mui/material';
 import { IBooking } from '../../../../types/booking';
+import { formatPrice } from '../../../../utils';
+import dayjs from 'dayjs';
 
 interface IProps {
   data: IBooking | null;
 }
 
-function calculateDaysBetween(date1: Date, date2: Date) {
-  // Convert both dates to milliseconds
-  const startDate = new Date(date1);
-  const endDate = new Date(date2);
-
-  // Calculate the difference in milliseconds
-  const diffInMs = endDate.getTime() - startDate.getTime();
-
-  // Convert milliseconds to days
-  return Math.round(diffInMs / (1000 * 60 * 60 * 24));
-}
-
 const PricingCard = (props: IProps) => {
   const { data } = props;
-  const totalNight = data?.checkinDate && data?.checkoutDate ? calculateDaysBetween(data.checkinDate, data.checkoutDate) : 0;
+  const roomPrice = data?.roomId.pricePerNight || 0;
+  const nights = data?.checkinDate && data?.checkoutDate ? dayjs(data.checkoutDate).diff(dayjs(data.checkinDate), 'day') : 0;
   const totalServiceFee = data?.services?.reduce((acc, service) => acc + service.serviceId.price * service.quantity, 0) || 0;
-  const totalDiscount = data?.promotionId?.discount
-    ? (((data.roomId.pricePerNight ?? 0) * data.promotionId.discount) / 100) * totalNight
-    : 0;
-  const totalAmount = (data?.roomId.pricePerNight ?? 0) * totalNight + totalServiceFee - totalDiscount;
+  const totalDiscount = data?.promotionId?.discount ? (((roomPrice ?? 0) * data?.promotionId?.discount) / 100) * nights : 0;
+  const totalAmount = (roomPrice ?? 0) * nights + totalServiceFee - totalDiscount;
+
   return (
     <Stack spacing={3} sx={{ padding: 4, border: '1px solid #E0E0E0', borderRadius: 4 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'row' }} gap={2}>
-        <img src={data?.roomId.images[0]} style={{ borderRadius: 6, width: 150, height: 100 }} />
-        <Box gap={2}>
-          <Typography variant="h1" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
-            {data?.roomId.roomNumber}
-          </Typography>
-          <Typography sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 20 }}>{data?.roomId.roomTypeId.typeName}</Typography>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <Avatar
+          variant="rounded"
+          sx={{ width: 128, height: 128, backgroundColor: 'gray.300' }}
+          src={data?.roomId.images[0]}
+        />
+        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 2 }}>
+          <Box>
+            <Typography variant="body2" sx={{ color: 'black.300' }}>
+              {data?.roomId.roomTypeId.typeName}
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'black.500' }}>
+              {data?.roomId.roomNumber}
+            </Typography>
+          </Box>
         </Box>
       </Box>
       <Divider />
-      <Stack spacing={2}>
-        <Typography variant="h2" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600 }}>
-          Price Details
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography variant="h5" sx={{ color: 'black.500' }}>
+          Price details
         </Typography>
-        <Stack gap={1}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 20 }}>
-              {data?.roomId.pricePerNight}đ x {totalNight} nights
-            </Typography>
-            <Typography sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 20 }}>
-              {(data?.roomId.pricePerNight ?? 0) * totalNight}đ
-            </Typography>
-          </Box>
-          {data?.promotionId && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 20 }}>Discount</Typography>
-              <Typography sx={{ fontFamily: 'Be Vietnam Pro', fontSize: 20 }}>
-                {' '}
-                - {data?.promotionId.discount}% ({totalDiscount}đ)
-              </Typography>
-            </Box>
-          )}
-          {data?.services && data.services.length > 0 && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="body1">Service fee</Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                <Box>
-                  {data?.services?.map((service) => (
-                    <Typography variant="body1" key={service.id} sx={{ textAlign: 'right' }}>
-                      {service.serviceId.price * service.quantity}đ
-                    </Typography>
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          )}
-        </Stack>
-        <Divider />
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600, fontSize: 20 }}>
-            Total (VND)
+          <Typography variant="body2" sx={{ color: 'black.500' }}>
+            {formatPrice(Number.parseFloat(roomPrice.toString() || '0'))} x {nights} {nights > 1 ? 'nights' : 'night'}
           </Typography>
-          <Typography variant="body1" sx={{ fontFamily: 'Be Vietnam Pro', fontWeight: 600, fontSize: 20 }}>
-            {totalAmount}đ
+          <Typography variant="body2" sx={{ color: 'black.500' }}>
+            {formatPrice(roomPrice * nights)}
           </Typography>
         </Box>
-      </Stack>
+        {data?.promotionId && (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body2" sx={{ color: 'black.500' }}>
+              Discount
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'black.500' }}>
+              -{formatPrice(Number.parseFloat(data?.promotionId?.discount.toString() || '0'))}
+            </Typography>
+          </Box>
+        )}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="body2" sx={{ color: 'black.500' }}>
+            Service fee
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'black.500' }}>
+            {formatPrice(totalServiceFee)}
+          </Typography>
+        </Box>
+        <Divider orientation="horizontal" flexItem sx={{ my: 1 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
+            Total
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
+            {formatPrice(totalAmount)}
+          </Typography>
+        </Box>
+      </Box>
     </Stack>
   );
 };

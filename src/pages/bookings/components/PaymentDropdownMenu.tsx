@@ -38,7 +38,15 @@ const PaymentDropdownMenu = ({ anchorEl, open, onClose, onSelect }: PaymentDropd
         vertical: 'top',
         horizontal: 'left',
       }}
-      PaperProps={{ sx: { width: '40%', borderRadius: '0.75rem' } }}
+      PaperProps={{
+        sx: {
+          width: {
+            xs: '100%',
+            sm: '45%',
+          },
+          borderRadius: '0.75rem',
+        },
+      }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {paymentMethods.map((method) => (
