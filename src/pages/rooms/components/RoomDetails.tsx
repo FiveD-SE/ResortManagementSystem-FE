@@ -4,18 +4,18 @@ import KeyFeatures from './KeyFeatures';
 import Amenities from './Amenities';
 import ReservationCard from './ReservationCard';
 import { IRating } from '../../../types/rating';
-import { IRoomType } from '../../../types';
+import { IRoom, IRoomType } from '../../../types';
 import { Dayjs } from 'dayjs';
 
 interface IRoomDetailsProps {
   ratings: IRating[];
   roomType: IRoomType;
-  roomId: string;
+  room?: IRoom;
   occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
   ratingsRef?: React.RefObject<HTMLDivElement>;
 }
 
-const RoomDetails = ({ ratings, roomType, roomId, occupiedDates, ratingsRef }: IRoomDetailsProps) => {
+const RoomDetails = ({ ratings, roomType, room, occupiedDates, ratingsRef }: IRoomDetailsProps) => {
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
   return (
     <Grid container spacing={6} sx={{ position: 'relative' }}>
@@ -26,7 +26,7 @@ const RoomDetails = ({ ratings, roomType, roomId, occupiedDates, ratingsRef }: I
       </Grid>
       {!isSmallScreen && (
         <Grid item xs={12} md={4}>
-          <ReservationCard roomType={roomType} roomId={roomId} occupiedDates={occupiedDates} />
+          <ReservationCard roomType={roomType} room={room} occupiedDates={occupiedDates} />
         </Grid>
       )}
     </Grid>

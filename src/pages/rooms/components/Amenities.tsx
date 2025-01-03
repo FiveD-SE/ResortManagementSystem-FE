@@ -28,7 +28,7 @@ const Amenities = ({ amenities: selectedAmenities }: AmenitiesProps) => {
       </Box>
       <Grid container spacing={2}>
         {selectedAmenities.map((amenityKey, index) => {
-          const amenity = amenities[amenityKey];
+          const amenity = amenities[amenityKey.toLowerCase()];
           const displayIcon = amenity ? amenity.icon : getRandomIcon();
           const displayTitle = amenity ? amenity.title : amenityKey;
           return <AmenityItem key={index} icon={displayIcon} title={displayTitle} />;

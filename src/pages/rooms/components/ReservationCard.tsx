@@ -2,11 +2,12 @@ import { ExpandMoreRounded } from '@mui/icons-material';
 import { Box, Button, Divider, Grid, IconButton, Typography } from '@mui/material';
 import { useState } from 'react';
 import GuestDropdownMenu from './GuestDropdownMenu';
-import { IRoomType } from '../../../types';
+import { IRoom, IRoomType } from '../../../types';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
+import { formatPrice } from '../../../utils';
 
 interface HandleClickEvent {
   currentTarget: EventTarget & HTMLDivElement;
@@ -14,11 +15,11 @@ interface HandleClickEvent {
 
 interface ReservationCardProps {
   roomType: IRoomType;
-  roomId: string;
+  room?: IRoom;
   occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
 }
 
-const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: ReservationCardProps) => {
+const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate }: ReservationCardProps) => {
   const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<{ adults: number; children: number }>({
@@ -56,8 +57,9 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
 
     return minDate;
   };
+
   const [checkInDate, setCheckInDate] = useState<Dayjs | null>(getMinCheckInDate());
-  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs(checkInDate).add(5, 'day'));
+  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs(checkInDate).add(7, 'day'));
 
   const shouldDisableDate = (date: Dayjs) => {
     return occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day'));
@@ -95,7 +97,7 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
 
   const numNights = checkInDate && checkOutDate ? checkOutDate.diff(checkInDate, 'day') : 0;
 
-  const totalPrice = numNights > 0 ? roomType.basePrice * numNights - roomType.basePrice * numNights * 0.05 : 0;
+  const totalPrice = numNights > 0 && room?.pricePerNight ? room.pricePerNight * numNights : 0;
 
   const formattedCheckInDate = checkInDate ? checkInDate.format('YYYY-MM-DD') : '';
   const formattedCheckOutDate = checkOutDate ? checkOutDate.format('YYYY-MM-DD') : '';
@@ -131,10 +133,10 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="h4" sx={{ color: 'gray.500', textDecoration: 'line-through' }}>
-              ${roomType.basePrice}
+              {room && roomType.basePrice > room.pricePerNight ? formatPrice(roomType.basePrice) : ''}
             </Typography>
             <Typography variant="h4" sx={{ color: 'black.500' }}>
-              ${roomType.basePrice - roomType.basePrice * 0.05}
+              {room ? formatPrice(room.pricePerNight) : ''}
             </Typography>
             <Typography variant="body1" sx={{ color: 'black.500' }}>
               night
@@ -170,6 +172,7 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
               slotProps={{
                 field: {
                   clearable: true,
+                  readOnly: true,
                 },
                 textField: {
                   size: 'small',
@@ -215,6 +218,7 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
               slotProps={{
                 field: {
                   clearable: true,
+                  readOnly: true,
                 },
                 textField: {
                   size: 'small',
@@ -275,7 +279,11 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
           />
         </Grid>
         <Link
-          to={`${ROUTES.BOOKINGS.replace(':roomId', roomId)}?checkin=${formattedCheckInDate}&checkout=${formattedCheckOutDate}&adults=${selectedGuests.adults}&children=${selectedGuests.children}`}
+          to={
+            room
+              ? `${ROUTES.BOOKINGS.replace(':roomId', room.id)}?checkin=${formattedCheckInDate}&checkout=${formattedCheckOutDate}&adults=${selectedGuests.adults}&children=${selectedGuests.children}`
+              : '#'
+          }
           style={{ textDecoration: 'none' }}
         >
           <Button
@@ -294,37 +302,23 @@ const ReservationCard = ({ roomType, roomId, occupiedDates: roomOccupiedDate }: 
           You won't be charged yet
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {room && (
+            <Typography variant="body2" sx={{ color: 'black.500' }}>
+              {formatPrice(room.pricePerNight)} x {numNights} {numNights > 1 ? 'nights' : 'night'}
+            </Typography>
+          )}
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            ${roomType.basePrice} x {numNights} nights
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            ${roomType.basePrice * 5}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            Discount
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            -${roomType.basePrice * 0.05}
+            {room ? formatPrice(room.pricePerNight * numNights) : ''}
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            Service fee
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'black.500' }}>
-            $0
-          </Typography>
-        </Box>
         <Divider orientation="horizontal" flexItem sx={{ my: 1 }} />
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
             Total
           </Typography>
           <Typography variant="body2" sx={{ fontSize: 16, color: 'black.500', fontWeight: 700 }}>
-            ${totalPrice.toFixed(2)}
+            {formatPrice(totalPrice)}
           </Typography>
         </Box>
       </Box>
