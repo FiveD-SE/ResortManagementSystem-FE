@@ -65,9 +65,9 @@ const AdminProfile = () => {
         if (!validateProfile()) return;
 
         try {
-            await changeProfileMutation({ firstName: firstName, lastName: lastName });
+            await changeProfileMutation({ firstName: firstName, lastName: lastName, phoneNumber: user?.phoneNumber || '' });
             toast.success("Update profile successfully");
-        } catch (error) {
+        } catch {
             toast.error("Update profile failed");
         }
     };

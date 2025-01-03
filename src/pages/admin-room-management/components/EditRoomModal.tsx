@@ -108,7 +108,7 @@ const EditRoomModal = ({ roomTypesData, selectedRoom, open, onClose }: EditRoomM
             toast.success('Room updated successfully');
             resetForm();
             onClose();
-        } catch (error) {
+        } catch {
             toast.error('Failed to update room');
         }
     };

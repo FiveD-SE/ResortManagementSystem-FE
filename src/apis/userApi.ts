@@ -11,7 +11,7 @@ export const userApi = createApi({
   }),
   endpoints: (builder) => ({
     createUser: builder.mutation<
-      any,
+      IUser,
       { firstName: string; lastName: string; email: string; password: string; role: Role; serviceTypeId: string }
     >({
       query: (body) => ({
@@ -23,7 +23,7 @@ export const userApi = createApi({
     getUserById: builder.query<IUser, string>({
       query: (id) => ({ url: `/${id}` }),
     }),
-    changeAvatar: builder.mutation<any, FormData>({
+    changeAvatar: builder.mutation<IUser, FormData>({
       query: (formData) => ({
         url: `/change-avatar`,
         method: 'POST',
@@ -33,7 +33,7 @@ export const userApi = createApi({
         },
       }),
     }),
-    changeProfile: builder.mutation<any, { firstName: string; lastName: string; phoneNumber: string }>({
+    changeProfile: builder.mutation<IUser, { firstName: string; lastName: string; phoneNumber: string }>({
       query: ({ firstName, lastName, phoneNumber }) => ({
         url: `/change-profile`,
         method: 'PATCH',
@@ -65,14 +65,14 @@ export const adminUserApi = createApi({
         },
       }),
     }),
-    deleteUser: builder.mutation<any, string>({
+    deleteUser: builder.mutation<void, string>({
       query: (id) => ({
         url: `/${id}`,
         method: 'DELETE',
       }),
     }),
     updateUser: builder.mutation<
-      any,
+      IUser,
       Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email'> & { id: string }
     >({
       query: (data) => ({

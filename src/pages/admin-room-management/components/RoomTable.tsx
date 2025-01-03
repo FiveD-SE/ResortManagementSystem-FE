@@ -101,7 +101,7 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
 
   const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows, roomsData, tabSelected, search]);
 
-  const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleTabChange = (_event: React.ChangeEvent<unknown>, newValue: number) => {
     setTabSelected(newValue);
   };
 
@@ -115,7 +115,7 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
     try {
       await deleteRoomMutation(selectedRoom.id).unwrap();
       toast.success('Room deleted successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete room');
     } finally {
       setSelectedRoom(undefined);
