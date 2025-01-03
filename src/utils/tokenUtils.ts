@@ -47,6 +47,13 @@ export const clearTokens = () => {
   Cookies.remove('refreshToken');
 };
 
+export const getUserIdFromRefreshToken = () => {
+  const token = getRefreshToken();
+  if (!token) return null;
+  const decoded = decodeToken(token);
+  return decoded ? decoded.userID || null : null;
+}
+
 export const getResetPasswordTokenFromUrl = (url: string) => {
   const urlParams = new URLSearchParams(url);
   const resetPasswordToken = urlParams.get('token');

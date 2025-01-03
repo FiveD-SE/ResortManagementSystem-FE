@@ -20,13 +20,13 @@ import { useDeleteRoomTypeMutation } from '../../../apis/roomTypeApi';
 import PopupModal from '../../../components/PopupModal';
 import toast from 'react-hot-toast';
 import React from 'react';
+import { formatPrice } from '../../../utils';
 
 interface RoomTypeManagementProps {
   onManageRoomType: () => void;
   onAddNewRoomType: () => void;
   onEditRoomType: (roomType: IRoomType | undefined) => void;
   roomTypesData: IRoomTypeApiResponse | undefined;
-  onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
 const RoomTypeManagement = ({
@@ -34,12 +34,12 @@ const RoomTypeManagement = ({
   onAddNewRoomType,
   onEditRoomType,
   roomTypesData,
-  onPageChange,
 }: RoomTypeManagementProps) => {
   const [search, setSearch] = React.useState<string>('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRoomType, setSelectedRoomType] = React.useState<IRoomType>();
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const [deleteRoomType, { isLoading }] = useDeleteRoomTypeMutation();
 
@@ -68,17 +68,23 @@ const RoomTypeManagement = ({
     }
   };
 
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value);
+  };
+
   const filteredRoomTypes = React.useMemo(() => {
     if (!roomTypesData?.docs) return [];
+    const docsInCurrentPage = roomTypesData?.docs.slice((currentPage - 1) * 10, currentPage * 10);
+
     const searchLower = search.toLowerCase();
-    return roomTypesData.docs.filter(
+    return docsInCurrentPage.filter(
       (row) =>
         row.typeName.toLowerCase().includes(searchLower) ||
         row.description?.toLowerCase().includes(searchLower) ||
         '' ||
         row.basePrice.toString().includes(searchLower),
     );
-  }, [roomTypesData, search]);
+  }, [roomTypesData, search, currentPage]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -151,7 +157,7 @@ const RoomTypeManagement = ({
         </Button>
       </Box>
 
-      <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
+      <Box sx={{ minHeight: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
         <TableContainer>
           <Table>
             <TableHead>
@@ -165,11 +171,11 @@ const RoomTypeManagement = ({
             </TableHead>
             <TableBody>
               {filteredRoomTypes.map((row, index) => (
-                <TableRow key={index}>
+                <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{row.typeName}</TableCell>
                   <TableCell>{row.description}</TableCell>
-                  <TableCell>{`$${row.basePrice}`}</TableCell>
+                  <TableCell>{formatPrice(row.basePrice)}</TableCell>
                   <TableCell>
                     <IconButton onClick={(e) => handleMenuOpen(e, row)}>
                       <MoreHoriz />
@@ -231,11 +237,12 @@ const RoomTypeManagement = ({
       </Box>
 
       <Pagination
-        count={roomTypesData?.totalPages ?? 0}
+        count={Math.ceil((roomTypesData?.totalDocs || 0) / 10)}
         variant="outlined"
         shape="rounded"
         sx={{ marginTop: 2, alignSelf: 'flex-end' }}
-        onChange={onPageChange}
+        page={currentPage}
+        onChange={handlePageChange}
       />
 
       <PopupModal

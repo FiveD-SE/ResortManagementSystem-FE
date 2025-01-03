@@ -141,8 +141,7 @@ const CustomerTable = ({ CustomerData, isLoading, onPageChange }: CustomerTableP
                                         <TableCell>ID</TableCell>
                                         <TableCell>Name</TableCell>
                                         <TableCell>Email</TableCell>
-                                        <TableCell>Gender</TableCell>
-                                        <TableCell>DoB</TableCell>
+                                        <TableCell>Phone</TableCell>
                                         <TableCell>Status</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -159,8 +158,7 @@ const CustomerTable = ({ CustomerData, isLoading, onPageChange }: CustomerTableP
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>{row.firstName} {row.lastName}</TableCell>
                                                 <TableCell>{row.email}</TableCell>
-                                                <TableCell>{row.gender}</TableCell>
-                                                <TableCell>{new Date(row.dob).toDateString()}</TableCell>
+                                                <TableCell>{row.phone}</TableCell>
                                                 <TableCell>
                                                     <Typography
                                                         sx={{

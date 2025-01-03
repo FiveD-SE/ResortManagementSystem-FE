@@ -2,16 +2,13 @@ import { Box, Typography, IconButton } from '@mui/material'
 import { Notifications } from '@mui/icons-material'
 import BookingTable from './components/BookingTable'
 import { useGetBookingsQuery } from '../../apis/bookingApi'
-import React from 'react'
 import BookingTableSkeleton from './components/BookingTableSkeleton'
+
 const BookingManagement = () => {
-    const [page, setPage] = React.useState(1)
-    const { data: pendingBookingData, isLoading: isLoadingPendingBooking } = useGetBookingsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc', filter: 'pending' })
-    const { data: checkedInBookingData, isLoading: isLoadingCheckedInBooking } = useGetBookingsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc', filter: 'checked in' })
-    const { data: checkedOutBookingData, isLoading: isLoadingCheckedOutBooking } = useGetBookingsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc', filter: 'checked out' })
-    const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-        setPage(value)
-    }
+    const { data: pendingBookingData, isLoading: isLoadingPendingBooking } = useGetBookingsQuery({ page: 1, limit: 100, sortBy: 'createdAt', sortOrder: 'desc', filter: 'pending' })
+    const { data: checkedInBookingData, isLoading: isLoadingCheckedInBooking } = useGetBookingsQuery({ page: 1, limit: 100, sortBy: 'createdAt', sortOrder: 'desc', filter: 'checked in' })
+    const { data: checkedOutBookingData, isLoading: isLoadingCheckedOutBooking } = useGetBookingsQuery({ page: 1, limit: 100, sortBy: 'createdAt', sortOrder: 'desc', filter: 'checked out' })
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -29,7 +26,6 @@ const BookingManagement = () => {
                     pendingBookingData={pendingBookingData}
                     checkedInBookingData={checkedInBookingData}
                     checkedOutBookingData={checkedOutBookingData}
-                    onPageChange={handlePageChange}
                 />
             )}
         </Box>

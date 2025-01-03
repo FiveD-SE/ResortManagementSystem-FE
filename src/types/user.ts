@@ -1,4 +1,4 @@
-import { Gender, Role, UserSortBy } from "./enums";
+import { Role, UserSortBy } from "./enums";
 
 export interface IUser {
     id: string;
@@ -7,8 +7,7 @@ export interface IUser {
     email: string;
     role: Role;
     avatar: string;
-    dob: Date;
-    gender: Gender;
+    phone: string;
     isVerified: boolean;
     isActive: boolean;
     serviceTypeId?: string;

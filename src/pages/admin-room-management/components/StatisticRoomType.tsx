@@ -1,39 +1,22 @@
-import { Circle, Settings } from '@mui/icons-material'
-import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Circle, Settings } from '@mui/icons-material';
+import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
-import { IRoomApiResponse, IRoomTypeApiResponse } from '../../../types';
 
 interface StatisticRoomTypeProps {
     onManageRoomType: () => void;
-    roomsData: IRoomApiResponse | undefined;
-    roomTypesData: IRoomTypeApiResponse | undefined;
+    roomTypesStatistic: { count: number; roomType: string }[] | undefined;
 }
 
-
-const StatisticRoomType = ({ onManageRoomType, roomsData, roomTypesData }: StatisticRoomTypeProps) => {
+const StatisticRoomType = ({ onManageRoomType, roomTypesStatistic }: StatisticRoomTypeProps) => {
     const colors = ['#FF385C', '#324155', '#43B75D', '#EE443F', '#FFAA00', '#0095FF'];
 
-    const roomTypeMap = roomTypesData?.docs.reduce((acc, curr, index) => {
-        acc[curr.id] = {
-            label: curr.typeName,
+    const data = roomTypesStatistic
+        ? roomTypesStatistic.map((stat, index) => ({
+            label: stat.roomType,
+            value: stat.count,
             color: colors[index % colors.length],
-        };
-        return acc;
-    }, {} as { [key: string]: { label: string; color: string } });
-
-    const roomCounts = roomsData?.docs.reduce((acc, room) => {
-        if (roomTypeMap && roomTypeMap[room.roomTypeId]) {
-            const typeName = roomTypeMap[room.roomTypeId].label;
-            acc[typeName] = (acc[typeName] || 0) + 1;
-        }
-        return acc;
-    }, {} as { [key: string]: number });
-
-    const data = roomCounts ? Object.entries(roomCounts).map(([label, value]) => ({
-        label,
-        value,
-        color: roomTypeMap ? roomTypeMap[Object.keys(roomTypeMap).find(key => roomTypeMap[key].label === label)!].color : '',
-    })) : [];
+        }))
+        : [];
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -41,7 +24,11 @@ const StatisticRoomType = ({ onManageRoomType, roomsData, roomTypesData }: Stati
                 <Typography sx={{ color: 'black.900', fontSize: 18, fontWeight: 600 }}>
                     Room Type
                 </Typography>
-                <Button sx={{ color: 'white.50', bgcolor: 'primary.500', textTransform: 'none', padding: '8px 16px', borderRadius: 2 }} startIcon={<Settings />} onClick={onManageRoomType}>
+                <Button
+                    sx={{ color: 'white.50', bgcolor: 'primary.500', textTransform: 'none', padding: '8px 16px', borderRadius: 2 }}
+                    startIcon={<Settings />}
+                    onClick={onManageRoomType}
+                >
                     Manage Room Type
                 </Button>
             </Box>
@@ -52,13 +39,15 @@ const StatisticRoomType = ({ onManageRoomType, roomsData, roomTypesData }: Stati
                 <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                     <Box sx={{ width: '30%', height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <PieChart
-                            series={[{
-                                data,
-                                highlightScope: { fade: 'global', highlight: 'item' },
-                                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                                innerRadius: 50,
-                                outerRadius: 100,
-                            }]}
+                            series={[
+                                {
+                                    data,
+                                    highlightScope: { fade: 'global', highlight: 'item' },
+                                    faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                                    innerRadius: 50,
+                                    outerRadius: 100,
+                                },
+                            ]}
                             width={200}
                             height={300}
                             margin={{ top: 0, right: 24, bottom: 0, left: 0 }}
@@ -85,7 +74,9 @@ const StatisticRoomType = ({ onManageRoomType, roomsData, roomTypesData }: Stati
                                                 {row.label}
                                             </TableCell>
                                             <TableCell>{row.value}</TableCell>
-                                            <TableCell>{((row.value / data.reduce((acc, cur) => acc + cur.value, 0)) * 100).toFixed(2)}%</TableCell>
+                                            <TableCell>
+                                                {((row.value / data.reduce((acc, cur) => acc + cur.value, 0)) * 100).toFixed(2)}%
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -95,7 +86,7 @@ const StatisticRoomType = ({ onManageRoomType, roomsData, roomTypesData }: Stati
                 </Box>
             </Box>
         </Box>
-    )
-}
+    );
+};
 
-export default StatisticRoomType
+export default StatisticRoomType;

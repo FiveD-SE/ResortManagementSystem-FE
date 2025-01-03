@@ -184,7 +184,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
             </Box>
 
             {/* Table */}
-            <Box sx={{ height: "85vh", borderRadius: 2, border: "1px solid rgb(222, 222, 222)" }}>
+            <Box sx={{ minHeight: "85vh", borderRadius: 2, border: "1px solid rgb(222, 222, 222)" }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -207,7 +207,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
                                 </TableRow>
                             ) : (
                                 (filteredRows ?? []).map((row, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell>{index}</TableCell>
                                         <TableCell>{row.promotionName}</TableCell>
                                         <TableCell>{row.description}</TableCell>

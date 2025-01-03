@@ -21,6 +21,7 @@ import { IService, IServiceApiResponse, IServiceTypeApiResponse } from "../../..
 import PopupModal from "../../../components/PopupModal";
 import { useDeleteServiceMutation } from "../../../apis/serviceApi";
 import toast from "react-hot-toast";
+import { formatPrice } from "../../../utils";
 
 interface ServiceTableProps {
     serviceData: IServiceApiResponse | undefined;
@@ -127,7 +128,7 @@ const ServiceTable = ({ serviceData, serviceTypeData, onPageChange }: ServiceTab
                     Add New Service
                 </Button>
             </Box>
-            <Box sx={{ height: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
+            <Box sx={{ minHeight: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -149,12 +150,12 @@ const ServiceTable = ({ serviceData, serviceTypeData, onPageChange }: ServiceTab
                                 </TableRow>
                             ) : (
                                 filteredRows?.map((row, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.serviceName}</TableCell>
                                         <TableCell>{getServiceTypeName(row.serviceTypeId)}</TableCell>
                                         <TableCell>{row.description}</TableCell>
-                                        <TableCell>{`$${row.price}`}</TableCell>
+                                        <TableCell>{formatPrice(row.price)}</TableCell>
                                         <TableCell>
                                             <IconButton onClick={(event) => {
                                                 setAnchorEl(event.currentTarget);

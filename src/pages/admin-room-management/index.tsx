@@ -11,22 +11,14 @@ import { useGetRoomTypesQuery } from "../../apis/roomTypeApi"
 import { IRoomType } from "../../types"
 import RoomTableSkeleton from "./components/RoomTableSkeleton"
 import StatisticRoomTypeSkeleton from "./components/StatisticRoomTypeSkeletion"
+import { useGetRoomCountByRoomTypeQuery } from "../../apis/adminDashboardApi"
 
 const RoomManagement = () => {
     const [viewMode, setViewMode] = React.useState<'default' | 'roomManagement' | 'addRoomType' | 'editRoomType'>('default');
     const [selectedRoomType, setSelectedRoomType] = React.useState<IRoomType>();
-    const [roomPage, setRoomPage] = React.useState<number>(1);
-    const [roomTypePage, setRoomTypePage] = React.useState<number>(1);
-    const { data: roomsData, isLoading: roomLoading } = useGetRoomsQuery({ page: roomPage, limit: 10 });
-    const { data: roomTypesData, isLoading: roomTypeLoading } = useGetRoomTypesQuery({ page: roomTypePage, limit: 10 });
-
-    const handleRoomPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-        setRoomPage(value);
-    };
-
-    const handleRoomTypePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-        setRoomTypePage(value);
-    }
+    const { data: roomsData, isLoading: roomLoading } = useGetRoomsQuery({ page: 1, limit: 100 });
+    const { data: roomTypesData } = useGetRoomTypesQuery({ page: 1, limit: 100 });
+    const { data: roomTypesStatistic, isLoading: roomTypesStatisticLoading } = useGetRoomCountByRoomTypeQuery();
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', padding: 2, gap: 4 }}>
@@ -39,15 +31,15 @@ const RoomManagement = () => {
 
             {viewMode === 'default' && (
                 <>
-                    {roomTypeLoading ? (
+                    {roomTypesStatisticLoading ? (
                         <StatisticRoomTypeSkeleton />
                     ) : (
-                        <StatisticRoomType onManageRoomType={() => setViewMode('roomManagement')} roomsData={roomsData} roomTypesData={roomTypesData} />
+                        <StatisticRoomType onManageRoomType={() => setViewMode('roomManagement')} roomTypesStatistic={roomTypesStatistic} />
                     )}
                     {roomLoading ? (
                         <RoomTableSkeleton />
                     ) : (
-                        <RoomTable roomsData={roomsData} roomTypesData={roomTypesData} onPageChange={handleRoomPageChange} />
+                        <RoomTable roomsData={roomsData} roomTypesData={roomTypesData} />
                     )}
                 </>
             )}
@@ -61,7 +53,6 @@ const RoomManagement = () => {
                         setViewMode('editRoomType');
                     }}
                     roomTypesData={roomTypesData}
-                    onPageChange={handleRoomTypePageChange}
                 />
             )}
 

@@ -33,3 +33,13 @@ export interface IYearlyRevenue {
     lastYearMonthlyRevenue: number[];
     growth: number;
 }
+
+export interface IRoomTypeStatistic {
+    count: number;
+    roomType: string;
+}
+
+export interface IServiceTypeStatistic {
+    count: number;
+    serviceType: string;
+}

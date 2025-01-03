@@ -7,7 +7,9 @@ interface IRevenueByServiceTypeProps {
 }
 
 const RevenueByServiceType = ({ serviceRevenue }: IRevenueByServiceTypeProps) => {
-    const data = serviceRevenue?.map((item) => {
+    if (!serviceRevenue || serviceRevenue.length === 0) return null;
+
+    const data = serviceRevenue.map((item) => {
         const { year, services } = item;
         return {
             year,

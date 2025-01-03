@@ -1,7 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { ADMIN_DASHBOARD_ENDPOINT } from '../constants/endpoints';
 import { axiosBaseQuery } from './axiosInstance';
-import { ICustomerGrowth, IRevenue, IRoomAvailability, IRoomTypeRevenue, IServiceRevenue, IYearlyRevenue } from '../types/statistic';
+import { ICustomerGrowth, IRevenue, IRoomAvailability, IRoomTypeRevenue, IRoomTypeStatistic, IServiceRevenue, IServiceTypeStatistic, IYearlyRevenue } from '../types/statistic';
 
 export const adminDashboardApi = createApi({
     reducerPath: 'adminDashboardApi',
@@ -51,8 +51,20 @@ export const adminDashboardApi = createApi({
                 url: '/yearly-revenue',
                 method: 'GET',
             })
+        }),
+        getRoomCountByRoomType: builder.query<IRoomTypeStatistic[], void>({
+            query: () => ({
+                url: '/room-count-by-room-type',
+                method: 'GET',
+            })
+        }),
+        getServiceCountByServiceType: builder.query<IServiceTypeStatistic[], void>({
+            query: () => ({
+                url: '/service-count-by-service-type',
+                method: 'GET',
+            })
         })
     }),
 });
 
-export const { useGetCustomerGrowthQuery, useGetDailyRevenueQuery, useGetRoomAvailabilityTodayQuery, useGetServiceRevenueQuery, useExportExcelMutation, useGetRoomTypeRevenueQuery, useGetYearlyRevenueQuery } = adminDashboardApi;
+export const { useGetCustomerGrowthQuery, useGetDailyRevenueQuery, useGetRoomAvailabilityTodayQuery, useGetServiceRevenueQuery, useExportExcelMutation, useGetRoomTypeRevenueQuery, useGetYearlyRevenueQuery, useGetRoomCountByRoomTypeQuery, useGetServiceCountByServiceTypeQuery } = adminDashboardApi;
