@@ -97,5 +97,4 @@ export const adminUserApi = createApi({
 
 export const { useGetUserByIdQuery, useCreateUserMutation, useChangeAvatarMutation, useChangeProfileMutation } = userApi;
 
-export const { useAdminGetUsersByRoleQuery, useDeleteUserMutation, useUpdateUserMutation, useGetStaffStatisticQuery } =
-  adminUserApi;
+export const { useAdminGetUsersByRoleQuery, useDeleteUserMutation, useUpdateUserMutation, useGetStaffStatisticQuery } = adminUserApi;

@@ -52,9 +52,9 @@ const AdminDashboard = () => {
 
                         {/* Statistic Section */}
                         <Statistic
-                            dailyRevenue={dailyRevenue}
-                            customerGrowth={customerGrowth}
-                            roomAvailability={roomAvailability}
+                            dailyRevenue={dailyRevenue ?? { revenue: 0, growth: 0 }}
+                            customerGrowth={customerGrowth ?? { customers: 0, growth: 0 }}
+                            roomAvailability={roomAvailability ?? { totalRooms: 0, bookedRooms: 0 }}
                         />
 
                         {/* Revenue Section */}
