@@ -2,33 +2,52 @@ import { Box, Button, Typography } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import StatisticBox from "./StatisticBox";
 import toast from "react-hot-toast";
-import { useExportExcelMutation } from "../../../apis/adminDashboardApi";
+import { useExportExcelMutation } from "../../../apis/exportApi";
 
 interface StatisticProps {
-    dailyRevenue: any;
-    customerGrowth: any;
-    roomAvailability: any;
+    dailyRevenue: { revenue: number; growth: number };
+    customerGrowth: { customers: number; growth: number };
+    roomAvailability: { totalRooms: number; bookedRooms: number };
 }
 
 const Statistic = ({ dailyRevenue, customerGrowth, roomAvailability }: StatisticProps) => {
+
     const [exportExcel, { isLoading }] = useExportExcelMutation();
 
     const handleExportExcel = async () => {
         try {
-            const response = await exportExcel().unwrap();
-            const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'report.xlsx');
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            toast.success('Exported successfully');
+            const response = await exportExcel();
+
+            if (response && response.data) {
+                const blob = new Blob([response.data], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                });
+
+                if (blob.size === 0) {
+                    toast.error('File is empty');
+                    return;
+                }
+
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'report.xlsx');
+                document.body.appendChild(link);
+                link.click();
+
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(link);
+
+                toast.success('File exported successfully');
+            } else {
+                toast.error('Error exporting file');
+            }
         } catch (error) {
-            toast.error('Failed to export file');
+            console.error('Excel export error:', error);
+            toast.error('Error exporting file');
         }
     };
+
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

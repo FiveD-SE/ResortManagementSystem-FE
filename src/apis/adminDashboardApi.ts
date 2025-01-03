@@ -33,13 +33,6 @@ export const adminDashboardApi = createApi({
                 method: 'GET',
             })
         }),
-        exportExcel: builder.mutation<Blob, void>({
-            query: () => ({
-                url: '/export-excel',
-                method: 'GET',
-                responseType: 'blob',
-            }),
-        }),
         getRoomTypeRevenue: builder.query<IRoomTypeRevenue[], void>({
             query: () => ({
                 url: '/revenue-by-room-type',
@@ -67,4 +60,4 @@ export const adminDashboardApi = createApi({
     }),
 });
 
-export const { useGetCustomerGrowthQuery, useGetDailyRevenueQuery, useGetRoomAvailabilityTodayQuery, useGetServiceRevenueQuery, useExportExcelMutation, useGetRoomTypeRevenueQuery, useGetYearlyRevenueQuery, useGetRoomCountByRoomTypeQuery, useGetServiceCountByServiceTypeQuery } = adminDashboardApi;
+export const { useGetCustomerGrowthQuery, useGetDailyRevenueQuery, useGetRoomAvailabilityTodayQuery, useGetServiceRevenueQuery, useGetRoomTypeRevenueQuery, useGetYearlyRevenueQuery, useGetRoomCountByRoomTypeQuery, useGetServiceCountByServiceTypeQuery } = adminDashboardApi;
