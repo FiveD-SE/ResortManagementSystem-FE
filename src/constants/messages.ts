@@ -11,6 +11,7 @@ export const REGISTER_ERROR_MESSAGE = {
   INVALID_CREDENTIALS: 'Invalid email or password.',
   PLEASE_FILL_ALL_FIELDS: 'Please fill all fields.',
   PASSWORD_DOES_NOT_MATCH: 'Passwords do not match.',
+  PHONE_NUMBER_ERROR: 'Invalid phone number.',
 };
 
 export const LOGOUT_SUCCESS_MESSAGE = 'Logout successful.';
