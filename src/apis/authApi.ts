@@ -11,7 +11,7 @@ export const authApi = createApi({
 
   endpoints: (builder) => ({
     register: builder.mutation({
-      query: ({ email, password, firstName, lastName }) => ({
+      query: ({ email, password, firstName, lastName, phoneNumber }) => ({
         url: '/register',
         method: 'POST',
         data: {
@@ -19,6 +19,7 @@ export const authApi = createApi({
           password,
           firstName,
           lastName,
+          phoneNumber,
         },
       }),
     }),
