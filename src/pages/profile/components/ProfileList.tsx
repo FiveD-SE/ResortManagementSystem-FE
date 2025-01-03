@@ -5,6 +5,7 @@ import { useChangeAvatarMutation, useChangeProfileMutation } from '../../../apis
 import toast from 'react-hot-toast';
 import { useMeQuery } from '../../../apis/authApi';
 import { useLocation } from 'react-router-dom';
+import ProfileBackground from '../../../components/ProfileBackGround';
 
 const ProfileList = () => {
   const [firstName, setFirstName] = React.useState<string>('');
@@ -93,16 +94,7 @@ const ProfileList = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', paddingBottom: 4 }}>
-      <img
-        src="src\assets\images\profile-background.jpg"
-        alt="Header"
-        style={{
-          width: '100%',
-          height: '30vh',
-          objectFit: 'cover',
-          aspectRatio: '3/1',
-        }}
-      />
+      <ProfileBackground />
       <Container>
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginX: 4, gap: 1 }}>
