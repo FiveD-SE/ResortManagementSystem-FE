@@ -7,7 +7,6 @@ import { Role } from '../types';
 import TripDetail from '../pages/trips/components/TripDetail';
 import TripReview from '../pages/trips/components/TripReview';
 import ThirdParty from '../pages/third-party';
-
 const Home = lazy(() => import('../pages/home'));
 const SignUp = lazy(() => import('../pages/signup'));
 const SignIn = lazy(() => import('../pages/signin'));
@@ -25,6 +24,7 @@ const AdminProfile = lazy(() => import('../pages/admin-profile'));
 const ServiceStaffDashboard = lazy(() => import('../pages/serviceStaff-dashboard/ServiceStaffDashboard'));
 const ReceptionistDashboard = lazy(() => import('../pages/receptionist-dashboard/ReceptionistDashboard'));
 const Bookings = lazy(() => import('../pages/bookings'));
+const ResetPassword = lazy(() => import('../pages/reset-password'));
 
 const Routing = () => {
   return (
@@ -44,6 +44,14 @@ const Routing = () => {
         element={
           <PublicRoute>
             <SignIn />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path={ROUTES.AUTH.RESET_PASSWORD}
+        element={
+          <PublicRoute>
+            <ResetPassword />
           </PublicRoute>
         }
       />

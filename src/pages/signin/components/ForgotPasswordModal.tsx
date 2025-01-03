@@ -1,7 +1,8 @@
-import { Box, Button, Modal, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Modal, Typography } from "@mui/material"
 import TextFieldCustom from "../../../components/TextFieldCustom"
 import { useState } from "react";
-
+import { useForgotPasswordMutation } from "../../../apis/authApi";
+import toast from "react-hot-toast";
 interface ForgotPasswordModalProps {
     open: boolean;
     onClose: () => void;
@@ -10,6 +11,21 @@ interface ForgotPasswordModalProps {
 const ForgotPasswordModal = ({ open, onClose }: ForgotPasswordModalProps) => {
     const [email, setEmail] = useState('');
 
+    const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+
+    const handleForgotPassword = async () => {
+        if (email === '') {
+            toast.error('Please enter your email');
+            return;
+        }
+        const response = await forgotPassword({ email });
+        if (response.error) {
+            toast.error('Failed to send email');
+            return;
+        }
+        toast.success('Email sent successfully');
+        onClose();
+    };
     return (
         <Modal
             open={open}
@@ -75,10 +91,13 @@ const ForgotPasswordModal = ({ open, onClose }: ForgotPasswordModalProps) => {
                         fontWeight: 600,
                         color: 'white.50',
                         bgcolor: 'primary.500',
-                        marginTop: 4
+                        marginTop: 4,
+                        ":disabled": { color: 'gray.200', bgcolor: 'gray.100' }
                     }}
+                    onClick={handleForgotPassword}
+                    disabled={isLoading}
                 >
-                    Reset password
+                    {isLoading ? <CircularProgress size={24} color={'inherit'} /> : 'Reset password'}
                 </Button>
             </Box>
         </Modal>

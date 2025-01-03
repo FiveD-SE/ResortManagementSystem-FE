@@ -46,3 +46,10 @@ export const clearTokens = () => {
   Cookies.remove('accessToken');
   Cookies.remove('refreshToken');
 };
+
+export const getResetPasswordTokenFromUrl = (url: string) => {
+  const urlParams = new URLSearchParams(url);
+  const resetPasswordToken = urlParams.get('token');
+
+  return resetPasswordToken;
+}
