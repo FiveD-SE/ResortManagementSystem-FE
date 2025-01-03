@@ -1,12 +1,9 @@
 import {
   AlarmOutlined,
-  CancelOutlined,
   CelebrationOutlined,
   ChevronRightRounded,
   Co2Outlined,
-  GroupsOutlined,
   PetsOutlined,
-  ReviewsOutlined,
   ScheduleOutlined,
   SmokeFreeOutlined,
   StairsOutlined,
@@ -42,7 +39,6 @@ const thingsToKnowData: ThingsToKnowItem[] = [
       {
         heading: 'During your stay',
         details: [
-          { icon: GroupsOutlined, text: '2 guests maximum' },
           { icon: PetsOutlined, text: 'Pets allowed' },
           { icon: CelebrationOutlined, text: 'No parties or events' },
           { icon: SmokeFreeOutlined, text: 'No smoking' },
@@ -67,29 +63,6 @@ const thingsToKnowData: ThingsToKnowItem[] = [
         details: [
           { icon: StairsOutlined, text: 'Must climb stairs' },
           { icon: PetsOutlined, text: 'Pool/hot tub without a gate or lock' },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Cancellation policy',
-    summary: [
-      'Free cancellation before Feb 2. Cancel before check-in on Feb 3 for a partial refund.',
-      "Review this Host's full policy for details.",
-    ],
-    dialogTitle: 'Cancellation policy',
-    dialogContent: [
-      {
-        heading: 'Cancellation policy',
-        details: [
-          {
-            icon: CancelOutlined,
-            text: 'Free cancellation before Feb 2. Cancel before check-in on Feb 3 for a partial refund.',
-          },
-          {
-            icon: ReviewsOutlined,
-            text: "Review this Host's full policy for details.",
-          },
         ],
       },
     ],
@@ -131,7 +104,7 @@ const ThingsToKnow = () => {
       </Box>
       <Grid container spacing={2}>
         {thingsToKnowData.map((item, index) => (
-          <Grid item xs={12} md={4} key={index}>
+          <Grid item xs={12} md={6} key={index}>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 2 }}>
               <Typography
                 variant="subtitle1"

@@ -1,15 +1,19 @@
-import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, IconButton, List, ListItem, Paper, Stack, Typography } from '@mui/material';
 import { TRIPS_FORM } from '../../constant';
 import { IBooking } from '../../../../types/booking';
-import { formatDate } from '../../../../utils';
-import { AccountBalanceRounded, PaymentsRounded } from '@mui/icons-material';
+import { formatDate, formatPrice } from '../../../../utils';
+import { AccountBalanceRounded, AddRounded, PaymentsRounded } from '@mui/icons-material';
+import AddMoreServiceDialog from './AddMoreServiceDialog';
+import { useState } from 'react';
 
 interface IProps {
   booking: IBooking | null;
+  refetchBooking: () => void;
 }
 
 const TripForm = (props: IProps) => {
-  const { booking } = props;
+  const [isAddServiceDialogOpen, setIsAddServiceDialogOpen] = useState(false);
+  const { booking, refetchBooking } = props;
   const totalGuest = (booking?.guests?.adults || 0) + (booking?.guests?.children || 0);
   const paymentMethod =
     booking?.paymentMethod === 'Pay on arrival'
@@ -21,6 +25,14 @@ const TripForm = (props: IProps) => {
           icon: <AccountBalanceRounded sx={{ color: 'black.500' }} />,
           text: 'Transfer',
         };
+
+  const handleOpenAddServiceDialog = () => {
+    setIsAddServiceDialogOpen(true);
+  };
+
+  const handleCloseAddServiceDialog = () => {
+    setIsAddServiceDialogOpen(false);
+  };
   return (
     <Stack spacing={2} gap={2}>
       <Typography variant="h5" component="h1" sx={{ color: 'black.500' }}>
@@ -110,6 +122,68 @@ const TripForm = (props: IProps) => {
               </Box>
             </Box>
           </Paper>
+        </Box>
+      )}
+
+      {booking?.services && booking?.services.length > 0 && (
+        <Box>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Adds-on service
+            <IconButton
+              size="medium"
+              sx={{ p: 0, ml: 1, borderColor: 'black.100', border: 1 }}
+              onClick={handleOpenAddServiceDialog}
+            >
+              <AddRounded sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Typography>
+          <List
+            dense
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 2,
+              overflowX: 'auto',
+              width: '100%',
+              padding: 0,
+            }}
+          >
+            {booking?.services?.map((service) => (
+              <ListItem key={service.id} sx={{ width: 'auto', p: 0 }}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: 1,
+                    borderColor: 'black.100',
+                    minWidth: 200,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
+                      {service.serviceId.serviceName}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'black.300', whiteSpace: 'nowrap' }}>
+                      {service.serviceId.description}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'primary.500' }}>
+                      {formatPrice(Number.parseFloat(service.serviceId.price.toString()))}
+                    </Typography>
+                  </Box>
+                </Paper>
+              </ListItem>
+            ))}
+          </List>
+          <AddMoreServiceDialog
+            open={isAddServiceDialogOpen}
+            onClose={handleCloseAddServiceDialog}
+            refetchBooking={refetchBooking}
+          />
         </Box>
       )}
 

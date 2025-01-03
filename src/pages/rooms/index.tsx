@@ -99,7 +99,7 @@ const Rooms = () => {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return (
     <>
