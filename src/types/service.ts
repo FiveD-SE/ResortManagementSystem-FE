@@ -54,8 +54,13 @@ export interface IBookingService {
     __v: number;
     id: string;
   };
-  status: string;
   _id: string;
   id: string;
+  serviceTypeName: string;
+  roomNumber: string;
+  checkinDate: string;
+  checkoutDate: string;
   quantity: number;
+  status: string;
+  price: number;
 }

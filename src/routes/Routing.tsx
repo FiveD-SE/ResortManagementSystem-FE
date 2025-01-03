@@ -21,10 +21,10 @@ const ServiceManagement = lazy(() => import('../pages/admin-service-management')
 const PromotionManagement = lazy(() => import('../pages/admin-promotion-management'));
 const BookingManagement = lazy(() => import('../pages/admin-booking-management'));
 const AdminProfile = lazy(() => import('../pages/admin-profile'));
-const ServiceStaffDashboard = lazy(() => import('../pages/serviceStaff-dashboard/ServiceStaffDashboard'));
-const ReceptionistDashboard = lazy(() => import('../pages/receptionist-dashboard/ReceptionistDashboard'));
 const Bookings = lazy(() => import('../pages/bookings'));
 const ResetPassword = lazy(() => import('../pages/reset-password'));
+const ServiceStaff = lazy(() => import('../pages/service-staff'));
+const Receptionist = lazy(() => import('../pages/receptionist'));
 
 const Routing = () => {
   return (
@@ -75,10 +75,10 @@ const Routing = () => {
         <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfile />} />
       </Route>
       <Route element={<PrivateRoute allowedRoles={[Role.ServiceStaff]} />}>
-        <Route path={ROUTES.SERVICE_STAFF.HOME} element={<ServiceStaffDashboard />} />
+        <Route path={ROUTES.SERVICE_STAFF.HOME} element={<ServiceStaff />} />
       </Route>
       <Route element={<PrivateRoute allowedRoles={[Role.Receptionist]} />}>
-        <Route path={ROUTES.RECEPTIONIST.HOME} element={<ReceptionistDashboard />} />
+        <Route path={ROUTES.RECEPTIONIST.HOME} element={<Receptionist />} />
       </Route>
     </Routes>
   );
