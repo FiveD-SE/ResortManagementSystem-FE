@@ -17,9 +17,13 @@ interface ReservationCardProps {
   roomType: IRoomType;
   room?: IRoom;
   occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
+  nextAvailableWeek: {
+    checkinDate: string;
+    checkoutDate: string;
+  };
 }
 
-const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate }: ReservationCardProps) => {
+const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate, nextAvailableWeek }: ReservationCardProps) => {
   const [isGuestMenuOpen, setIsGuestMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const [selectedGuests, setSelectedGuests] = useState<{ adults: number; children: number }>({
@@ -38,28 +42,12 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate }: Re
           .flat()
       : [];
 
-  const getMinCheckInDate = () => {
-    if (!roomOccupiedDate.length) {
-      return dayjs();
-    }
-
-    let minDate = dayjs();
-    const sortedOccupiedDates = [...roomOccupiedDate].sort((a, b) => dayjs(a.checkinDate).diff(dayjs(b.checkinDate)));
-
-    for (const dateRange of sortedOccupiedDates) {
-      const checkoutDate = dayjs(dateRange.checkoutDate);
-
-      if (minDate.isBefore(dayjs(dateRange.checkinDate))) {
-        break;
-      }
-      minDate = checkoutDate.add(1, 'day');
-    }
-
-    return minDate;
-  };
-
-  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(getMinCheckInDate());
-  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(dayjs(checkInDate).add(7, 'day'));
+  const [checkInDate, setCheckInDate] = useState<Dayjs | null>(
+    nextAvailableWeek ? dayjs(nextAvailableWeek.checkinDate) : null,
+  );
+  const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(
+    nextAvailableWeek ? dayjs(nextAvailableWeek.checkoutDate) : null,
+  );
 
   const shouldDisableDate = (date: Dayjs) => {
     return occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day'));
@@ -101,8 +89,6 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate }: Re
 
   const formattedCheckInDate = checkInDate ? checkInDate.format('YYYY-MM-DD') : '';
   const formattedCheckOutDate = checkOutDate ? checkOutDate.format('YYYY-MM-DD') : '';
-
-  const minCheckInDate = getMinCheckInDate();
 
   return (
     <Box
@@ -167,7 +153,7 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate }: Re
               value={checkInDate}
               onChange={handleCheckInChange}
               shouldDisableDate={shouldDisableDate}
-              minDate={minCheckInDate}
+              minDate={dayjs(checkInDate || undefined)}
               format="DD/MM/YYYY"
               slotProps={{
                 field: {
@@ -213,7 +199,7 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate }: Re
               value={checkOutDate}
               onChange={handleCheckOutChange}
               shouldDisableDate={shouldDisableDate}
-              minDate={checkInDate ? checkInDate.add(1, 'day') : dayjs().add(1, 'day')}
+              minDate={dayjs(checkOutDate)}
               format="DD/MM/YYYY"
               slotProps={{
                 field: {

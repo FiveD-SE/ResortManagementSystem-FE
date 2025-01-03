@@ -19,7 +19,7 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
 
   const nights = checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 0;
 
-  const roomPrice = roomDetail ? roomDetail.roomType.basePrice * nights : 0;
+  const roomPrice = roomDetail ? roomDetail.room.pricePerNight * nights : 0;
   const serviceFee = services.reduce((acc, service) => acc + service.price, 0);
   const discountAmount = roomPrice * (discount / 100);
   const totalPrice = roomPrice - discountAmount + serviceFee;
@@ -45,7 +45,7 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <StarRounded sx={{ fontSize: 14 }} />
               <Typography variant="body1" sx={{ color: 'black.500' }}>
-                {averageRating}
+                {averageRating.toFixed(1)}
               </Typography>
               <Typography variant="body1" sx={{ color: 'black.300' }}>
                 ({roomDetail?.ratings.length} reviews)
@@ -60,7 +60,8 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
-            {formatPrice(Number.parseFloat(roomDetail?.roomType.basePrice?.toString() || '0'))} x {nights} nights
+            {formatPrice(Number.parseFloat(roomDetail?.room.pricePerNight?.toString() || '0'))} x {nights}{' '}
+            {nights > 1 ? 'nights' : 'night'}
           </Typography>
           <Typography variant="body2" sx={{ color: 'black.500' }}>
             {formatPrice(roomPrice)}

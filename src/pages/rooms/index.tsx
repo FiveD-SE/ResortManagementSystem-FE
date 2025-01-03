@@ -15,11 +15,15 @@ import {
   VpnKeyOutlined,
 } from '@mui/icons-material';
 import RoomDetailSkeleton from './components/RoomDetailSkeleton';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 const Rooms = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: roomDetail, isLoading } = useGetRoomDetailByIdQuery(id ?? '', {
+  const {
+    data: roomDetail,
+    isLoading,
+    refetch,
+  } = useGetRoomDetailByIdQuery(id ?? '', {
     skip: !id,
   });
 
@@ -93,6 +97,10 @@ const Rooms = () => {
 
   const ratingsRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    refetch();
+  }, []);
+
   return (
     <>
       {isLoading ? (
@@ -118,6 +126,7 @@ const Rooms = () => {
               }
             }
             occupiedDates={roomDetail?.occupiedDates || []}
+            nextAvailableWeek={roomDetail?.nextAvailableWeek ?? { checkinDate: '', checkoutDate: '' }}
             ratingsRef={ratingsRef}
           />
           <div ref={ratingsRef}>

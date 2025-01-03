@@ -1,4 +1,4 @@
-import { Box, Grid2 as Grid, Typography } from '@mui/material';
+import { Box, Button, Grid2 as Grid, Typography } from '@mui/material';
 import AccommodationCard from './AccommodationCard';
 import AccommodationCardSkeleton from './AccommodationCardSkeleton';
 import { resetRoomsState, useFilterQuery } from '../../../apis/roomApi';
@@ -13,7 +13,7 @@ interface ObserverEntry {
 const AccommodationList = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState<number>(1);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const roomTypeId = searchParams.get('roomType');
   const sortBy = searchParams.get('sortBy');
   const sortOrder = searchParams.get('sortOrder');
@@ -96,6 +96,11 @@ const AccommodationList = () => {
     };
   }, [handleObserver]);
 
+  const handleClearAll = useCallback(() => {
+    setSearchParams({});
+    setPage(1);
+  }, [setSearchParams]);
+
   useEffect(() => {
     setCurrentData(null);
     dispatch(resetRoomsState());
@@ -133,8 +138,8 @@ const AccommodationList = () => {
                 roomTypeName={item.roomTypeName}
                 averageRating={item.averageRating}
                 images={item.images}
-                startDate={item.nextAvailableWeek.start}
-                endDate={item.nextAvailableWeek.end}
+                startDate={item.nextAvailableWeek.checkinDate}
+                endDate={item.nextAvailableWeek.checkoutDate}
                 pricePerNight={item.pricePerNight}
                 onCardClick={() => handleCardClick(item.id)}
               />
@@ -142,9 +147,31 @@ const AccommodationList = () => {
           ))
         ) : !isLoading && currentData && currentData.docs.length === 0 ? (
           <Grid size={{ xs: 12 }}>
-            <Typography variant="h6" align="center">
-              No rooms found.
-            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                No rooms found matching your criteria.
+              </Typography>
+              <Typography variant="body1" color="text.secondary" align="center" paragraph>
+                Try adjusting your search filters or clearing them to see more results.
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={handleClearAll}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  backgroundColor: 'primary.main',
+                  ':hover': {
+                    backgroundColor: 'primary.dark',
+                  },
+                }}
+              >
+                <Typography variant="body2" sx={{ color: 'white.50', fontWeight: 600, fontSize: 14, textTransform: 'none' }}>
+                  Clear All Filters
+                </Typography>
+              </Button>
+            </Box>
           </Grid>
         ) : (
           Array.from({ length: 12 }).map((_, index) => (

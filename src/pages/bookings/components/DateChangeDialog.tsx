@@ -54,6 +54,9 @@ const DateChangeDialog = ({
     onClose();
   };
 
+  const nights =
+    currentCheckInDate && currentCheckOutDate ? dayjs(currentCheckOutDate).diff(dayjs(currentCheckInDate), 'day') : 0;
+
   return (
     <CustomDialog
       open={open}
@@ -77,10 +80,7 @@ const DateChangeDialog = ({
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column' }}>
           <Typography variant="h4" component="h2" sx={{ color: 'black.500' }}>
-            5 nights
-          </Typography>
-          <Typography variant="body1" component="h2" sx={{ color: 'black.300' }}>
-            3 beds - 2 bathrooms
+            {nights} {nights > 1 ? 'nights' : 'night'}
           </Typography>
         </Box>
         <Grid container>

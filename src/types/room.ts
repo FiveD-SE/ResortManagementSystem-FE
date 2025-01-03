@@ -43,8 +43,8 @@ export interface IRoomApiResponse {
   pagingCounter: number | null;
   docs: (IRoom & {
     nextAvailableWeek: {
-      start: string;
-      end: string;
+      checkinDate: string;
+      checkoutDate: string;
     };
   })[];
 }
@@ -86,6 +86,10 @@ export interface IRoomDetailApiResponse {
     fiveStars: number;
   };
   occupiedDates: { checkinDate: Dayjs; checkoutDate: Dayjs }[];
+  nextAvailableWeek: {
+    checkinDate: string;
+    checkoutDate: string;
+  };
 }
 
 export interface IBookingRoom {
