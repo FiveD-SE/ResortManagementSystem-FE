@@ -1,4 +1,4 @@
-import { Add, Close } from "@mui/icons-material";
+import { Add, Close, Delete } from "@mui/icons-material";
 import { Box, Button, CircularProgress, IconButton, Modal, Typography } from "@mui/material";
 import React from "react";
 import CustomInputForm from "../../../components/CustomInputForm";
@@ -157,12 +157,55 @@ const EditRoomModal = ({ roomTypesData, selectedRoom, open, onClose }: EditRoomM
                     }}
                 >
                     {images.map((picture, index) => (
-                        <Box key={index} sx={{ position: 'relative', height: 150, gap: 1 }}>
+                        <Box
+                            key={index}
+                            sx={{
+                                position: 'relative',
+                                height: 150,
+                                cursor: 'pointer',
+                                overflow: 'hidden',
+                                borderRadius: 2,
+                                ":hover .delete-overlay": { opacity: 1 },
+                                ":hover img": { filter: 'brightness(0.8)' },
+                                transition: 'ease 0.3s',
+                            }}
+                        >
+                            {/* Ảnh */}
                             <img
                                 src={URL.createObjectURL(picture)}
                                 alt={`room-${index}`}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    borderRadius: '8px',
+                                    transition: 'ease 0.3s',
+                                }}
                             />
+                            <Box
+                                className="delete-overlay"
+                                sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                    color: 'white.50',
+                                    fontSize: 18,
+                                    fontWeight: 500,
+                                    opacity: 0,
+                                    transition: 'opacity 0.3s ease',
+                                    zIndex: 2,
+                                    gap: 1,
+                                }}
+                                onClick={() => setImages((prev) => prev.filter((_, i) => i !== index))}
+                            >
+                                <Delete /> Delete
+                            </Box>
                         </Box>
                     ))}
                     <label htmlFor="room-picture-upload">
