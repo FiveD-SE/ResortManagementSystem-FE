@@ -118,7 +118,10 @@ export interface ICreateBookingRequest {
     adults: number;
     children: number;
   };
-  serviceIds: string[];
+  servicesWithQuantities: {
+    serviceId: string;
+    quantity: number;
+  }[];
   promotionId: string;
   paymentMethod: PaymentMethod;
 }

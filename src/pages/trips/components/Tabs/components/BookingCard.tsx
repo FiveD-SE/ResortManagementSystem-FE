@@ -1,23 +1,54 @@
-import { Avatar, Box, Card, CardActionArea, Typography } from '@mui/material';
+import { Avatar, Box, Card, CardActionArea, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { ITrip } from '../../../../../types';
 import { formatDate } from '../../../../../utils';
 import { ChevronRightRounded } from '@mui/icons-material';
 
 const BookingCard = ({ trip }: { trip: ITrip }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Card variant="outlined" sx={{ marginY: 2, borderRadius: 4, boxShadow: 1 }}>
       <CardActionArea
-        sx={{ display: 'flex', padding: 2, flexDirection: 'row', justifyContent: 'space-between' }}
+        sx={{
+          display: 'flex',
+          padding: 2,
+          flexDirection: isSmallScreen ? 'column' : 'row',
+          justifyContent: 'space-between',
+          alignItems: isSmallScreen ? 'center' : 'flex-start',
+        }}
         onClick={() => (window.location.href = `/trips/detail/${trip.id}`)}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-          <Avatar src={trip.roomId.images[0]} style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 6 }} />
-          <Box sx={{ paddingX: 2, justifyContent: 'space-between', display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Typography variant="h6">{trip.roomId.roomNumber}</Typography>
-            <Typography variant="body2">
-              From: {formatDate(trip.checkinDate)} to {formatDate(trip.checkoutDate)}
+        <Box sx={{ display: 'flex', flexDirection: isSmallScreen ? 'column' : 'row', gap: isSmallScreen ? 2 : 0 }}>
+          <Avatar
+            src={trip.roomId.images[0]}
+            sx={{
+              width: isSmallScreen ? '100%' : 120,
+              height: isSmallScreen ? 'auto' : 120,
+              objectFit: 'cover',
+              borderRadius: isSmallScreen ? 4 : 6,
+            }}
+          />
+          <Box
+            sx={{
+              paddingX: isSmallScreen ? 0 : 2,
+              justifyContent: 'space-between',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1,
+            }}
+          >
+            <Typography variant="h6" sx={{ whiteSpace: 'nowrap' }}>
+              {trip.roomId.roomNumber}
             </Typography>
-            <Typography variant="body2">To {formatDate(trip.checkoutDate)}</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, justifyContent: 'space-between' }}>
+              <Typography variant="body2">From:</Typography>
+              <Typography variant="body2">{formatDate(trip.checkinDate)}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, justifyContent: 'space-between' }}>
+              <Typography variant="body2">To:</Typography>
+              <Typography variant="body2">{formatDate(trip.checkoutDate)}</Typography>
+            </Box>
             <Box
               sx={{
                 display: 'flex',
@@ -36,7 +67,11 @@ const BookingCard = ({ trip }: { trip: ITrip }) => {
             </Box>
           </Box>
         </Box>
-        <ChevronRightRounded />
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', width: isSmallScreen ? '100%' : 'auto', justifyContent: 'flex-end' }}
+        >
+          <ChevronRightRounded />
+        </Box>
       </CardActionArea>
     </Card>
   );

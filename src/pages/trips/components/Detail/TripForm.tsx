@@ -192,6 +192,10 @@ const TripForm = (props: IProps) => {
                   <Typography variant="caption" sx={{ color: 'primary.500' }}>
                     {formatPrice(Number.parseFloat(service.serviceId.price.toString()))}
                   </Typography>
+
+                  <Typography variant="caption" sx={{ color: 'black.500', fontWeight: 500 }}>
+                    Qty: {service.quantity}
+                  </Typography>
                 </Box>
               </Paper>
             </ListItem>
