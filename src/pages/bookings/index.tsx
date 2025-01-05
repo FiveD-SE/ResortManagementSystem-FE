@@ -1,25 +1,30 @@
 import { Box, Button, CircularProgress, Container, Grid, TextField, Typography } from '@mui/material';
+import { PaymentsRounded } from '@mui/icons-material';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
+
 import Header from './components/Header';
 import TripDetails from './components/TripDetails';
 import Payment from './components/Payment';
 import Voucher from './components/Voucher';
 import AddsOnService from './components/AddsOnService';
 import PricingDetailCard from './components/PricingDetailCard';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
-import { PaymentsRounded } from '@mui/icons-material';
-import { useGetRoomDetailByIdQuery } from '../../apis/roomApi';
-import { IPromotion, IService, PaymentMethod } from '../../types';
-import { useCreateBookingMutation } from '../../apis/bookingApi';
-import toast from 'react-hot-toast';
-import { ICreateBookingRequest } from '../../types/booking';
-import { BOOKING_SUCCESS_MESSAGE, BOOKING_SYSTEM_ERROR_MESSAGE } from '../../constants/messages';
 import CustomDialog from '../../components/CustomDialog';
-import { ROUTES } from '../../constants/routes';
-import { useAppSelector } from '../../stores/store';
+
+import { useGetRoomDetailByIdQuery } from '../../apis/roomApi';
+import { useCreateBookingMutation } from '../../apis/bookingApi';
 import { useChangeProfileMutation } from '../../apis/userApi';
-import Cookies from 'js-cookie';
+
+import { useAppSelector } from '../../stores/store';
+
+import { IPromotion, IService, PaymentMethod } from '../../types';
+import { ICreateBookingRequest } from '../../types/booking';
+
+import { BOOKING_SUCCESS_MESSAGE, BOOKING_SYSTEM_ERROR_MESSAGE } from '../../constants/messages';
+import { ROUTES } from '../../constants/routes';
 
 const Bookings = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -28,9 +33,11 @@ const Bookings = () => {
     skip: !roomId,
   });
   const navigate = useNavigate();
+
   const [createBooking, { isLoading: isCreateBookingLoading }] = useCreateBookingMutation();
   const [changeProfile, { isLoading: isLoadingChangeProfile, isSuccess: isSuccessChangeProfile }] =
     useChangeProfileMutation();
+
   const [phoneNumber, setPhoneNumber] = useState<string | null>(user?.phoneNumber || null);
   const [searchParams] = useSearchParams();
   const checkInDateFromParams = searchParams.get('checkin');
@@ -41,10 +48,61 @@ const Bookings = () => {
   const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(
     checkOutDateFromParams ? dayjs(checkOutDateFromParams) : null,
   );
+  const [checkInTime] = useState<string>('14:00');
+  const [checkOutTime] = useState<string>('12:00');
   const [guests, setGuests] = useState({
     adults: adultsFromParams ? parseInt(adultsFromParams) : 1,
     children: childrenFromParams ? parseInt(childrenFromParams) : 0,
   });
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<{
+    icon: JSX.Element;
+    text: string;
+  }>({
+    icon: <PaymentsRounded sx={{ color: 'black.500' }} />,
+    text: 'Pay on arrival',
+  });
+  const [selectedServices, setSelectedServices] = useState<IService[]>([]);
+  const [selectedPromotion, setSelectedPromotion] = useState<IPromotion | null>(null);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [countdown, setCountdown] = useState(30);
+  const [requiredPhoneNumberDialog, setRequiredPhoneNumberDialog] = useState(false);
+
+  const handlePaymentMethodSelect = (method: { icon: JSX.Element; text: string }) => {
+    setSelectedPaymentMethod(method);
+  };
+
+  const handleSelectServices = (service: IService): void => {
+    if (selectedServices.some((s) => s.id === service.id)) {
+      setSelectedServices(selectedServices.filter((s) => s.id !== service.id));
+    } else {
+      setSelectedServices([...selectedServices, service]);
+    }
+  };
+
+  const handleSelectPromotion = (promotion: IPromotion): void => {
+    setSelectedPromotion((prev) => (prev?.id === promotion.id ? null : promotion));
+  };
+
+  const handleUpdatePhoneNumber = async () => {
+    try {
+      const response = await changeProfile({
+        phoneNumber: phoneNumber || '',
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+      }).unwrap();
+      if (isSuccessChangeProfile) {
+        const updatedUser = { ...user, phoneNumber: response.phoneNumber };
+        Cookies.set('user', JSON.stringify(updatedUser));
+        toast.success('Phone number updated successfully');
+        setPhoneNumber(response.phoneNumber);
+        setRequiredPhoneNumberDialog(false);
+      }
+    } catch (error) {
+      console.error('Failed to update phone number:', error);
+      toast.error('Failed to update phone number');
+    }
+  };
+
   useEffect(() => {
     setCheckInDate(checkInDateFromParams ? dayjs(checkInDateFromParams) : null);
     setCheckOutDate(checkOutDateFromParams ? dayjs(checkOutDateFromParams) : null);
@@ -57,35 +115,6 @@ const Bookings = () => {
     });
   }, [adultsFromParams, childrenFromParams]);
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<{
-    icon: JSX.Element;
-    text: string;
-  }>({
-    icon: <PaymentsRounded sx={{ color: 'black.500' }} />,
-    text: 'Pay on arrival',
-  });
-
-  const handlePaymentMethodSelect = (method: { icon: JSX.Element; text: string }) => {
-    setSelectedPaymentMethod(method);
-  };
-
-  const [selectedServices, setSelectedServices] = useState<IService[]>([]);
-  const handleSelectServices = (service: IService): void => {
-    if (selectedServices.some((s) => s.id === service.id)) {
-      setSelectedServices(selectedServices.filter((s) => s.id !== service.id));
-    } else {
-      setSelectedServices([...selectedServices, service]);
-    }
-  };
-
-  const [selectedPromotion, setSelectedPromotion] = useState<IPromotion | null>(null);
-
-  const handleSelectPromotion = (promotion: IPromotion): void => {
-    setSelectedPromotion((prev) => (prev?.id === promotion.id ? null : promotion));
-  };
-
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [countdown, setCountdown] = useState(30);
   useEffect(() => {
     let timerId: NodeJS.Timeout;
     if (showPaymentDialog) {
@@ -105,29 +134,7 @@ const Bookings = () => {
     }
   }, [countdown, navigate]);
 
-  const [requiredPhoneNumberDialog, setRequiredPhoneNumberDialog] = useState(false);
-
-  const handleUpdatePhoneNumber = async () => {
-    try {
-      const response = await changeProfile({
-        phoneNumber: phoneNumber || '',
-        firstName: user?.firstName || '',
-        lastName: user?.lastName || '',
-      }).unwrap();
-      if (isSuccessChangeProfile) {
-        const updatedUser = { ...user, phoneNumber: response.data.phoneNumber };
-        Cookies.set('user', JSON.stringify(updatedUser));
-        toast.success('Phone number updated successfully');
-        setPhoneNumber(response.data.phoneNumber);
-        setRequiredPhoneNumberDialog(false);
-      }
-    } catch (error) {
-      console.error('Failed to update phone number:', error);
-      toast.error('Failed to update phone number');
-    }
-  };
-
-  const handleCreateBooking = async () => {
+  const handleCreateBooking = useCallback(async () => {
     if (!roomId || !checkInDate || !checkOutDate) {
       toast.error(BOOKING_SYSTEM_ERROR_MESSAGE);
       return;
@@ -138,9 +145,20 @@ const Bookings = () => {
       return;
     }
 
+    const formattedCheckinDate = checkInDate
+      ?.hour(parseInt(checkInTime.split(':')[0]))
+      .minute(parseInt(checkInTime.split(':')[1]))
+      .second(0)
+      .toDate();
+    const formattedCheckoutDate = checkOutDate
+      ?.hour(parseInt(checkOutTime.split(':')[0]))
+      .minute(parseInt(checkOutTime.split(':')[1]))
+      .second(0)
+      .toDate();
+
     const bookingData: Partial<ICreateBookingRequest> = {
-      checkinDate: checkInDate.toDate(),
-      checkoutDate: checkOutDate.toDate(),
+      checkinDate: formattedCheckinDate,
+      checkoutDate: formattedCheckoutDate,
       guests: guests,
       paymentMethod: selectedPaymentMethod.text as PaymentMethod,
       serviceIds: selectedServices.map((service) => service.id),
@@ -164,13 +182,26 @@ const Bookings = () => {
       console.error('Failed to create booking:', error);
       toast.error(BOOKING_SYSTEM_ERROR_MESSAGE);
     }
-  };
+  }, [
+    roomId,
+    checkInDate,
+    checkOutDate,
+    checkInTime,
+    checkOutTime,
+    guests,
+    selectedPaymentMethod,
+    selectedServices,
+    selectedPromotion,
+    phoneNumber,
+    createBooking,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (isSuccessChangeProfile && phoneNumber) {
       handleCreateBooking();
     }
-  }, [isSuccessChangeProfile, phoneNumber]);
+  }, [isSuccessChangeProfile, phoneNumber, handleCreateBooking]);
 
   return (
     <Container>
