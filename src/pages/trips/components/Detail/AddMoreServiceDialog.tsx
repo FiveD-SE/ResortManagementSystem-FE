@@ -145,13 +145,13 @@ const AddMoreServiceDialog = ({ open, onClose, refetchBooking }: IAddMoreService
             <Typography variant="body2" sx={{ color: 'black.500', fontWeight: 500 }}>
               Selected services
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', px: 1.5, gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Grid container spacing={1}>
                 {chunkedSelectedServices.map((chunk, chunkIndex) => (
                   <Grid item xs={4} key={chunkIndex * 10}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                       {chunk.map((selectedService) => (
-                        <Typography key={selectedService.service.id} variant="body2" sx={{ color: 'black.500', px: 1 }}>
+                        <Typography key={selectedService.service.id} variant="body2" sx={{ color: 'black.500' }}>
                           • {selectedService.service.serviceName} x {selectedService.quantity}
                         </Typography>
                       ))}

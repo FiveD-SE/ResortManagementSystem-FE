@@ -61,7 +61,7 @@ const Bookings = () => {
     icon: <PaymentsRounded sx={{ color: 'black.500' }} />,
     text: 'Pay on arrival',
   });
-  const [selectedServices, setSelectedServices] = useState<IService[]>([]);
+  const [selectedServices, setSelectedServices] = useState<{ service: IService; quantity: number }[]>([]);
   const [selectedPromotion, setSelectedPromotion] = useState<IPromotion | null>(null);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [countdown, setCountdown] = useState(30);
@@ -71,11 +71,16 @@ const Bookings = () => {
     setSelectedPaymentMethod(method);
   };
 
-  const handleSelectServices = (service: IService): void => {
-    if (selectedServices.some((s) => s.id === service.id)) {
-      setSelectedServices(selectedServices.filter((s) => s.id !== service.id));
+  const handleSelectServices = (service: IService, quantity: number): void => {
+    if (quantity === 0) {
+      setSelectedServices(selectedServices.filter((s) => s.service.id !== service.id));
     } else {
-      setSelectedServices([...selectedServices, service]);
+      const existingServiceIndex = selectedServices.findIndex((s) => s.service.id === service.id);
+      if (existingServiceIndex !== -1) {
+        setSelectedServices(selectedServices.map((s) => (s.service.id === service.id ? { ...s, quantity: quantity } : s)));
+      } else {
+        setSelectedServices([...selectedServices, { service, quantity }]);
+      }
     }
   };
 
@@ -161,7 +166,10 @@ const Bookings = () => {
       checkoutDate: formattedCheckoutDate,
       guests: guests,
       paymentMethod: selectedPaymentMethod.text as PaymentMethod,
-      serviceIds: selectedServices.map((service) => service.id),
+      servicesWithQuantities: selectedServices.map((service) => ({
+        serviceId: service.service.id,
+        quantity: service.quantity,
+      })),
     };
 
     if (selectedPromotion) {
@@ -258,7 +266,7 @@ const Bookings = () => {
               checkInDate={checkInDate}
               checkOutDate={checkOutDate}
               discount={selectedPromotion?.discount || 0}
-              services={selectedServices}
+              services={selectedServices.map((service) => service.service)}
             />
           </Grid>
         </Grid>

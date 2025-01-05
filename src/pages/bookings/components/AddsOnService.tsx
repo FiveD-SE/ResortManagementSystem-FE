@@ -3,14 +3,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGetServicesQuery } from '../../../apis/serviceApi';
 import { IService, IServiceApiResponse } from '../../../types';
 import { formatPrice } from '../../../utils';
+import QuantityPicker from '../../trips/components/Detail/QuantityPicker';
 
 interface ObserverEntry {
   isIntersecting: boolean;
 }
 
 interface AddsOnServiceProps {
-  selectedServices: IService[];
-  handleSelectServices: (service: IService) => void;
+  selectedServices: {
+    service: IService;
+    quantity: number;
+  }[];
+  handleSelectServices: (service: IService, quantity: number) => void;
 }
 
 const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnServiceProps) => {
@@ -72,6 +76,14 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
     }
   }, [servicesData]);
 
+  const isServiceSelected = (service: IService) => {
+    return selectedServices.some((selectedService) => selectedService.service.id === service.id);
+  };
+
+  const handleQuantityChange = (service: IService, newQuantity: number) => {
+    handleSelectServices(service, newQuantity);
+  };
+
   return (
     <Box
       sx={{
@@ -103,8 +115,8 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
             padding: 0,
           }}
         >
-          {currentServices?.docs.map((service) => (
-            <ListItem key={service.id} sx={{ width: 'auto', p: 0 }}>
+          {currentServices?.docs.map((service, index) => (
+            <ListItem key={service.id + index} sx={{ width: 'auto', p: 0 }}>
               <Paper
                 elevation={0}
                 sx={{
@@ -114,13 +126,15 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
                   p: 1.5,
                   borderRadius: 2,
                   border: 1,
-                  borderColor: selectedServices.includes(service) ? 'primary.500' : 'black.100',
+                  borderColor: isServiceSelected(service) ? 'primary.500' : 'black.100',
                   minWidth: 200,
                   cursor: 'pointer',
                 }}
-                onClick={() => handleSelectServices(service)}
               >
-                <Checkbox checked={selectedServices.includes(service)} />
+                <Checkbox
+                  checked={isServiceSelected(service)}
+                  onChange={() => handleSelectServices(service, isServiceSelected(service) ? 0 : 1)}
+                />
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                   <Typography variant="subtitle2" sx={{ whiteSpace: 'nowrap', color: 'black.500', fontWeight: 500 }}>
                     {service.serviceName}
@@ -141,6 +155,12 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
                     {formatPrice(service.price)}
                   </Typography>
                 </Box>
+                {isServiceSelected(service) && (
+                  <QuantityPicker
+                    initialQuantity={selectedServices.find((s) => s.service.id === service.id)?.quantity || 1}
+                    onChange={(newQuantity) => handleQuantityChange(service, newQuantity)}
+                  />
+                )}
               </Paper>
             </ListItem>
           ))}
