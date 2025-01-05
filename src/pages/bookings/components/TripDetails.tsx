@@ -42,6 +42,12 @@ const TripDetails = ({
     setOpenGuestChangeDialog(false);
   };
 
+  const isDateRangeOccupied = (startDate: Dayjs | null, endDate: Dayjs | null) => {
+    if (!startDate || !endDate) return false;
+    const range = Array.from({ length: endDate.diff(startDate, 'day') }).map((_, index) => startDate.add(index, 'day'));
+    return range.some((date) => occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day')));
+  };
+
   const occupiedDates: Dayjs[] =
     roomOccupiedDate && roomOccupiedDate.length > 0
       ? roomOccupiedDate
@@ -96,6 +102,7 @@ const TripDetails = ({
           selectedCheckInDate={checkInDate}
           selectedCheckOutDate={checkOutDate}
           shouldDisableDate={shouldDisableDate}
+          isDateRangeOccupied={isDateRangeOccupied}
         />
       </Grid>
       <Grid container sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>

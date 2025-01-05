@@ -26,14 +26,14 @@ interface ThingsToKnowItem {
 const thingsToKnowData: ThingsToKnowItem[] = [
   {
     title: 'House rules',
-    summary: ['Check-in: 2:00 PM - 8:00 PM', 'Checkout before 10:00 AM', '2 guests maximum'],
+    summary: ['Check-in: 2:00 PM - 8:00 PM', 'Checkout before 12:00 AM'],
     dialogTitle: 'House Rules',
     dialogContent: [
       {
         heading: 'Checking in and out',
         details: [
-          { icon: ScheduleOutlined, text: 'Check-in: 2:00 PM - 12:00 AM' },
-          { icon: ScheduleOutlined, text: 'Checkout before 11:00 AM' },
+          { icon: ScheduleOutlined, text: 'Check-in: 2:00 PM - 8:00 PM' },
+          { icon: ScheduleOutlined, text: 'Checkout before 12:00 AM' },
         ],
       },
       {
@@ -124,11 +124,13 @@ const ThingsToKnow = () => {
                   <ChevronRightRounded />
                 </IconButton>
               </Typography>
-              {item.summary.map((summaryItem, summaryIndex) => (
-                <Typography key={summaryIndex} variant="body2" sx={{ color: 'black.500' }}>
-                  {summaryItem}
-                </Typography>
-              ))}
+              <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, gap: 2 }}>
+                {item.summary.map((summaryItem, summaryIndex) => (
+                  <Typography key={summaryIndex} variant="body2" sx={{ color: 'black.500' }}>
+                    {summaryItem}
+                  </Typography>
+                ))}
+              </Box>
               <Box
                 sx={{
                   display: {

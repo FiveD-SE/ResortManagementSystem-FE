@@ -109,7 +109,7 @@ const TripForm = (props: IProps) => {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  maxWidth: 200,
+                  maxWidth: 500,
                 }}
               >
                 {booking?.promotionId?.description}

@@ -67,10 +67,23 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate, next
     setAnchorEl(null);
   };
 
+  const isDateRangeOccupied = (startDate: Dayjs | null, endDate: Dayjs | null) => {
+    if (!startDate || !endDate) return false;
+    const range = Array.from({ length: endDate.diff(startDate, 'day') }).map((_, index) => startDate.add(index, 'day'));
+    return range.some((date) => occupiedDates.some((occupiedDate) => occupiedDate.isSame(date, 'day')));
+  };
+
   const handleCheckInChange = (date: Dayjs | null) => {
     setCheckInDate(date);
     if (checkOutDate && date && date.isAfter(checkOutDate.subtract(1, 'day'))) {
       setCheckOutDate(date.add(1, 'day'));
+    }
+
+    if (date && shouldDisableDate(date)) {
+      const nextAvailableDate = occupiedDates.filter((d) => d.isAfter(date)).sort((a, b) => a.diff(b))[0];
+      if (nextAvailableDate) {
+        setCheckOutDate(nextAvailableDate.add(1, 'day'));
+      }
     }
   };
 
@@ -153,7 +166,7 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate, next
               value={checkInDate}
               onChange={handleCheckInChange}
               shouldDisableDate={shouldDisableDate}
-              minDate={dayjs(checkInDate || undefined)}
+              minDate={dayjs()}
               format="MM-DD-YYYY"
               slotProps={{
                 field: {
@@ -280,8 +293,11 @@ const ReservationCard = ({ room, roomType, occupiedDates: roomOccupiedDate, next
               backgroundColor: 'primary.500',
               borderRadius: 3,
             }}
+            disabled={isDateRangeOccupied(checkInDate, checkOutDate)}
           >
-            <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>Reserve</Typography>
+            <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>
+              {isDateRangeOccupied(checkInDate, checkOutDate) ? 'Unavailable' : 'Reserve'}
+            </Typography>
           </Button>
         </Link>
         <Typography variant="body2" sx={{ textAlign: 'center', color: 'black.400' }}>

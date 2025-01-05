@@ -1,4 +1,4 @@
-import { Box, Card, CardActionArea, CircularProgress, Paper, Skeleton, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, Paper, Skeleton, Typography } from '@mui/material';
 import BookingList from './components/BookingList';
 import { useGetBookingsByUserIdQuery } from '../../../../apis/bookingApi';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ const BookingTab = (props: IProps) => {
   const { user } = useSelector((state: RootState) => state.user);
   const { data, isFetching } = useGetBookingsByUserIdQuery({ userId: user?.id || '', filter: props.type });
   return (
-    <Box sx={{ paddingX: 6, paddingY: 3 }}>
+    <Box sx={{ paddingY: 3 }}>
       {isFetching || data === undefined ? (
         Array.from({ length: 2 }).map((_, index) => (
           <Card key={index} variant="outlined" sx={{ marginY: 2, flex: 1 }}>
