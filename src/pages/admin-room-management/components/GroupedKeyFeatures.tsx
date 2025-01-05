@@ -11,10 +11,10 @@ interface GroupedKeyFeaturesProps {
 const GroupedKeyFeatures = ({ selectedKeyFeatures, onSelectedKeyFeature }: GroupedKeyFeaturesProps) => {
     const [visibleCount, setVisibleCount] = useState(4);
 
-    const handleSelectKeyFeature = (title: string) => {
-        const newSelected = selectedKeyFeatures.includes(title)
-            ? selectedKeyFeatures.filter((item) => item !== title)
-            : [...selectedKeyFeatures, title];
+    const handleSelectKeyFeature = (key: string) => {
+        const newSelected = selectedKeyFeatures.includes(key)
+            ? selectedKeyFeatures.filter((item) => item !== key)
+            : [...selectedKeyFeatures, key];
         onSelectedKeyFeature(newSelected);
     };
 
@@ -31,14 +31,14 @@ const GroupedKeyFeatures = ({ selectedKeyFeatures, onSelectedKeyFeature }: Group
                 gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                 gap: 2
             }}>
-                {visibleFeatures.map(([key, value]) => (
+                {visibleFeatures.map(([key, feature]) => (
                     <KeyFeatureItem
                         key={key}
-                        title={value.title}
-                        icon={value.icon}
-                        description={value.description}
-                        selected={selectedKeyFeatures.includes(value.title)}
-                        onSelected={() => handleSelectKeyFeature(value.title)}
+                        title={feature.title}
+                        icon={feature.icon}
+                        description={feature.description}
+                        selected={selectedKeyFeatures.includes(key)}
+                        onSelected={() => handleSelectKeyFeature(key)}
                     />
                 ))}
             </Box>

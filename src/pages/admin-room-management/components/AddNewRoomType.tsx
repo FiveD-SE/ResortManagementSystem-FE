@@ -88,6 +88,11 @@ const AddNewRoomType = ({ onAddNewRoomType }: AddNewRoomTypeProps) => {
         }
     }
 
+    React.useEffect(() => {
+        console.log('amenities', amenities);
+        console.log('keyFeatures', keyFeatures);
+    }, [amenities, keyFeatures]);
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button

@@ -32,12 +32,13 @@ const GroupedAmenities = ({ selectedAmenities, onSelectedAmenity }: GroupedAmeni
     }));
   };
 
-  const handleSelectAmenity = (title: string) => {
-    const newSelected = selectedAmenities.includes(title)
-      ? selectedAmenities.filter((item) => item !== title)
-      : [...selectedAmenities, title];
+  const handleSelectAmenity = (key: string) => {
+    const newSelected = selectedAmenities.includes(key)
+      ? selectedAmenities.filter((item) => item !== key)
+      : [...selectedAmenities, key];
     onSelectedAmenity(newSelected);
   };
+
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -74,13 +75,13 @@ const GroupedAmenities = ({ selectedAmenities, onSelectedAmenity }: GroupedAmeni
               gap: 2,
               padding: 2,
             }}>
-              {items.map((amenity) => (
+              {items.map((amenity, index) => (
                 <AmenityItem
-                  key={amenity.title}
+                  key={index}
                   title={amenity.title}
                   icon={amenity.icon}
-                  selected={selectedAmenities.includes(amenity.title)}
-                  onSelected={() => handleSelectAmenity(amenity.title)}
+                  selected={selectedAmenities.includes(Object.keys(amenities).find(key => amenities[key] === amenity) ?? '')}
+                  onSelected={() => handleSelectAmenity(Object.keys(amenities).find(key => amenities[key] === amenity)!)}
                 />
               ))}
             </Box>
