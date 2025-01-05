@@ -33,8 +33,9 @@ const TripForm = (props: IProps) => {
   const handleCloseAddServiceDialog = () => {
     setIsAddServiceDialogOpen(false);
   };
+
   return (
-    <Stack spacing={2} gap={2}>
+    <Stack spacing={2} gap={2} sx={{ mb: 2 }}>
       <Typography variant="h5" component="h1" sx={{ color: 'black.500' }}>
         Your booking
       </Typography>
@@ -203,23 +204,25 @@ const TripForm = (props: IProps) => {
         />
       </Box>
 
-      <Box sx={{ pb: 2 }}>
-        <Button
-          variant="contained"
-          sx={{
-            width: 'fit-content',
-            py: 1.5,
-            px: 3,
-            textTransform: 'none',
-            borderRadius: 3,
-            backgroundColor: 'primary.500',
-          }}
-        >
-          <Typography variant="h6" sx={{}} onClick={() => (window.location.href = `/trips/review/${booking?.id}`)}>
-            {TRIPS_FORM.START_TO_REVIEW}
-          </Typography>
-        </Button>
-      </Box>
+      {booking?.status === 'Checked out' && (
+        <Box>
+          <Button
+            variant="contained"
+            sx={{
+              width: 'fit-content',
+              py: 1.5,
+              px: 3,
+              textTransform: 'none',
+              borderRadius: 3,
+              backgroundColor: 'primary.500',
+            }}
+          >
+            <Typography variant="h6" sx={{}} onClick={() => (window.location.href = `/trips/review/${booking?.id}`)}>
+              {TRIPS_FORM.START_TO_REVIEW}
+            </Typography>
+          </Button>
+        </Box>
+      )}
     </Stack>
   );
 };

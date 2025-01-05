@@ -1,35 +1,35 @@
-import { Role, UserSortBy } from "./enums";
+import { Role, UserSortBy } from './enums';
 
 export interface IUser {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: Role;
-    avatar: string;
-    phone: string;
-    isVerified: boolean;
-    isActive: boolean;
-    serviceTypeId?: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: Role;
+  avatar: string;
+  phoneNumber: string;
+  isVerified: boolean;
+  isActive: boolean;
+  serviceTypeId?: string;
 }
 
 export interface IUserApiResponse {
-    totalDocs: number;
-    page: string;
-    limit: string;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-    nextPage: string | null;
-    prevPage: string | null;
-    pagingCounter: number;
-    docs: IUser[];
+  totalDocs: number;
+  page: string;
+  limit: string;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  nextPage: string | null;
+  prevPage: string | null;
+  pagingCounter: number;
+  docs: IUser[];
 }
 
 export interface IUserApiRequest {
-    role: Role;
-    sortOrder: 'asc' | 'desc';
-    sortBy: UserSortBy;
-    page: number;
-    limit: number;
+  role: Role;
+  sortOrder: 'asc' | 'desc';
+  sortBy: UserSortBy;
+  page: number;
+  limit: number;
 }
