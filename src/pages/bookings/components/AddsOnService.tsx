@@ -1,6 +1,6 @@
 import { Box, Checkbox, FormControl, List, ListItem, Paper, Skeleton, Typography } from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useGetServicesQuery } from '../../../apis/serviceApi';
+import { useGetServiceByRoomTypeQuery } from '../../../apis/serviceApi';
 import { IService, IServiceApiResponse } from '../../../types';
 import { formatPrice } from '../../../utils';
 import QuantityPicker from '../../trips/components/Detail/QuantityPicker';
@@ -10,6 +10,7 @@ interface ObserverEntry {
 }
 
 interface AddsOnServiceProps {
+  roomTypeId: string;
   selectedServices: {
     service: IService;
     quantity: number;
@@ -17,18 +18,25 @@ interface AddsOnServiceProps {
   handleSelectServices: (service: IService, quantity: number) => void;
 }
 
-const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnServiceProps) => {
+const AddsOnService = ({ roomTypeId, selectedServices, handleSelectServices }: AddsOnServiceProps) => {
   const [page, setPage] = useState(1);
   const [currentServices, setCurrentServices] = useState<IServiceApiResponse | null>(null);
   const {
     data: servicesData,
     isLoading: isLoadingServices,
     isFetching: isFetchingServices,
-  } = useGetServicesQuery({
-    page: page,
-    limit: 12,
-    sort: 'asc',
-  });
+  } = useGetServiceByRoomTypeQuery(
+    {
+      roomTypeId: roomTypeId,
+      page: page,
+      limit: 12,
+      sortBy: 'price',
+      sortOrder: 'asc',
+    },
+    {
+      skip: roomTypeId === '',
+    },
+  );
   const loader = useRef(null);
 
   const hasNextPage = servicesData?.hasNextPage;
@@ -164,30 +172,31 @@ const AddsOnService = ({ selectedServices, handleSelectServices }: AddsOnService
               </Paper>
             </ListItem>
           ))}
-          {isFetchingServices &&
-            Array.from({ length: 12 }).map((_, index) => (
-              <ListItem key={index} sx={{ width: 'auto', p: 0 }}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    p: 1.5,
-                    borderRadius: 2,
-                    border: 1,
-                    borderColor: 'black.100',
-                    minWidth: 200,
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <Skeleton variant="text" width="80%" />
-                    <Skeleton variant="text" width="60%" />
-                    <Skeleton variant="text" width="40%" />
-                  </Box>
-                </Paper>
-              </ListItem>
-            ))}
+          {isFetchingServices ||
+            (roomTypeId === '' &&
+              Array.from({ length: 12 }).map((_, index) => (
+                <ListItem key={index} sx={{ width: 'auto', p: 0 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      p: 1.5,
+                      borderRadius: 2,
+                      border: 1,
+                      borderColor: 'black.100',
+                      minWidth: 200,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                      <Skeleton variant="text" width="80%" />
+                      <Skeleton variant="text" width="60%" />
+                      <Skeleton variant="text" width="40%" />
+                    </Box>
+                  </Paper>
+                </ListItem>
+              )))}
           <ListItem ref={loader} sx={{ width: '100%', p: 0, height: isFetchingServices ? 0 : 'auto' }} />
         </List>
       </FormControl>

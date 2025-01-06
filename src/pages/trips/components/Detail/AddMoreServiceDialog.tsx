@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import CustomDialog from '../../../../components/CustomDialog';
 import { Box, Button, Checkbox, Container, Grid, List, ListItem, Paper, Skeleton, Typography } from '@mui/material';
 import { formatPrice } from '../../../../utils';
 import { IService, IServiceApiResponse } from '../../../../types';
-import { useGetServicesQuery } from '../../../../apis/serviceApi';
+import { useGetServiceByRoomTypeQuery } from '../../../../apis/serviceApi';
 import { useParams } from 'react-router-dom';
 import { useAddServicesToBookingMutation } from '../../../../apis/bookingApi';
 import toast from 'react-hot-toast';
@@ -15,6 +15,7 @@ interface ObserverEntry {
 }
 
 interface IAddMoreServiceDialogProps {
+  roomTypeId: string;
   open: boolean;
   onClose: () => void;
   refetchBooking: () => void;
@@ -25,7 +26,7 @@ interface SelectedService {
   quantity: number;
 }
 
-const AddMoreServiceDialog = ({ open, onClose, refetchBooking }: IAddMoreServiceDialogProps) => {
+const AddMoreServiceDialog = ({ roomTypeId, open, onClose, refetchBooking }: IAddMoreServiceDialogProps) => {
   const { id } = useParams<{ id: string }>();
   const [page, setPage] = useState(1);
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
@@ -35,11 +36,18 @@ const AddMoreServiceDialog = ({ open, onClose, refetchBooking }: IAddMoreService
     data: servicesData,
     isLoading: isLoadingServices,
     isFetching: isFetchingServices,
-  } = useGetServicesQuery({
-    page: page,
-    limit: 12,
-    sort: 'asc',
-  });
+  } = useGetServiceByRoomTypeQuery(
+    {
+      roomTypeId: roomTypeId,
+      page: page,
+      limit: 12,
+      sortBy: 'price',
+      sortOrder: 'asc',
+    },
+    {
+      skip: roomTypeId === '',
+    },
+  );
   const loader = useRef(null);
 
   const hasNextPage = servicesData?.hasNextPage;
@@ -111,7 +119,7 @@ const AddMoreServiceDialog = ({ open, onClose, refetchBooking }: IAddMoreService
     if (id) {
       addServices({
         bookingId: id,
-        data: { serviceId: selectedServices.map((s) => ({ id: s.service.id, quantity: s.quantity })) },
+        data: { servicesWithQuantities: selectedServices.map((s) => ({ serviceId: s.service.id, quantity: s.quantity })) },
       });
     }
   };

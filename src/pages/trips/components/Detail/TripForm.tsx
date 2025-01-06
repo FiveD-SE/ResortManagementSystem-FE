@@ -202,6 +202,7 @@ const TripForm = (props: IProps) => {
           ))}
         </List>
         <AddMoreServiceDialog
+          roomTypeId={booking?.roomId.roomTypeId._id || ''}
           open={isAddServiceDialogOpen}
           onClose={handleCloseAddServiceDialog}
           refetchBooking={refetchBooking}

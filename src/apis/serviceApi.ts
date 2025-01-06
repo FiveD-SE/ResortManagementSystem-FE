@@ -58,6 +58,22 @@ export const serviceApi = createApi({
         },
       }),
     }),
+    getServiceByRoomType: builder.query<
+      IServiceApiResponse,
+      { roomTypeId: string; page: number; limit: number; sortBy: string; sortOrder: string }
+    >({
+      query: ({ roomTypeId, page, limit, sortBy, sortOrder }) => ({
+        url: `/room-type/${roomTypeId}`,
+        method: 'GET',
+        params: {
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+        },
+      }),
+      keepUnusedDataFor: 1,
+    }),
   }),
 });
 
@@ -67,4 +83,5 @@ export const {
   useDeleteServiceMutation,
   useCreateServiceMutation,
   useUpdateServiceMutation,
+  useGetServiceByRoomTypeQuery,
 } = serviceApi;
