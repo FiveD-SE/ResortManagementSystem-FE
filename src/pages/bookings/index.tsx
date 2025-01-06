@@ -225,8 +225,16 @@ const Bookings = () => {
               occupiedDates={roomDetail?.occupiedDates || []}
             />
             <Payment selectedPaymentMethod={selectedPaymentMethod} handlePaymentMethodSelect={handlePaymentMethodSelect} />
-            <Voucher selectedPromotion={selectedPromotion} handleSelectPromotion={handleSelectPromotion} />
-            <AddsOnService selectedServices={selectedServices} handleSelectServices={handleSelectServices} />
+            <Voucher
+              roomTypeId={roomDetail?.roomType.id || ''}
+              selectedPromotion={selectedPromotion}
+              handleSelectPromotion={handleSelectPromotion}
+            />
+            <AddsOnService
+              roomTypeId={roomDetail?.roomType.id || ''}
+              selectedServices={selectedServices}
+              handleSelectServices={handleSelectServices}
+            />
             <Box
               sx={{
                 display: 'flex',
