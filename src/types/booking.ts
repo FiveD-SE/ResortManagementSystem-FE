@@ -20,6 +20,9 @@ export interface IBooking {
     children: number;
     id: string;
   };
+  invoice: {
+    checkoutUrl: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   __v: number;

@@ -63,8 +63,6 @@ const Bookings = () => {
   });
   const [selectedServices, setSelectedServices] = useState<{ service: IService; quantity: number }[]>([]);
   const [selectedPromotion, setSelectedPromotion] = useState<IPromotion | null>(null);
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [countdown, setCountdown] = useState(30);
   const [requiredPhoneNumberDialog, setRequiredPhoneNumberDialog] = useState(false);
 
   const handlePaymentMethodSelect = (method: { icon: JSX.Element; text: string }) => {
@@ -120,25 +118,6 @@ const Bookings = () => {
     });
   }, [adultsFromParams, childrenFromParams]);
 
-  useEffect(() => {
-    let timerId: NodeJS.Timeout;
-    if (showPaymentDialog) {
-      timerId = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-    }
-
-    return () => {
-      clearInterval(timerId);
-    };
-  }, [showPaymentDialog]);
-
-  useEffect(() => {
-    if (countdown <= 0) {
-      navigate(ROUTES.HOME);
-    }
-  }, [countdown, navigate]);
-
   const handleCreateBooking = useCallback(async () => {
     if (!roomId || !checkInDate || !checkOutDate) {
       toast.error(BOOKING_SYSTEM_ERROR_MESSAGE);
@@ -182,7 +161,7 @@ const Bookings = () => {
       toast.success(BOOKING_SUCCESS_MESSAGE);
       setRequiredPhoneNumberDialog(false);
       if (selectedPaymentMethod.text === 'Transfer') {
-        setShowPaymentDialog(true);
+        window.location.replace(response.invoice.checkoutUrl);
       } else {
         navigate(ROUTES.TRIPS.DETAIL.replace(':id', response.id));
       }
@@ -279,27 +258,6 @@ const Bookings = () => {
           </Grid>
         </Grid>
       </Box>
-      <CustomDialog open={showPaymentDialog} onClose={() => setShowPaymentDialog(false)}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h5" gutterBottom>
-            Please check your email to complete the payment process.
-          </Typography>
-          <Typography variant="body1" color="text.secondary" textAlign="center" gutterBottom>
-            You will be redirect to Home after {countdown} seconds
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{
-              width: 'fit-content',
-              backgroundColor: 'primary.500',
-              borderRadius: 3,
-            }}
-            onClick={() => navigate(ROUTES.HOME)}
-          >
-            <Typography sx={{ textTransform: 'none', fontSize: 16, fontWeight: 600 }}>Continue</Typography>
-          </Button>
-        </Box>
-      </CustomDialog>
       <CustomDialog open={requiredPhoneNumberDialog} onClose={() => setRequiredPhoneNumberDialog(false)}>
         <Box>
           <Typography variant="h5" gutterBottom>
