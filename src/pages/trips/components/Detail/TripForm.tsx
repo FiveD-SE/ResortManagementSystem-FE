@@ -109,7 +109,7 @@ const TripForm = (props: IProps) => {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  maxWidth: 200,
+                  maxWidth: 500,
                 }}
               >
                 {booking?.promotionId?.description}
@@ -192,12 +192,17 @@ const TripForm = (props: IProps) => {
                   <Typography variant="caption" sx={{ color: 'primary.500' }}>
                     {formatPrice(Number.parseFloat(service.serviceId.price.toString()))}
                   </Typography>
+
+                  <Typography variant="caption" sx={{ color: 'black.500', fontWeight: 500 }}>
+                    Qty: {service.quantity}
+                  </Typography>
                 </Box>
               </Paper>
             </ListItem>
           ))}
         </List>
         <AddMoreServiceDialog
+          roomTypeId={booking?.roomId.roomTypeId._id || ''}
           open={isAddServiceDialogOpen}
           onClose={handleCloseAddServiceDialog}
           refetchBooking={refetchBooking}

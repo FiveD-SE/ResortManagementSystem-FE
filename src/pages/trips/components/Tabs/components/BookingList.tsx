@@ -1,6 +1,5 @@
-import { Box } from '@mui/material';
+import { Grid } from '@mui/material';
 import BookingCard from './BookingCard';
-import SearchButton from './SearchButton';
 import { ITrip } from '../../../../../types';
 
 interface IProps {
@@ -9,12 +8,13 @@ interface IProps {
 
 const BookingList = (props: IProps) => {
   return (
-    <Box>
+    <Grid container spacing={2}>
       {props.trips.map((trip: ITrip) => (
-        <BookingCard trip={trip} key={trip.id} />
+        <Grid item xs={12} sm={6} md={3} key={trip.id}>
+          <BookingCard trip={trip} />
+        </Grid>
       ))}
-      <SearchButton />
-    </Box>
+    </Grid>
   );
 };
 

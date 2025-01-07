@@ -109,7 +109,10 @@ export const bookingApi = createApi({
         method: 'PATCH',
       }),
     }),
-    addServicesToBooking: builder.mutation<IBooking, { bookingId: string; data: { serviceId: string[] } }>({
+    addServicesToBooking: builder.mutation<
+      IBooking,
+      { bookingId: string; data: { servicesWithQuantities: { serviceId: string; quantity: number }[] } }
+    >({
       query: ({ bookingId, data }) => ({
         url: `/${bookingId}/services`,
         method: 'POST',

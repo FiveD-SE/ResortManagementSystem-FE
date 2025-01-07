@@ -11,6 +11,7 @@ interface DateChangeDialogProps {
   selectedCheckInDate: dayjs.Dayjs | null;
   selectedCheckOutDate: dayjs.Dayjs | null;
   shouldDisableDate: (date: dayjs.Dayjs) => boolean;
+  isDateRangeOccupied: (startDate: Dayjs | null, endDate: Dayjs | null) => boolean;
 }
 
 const DateChangeDialog = ({
@@ -19,6 +20,7 @@ const DateChangeDialog = ({
   selectedCheckInDate,
   selectedCheckOutDate,
   shouldDisableDate,
+  isDateRangeOccupied,
 }: DateChangeDialogProps) => {
   const [currentCheckInDate, setCurrentCheckInDate] = useState<dayjs.Dayjs | null>(selectedCheckInDate);
   const [currentCheckOutDate, setCurrentCheckOutDate] = useState<dayjs.Dayjs | null>(selectedCheckOutDate);
@@ -33,6 +35,9 @@ const DateChangeDialog = ({
 
   const handleCheckOutChange = (date: dayjs.Dayjs | null) => {
     setCurrentCheckOutDate(date);
+    if (currentCheckInDate && date && date.isBefore(currentCheckInDate.add(1, 'day'))) {
+      setCurrentCheckInDate(date.subtract(1, 'day'));
+    }
   };
 
   const handleDeleteDate = () => {
@@ -70,9 +75,13 @@ const DateChangeDialog = ({
             variant="contained"
             onClick={handleSaveDateChange}
             sx={{ borderRadius: 2 }}
-            disabled={!currentCheckInDate || !currentCheckOutDate}
+            disabled={
+              !currentCheckInDate || !currentCheckOutDate || isDateRangeOccupied(currentCheckInDate, currentCheckOutDate)
+            }
           >
-            <Typography sx={{ fontSize: 16, textTransform: 'none', fontWeight: 600 }}>Save</Typography>
+            <Typography sx={{ fontSize: 16, textTransform: 'none', fontWeight: 600 }}>
+              {isDateRangeOccupied(currentCheckInDate, currentCheckOutDate) ? 'Unavailable' : 'Save'}
+            </Typography>
           </Button>
         </Box>
       }

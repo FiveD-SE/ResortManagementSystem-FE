@@ -1,4 +1,4 @@
-import { Box, Card, CardActionArea, CircularProgress, Paper, Skeleton, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, Grid, Paper, Skeleton, Typography } from '@mui/material';
 import BookingList from './components/BookingList';
 import { useGetBookingsByUserIdQuery } from '../../../../apis/bookingApi';
 import { useSelector } from 'react-redux';
@@ -12,31 +12,35 @@ const BookingTab = (props: IProps) => {
   const { user } = useSelector((state: RootState) => state.user);
   const { data, isFetching } = useGetBookingsByUserIdQuery({ userId: user?.id || '', filter: props.type });
   return (
-    <Box sx={{ paddingX: 6, paddingY: 3 }}>
+    <Box sx={{ paddingY: 3 }}>
       {isFetching || data === undefined ? (
-        Array.from({ length: 2 }).map((_, index) => (
-          <Card key={index} variant="outlined" sx={{ marginY: 2, flex: 1 }}>
-            <CardActionArea sx={{ display: 'flex', padding: 2, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
-                <Skeleton variant="rectangular" width={100} height={100} />
-                <Box
-                  sx={{
-                    paddingX: 2,
-                    justifyContent: 'space-between',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                  }}
-                >
-                  <Skeleton variant="text" width="100%" height={40} />
-                  <Skeleton variant="text" width="80%" height={30} />
-                  <Skeleton variant="text" width="60%" height={20} />
-                </Box>
-              </Box>
-              <Skeleton variant="circular" width={20} height={20} />
-            </CardActionArea>
-          </Card>
-        ))
+        <Grid container spacing={2}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4}>
+              <Card variant="outlined" sx={{ marginY: 2, flex: 1 }}>
+                <CardActionArea sx={{ display: 'flex', padding: 2, flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1 }}>
+                    <Skeleton variant="rectangular" width={100} height={100} />
+                    <Box
+                      sx={{
+                        paddingX: 2,
+                        justifyContent: 'space-between',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        width: '100%',
+                      }}
+                    >
+                      <Skeleton variant="text" width="100%" height={40} />
+                      <Skeleton variant="text" width="80%" height={30} />
+                      <Skeleton variant="text" width="60%" height={20} />
+                    </Box>
+                  </Box>
+                  <Skeleton variant="circular" width={20} height={20} />
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       ) : data?.docs.length === 0 ? (
         <Paper
           sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 2 }}

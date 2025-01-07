@@ -8,18 +8,24 @@ interface ObserverEntry {
 }
 
 interface VoucherProps {
+  roomTypeId: string;
   selectedPromotion: IPromotion | null;
   handleSelectPromotion: (promotion: IPromotion) => void;
 }
 
-const Voucher = ({ selectedPromotion, handleSelectPromotion }: VoucherProps) => {
+const Voucher = ({ roomTypeId, selectedPromotion, handleSelectPromotion }: VoucherProps) => {
   const [page, setPage] = useState(1);
   const [currentPromotion, setCurrentPromotion] = useState<IPromotionApiResponse | null>(null);
   const {
     data: promotionData,
     isLoading: isLoadingPromotion,
     isFetching: isFetchingPromotion,
-  } = useGetPromotionsQuery({ page: 1, limit: 10 });
+  } = useGetPromotionsQuery(
+    { page: 1, limit: 12 },
+    {
+      skip: roomTypeId === '',
+    },
+  );
   const loader = useRef(null);
 
   const hasNextPage = promotionData?.hasNextPage;
@@ -70,7 +76,7 @@ const Voucher = ({ selectedPromotion, handleSelectPromotion }: VoucherProps) => 
   return (
     <Box
       sx={{
-        display: promotionData?.docs.length === 0 ? 'none' : 'flex',
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',
@@ -137,30 +143,31 @@ const Voucher = ({ selectedPromotion, handleSelectPromotion }: VoucherProps) => 
               </Paper>
             </ListItem>
           ))}
-          {isFetchingPromotion &&
-            Array.from({ length: 12 }).map((_, index) => (
-              <ListItem key={index} sx={{ width: 'auto', p: 0 }}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                    p: 1.5,
-                    borderRadius: 2,
-                    border: 1,
-                    borderColor: 'black.100',
-                    minWidth: 200,
-                  }}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <Skeleton variant="text" width="80%" />
-                    <Skeleton variant="text" width="60%" />
-                    <Skeleton variant="text" width="40%" />
-                  </Box>
-                </Paper>
-              </ListItem>
-            ))}
+          {isFetchingPromotion ||
+            (roomTypeId === '' &&
+              Array.from({ length: 12 }).map((_, index) => (
+                <ListItem key={index} sx={{ width: 'auto', p: 0 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      p: 1.5,
+                      borderRadius: 2,
+                      border: 1,
+                      borderColor: 'black.100',
+                      minWidth: 200,
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                      <Skeleton variant="text" width="80%" />
+                      <Skeleton variant="text" width="60%" />
+                      <Skeleton variant="text" width="40%" />
+                    </Box>
+                  </Paper>
+                </ListItem>
+              )))}
           <ListItem ref={loader} sx={{ width: '100%', p: 0, height: isFetchingPromotion ? 0 : 'auto' }} />
         </List>
       </FormControl>

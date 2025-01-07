@@ -26,18 +26,6 @@ export interface IBooking {
   id: string;
 }
 
-// export interface IBookingService {
-//   id: string;
-//   serviceName: string;
-//   serviceTypeName: string;
-//   roomNumber: string;
-//   checkinDate: Date;
-//   checkoutDate: Date;
-//   quantity: number;
-//   status: string;
-//   price: number;
-// }
-
 export interface IBookingApiRequest {
   sortOrder?: 'asc' | 'desc';
   sortBy?: 'checkinDate' | 'checkoutDate' | 'totalAmount' | 'createdAt' | 'status';
@@ -122,6 +110,7 @@ export interface ITrip {
   __v: number;
   id: string;
 }
+
 export interface ICreateBookingRequest {
   checkinDate: Date;
   checkoutDate: Date;
@@ -129,20 +118,10 @@ export interface ICreateBookingRequest {
     adults: number;
     children: number;
   };
-  serviceIds: string[];
+  servicesWithQuantities: {
+    serviceId: string;
+    quantity: number;
+  }[];
   promotionId: string;
   paymentMethod: PaymentMethod;
-}
-
-export interface IBookingApiResponse {
-  page: number;
-  limit: number;
-  totalDocs: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-  nextPage: number | null;
-  prevPage: number | null;
-  totalPages: number | null;
-  pagingCounter: number | null;
-  docs: IBooking[];
 }
