@@ -12,6 +12,7 @@ import { serviceTypeApi } from '../apis/serviceTypeApi';
 import { promotionApi } from '../apis/promotionApi';
 import { adminDashboardApi } from '../apis/adminDashboardApi';
 import { exportApi } from '../apis/exportApi';
+import { roomServiceApi } from '../apis/roomServiceApi';
 
 const store = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ const store = configureStore({
     [adminUserApi.reducerPath]: adminUserApi.reducer,
     [adminDashboardApi.reducerPath]: adminDashboardApi.reducer,
     [exportApi.reducerPath]: exportApi.reducer,
+    [roomServiceApi.reducerPath]: roomServiceApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware().concat(
@@ -41,6 +43,7 @@ const store = configureStore({
       adminUserApi.middleware,
       adminDashboardApi.middleware,
       exportApi.middleware,
+      roomServiceApi.middleware,
     );
   },
 });

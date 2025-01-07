@@ -48,8 +48,9 @@ const tabIconStyle = {
 interface PromotionTableProps {
     promotionData: IPromotionApiResponse | undefined;
     onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void;
+    onRefetch: () => void;
 }
-const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) => {
+const PromotionTable = ({ promotionData, onPageChange, onRefetch }: PromotionTableProps) => {
     const [openAddPromotionModal, setOpenAddPromotionModal] = React.useState<boolean>(false);
     const [openViewDetailPromotionModal, setOpenViewDetailPromotionModal] = React.useState<boolean>(false);
     const [tabSelected, setTabSelected] = React.useState<number>(0);
@@ -99,6 +100,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
                 toast.error("Failed to delete promotion");
             } finally {
                 setOpenDeleteModal(false);
+                onRefetch();
             }
         }
     }
@@ -208,7 +210,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
                             ) : (
                                 (filteredRows ?? []).map((row, index) => (
                                     <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                        <TableCell>{index}</TableCell>
+                                        <TableCell>{index + 1}</TableCell>
                                         <TableCell>{row.promotionName}</TableCell>
                                         <TableCell>{row.description}</TableCell>
                                         <TableCell>{row.discount}</TableCell>
@@ -284,7 +286,7 @@ const PromotionTable = ({ promotionData, onPageChange }: PromotionTableProps) =>
             />
 
             {/* Modals */}
-            <AddPromotionModal open={openAddPromotionModal} onClose={() => setOpenAddPromotionModal(false)} />
+            <AddPromotionModal open={openAddPromotionModal} onClose={() => setOpenAddPromotionModal(false)} onRefetch={onRefetch} />
             <ViewDetailPromotionModal open={openViewDetailPromotionModal} onClose={() => setOpenViewDetailPromotionModal(false)} selectedPromotion={selectedPromotion} />
 
             {/* Popup Modal */}

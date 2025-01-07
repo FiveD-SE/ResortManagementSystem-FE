@@ -9,9 +9,10 @@ import toast from 'react-hot-toast';
 
 interface AddNewRoomTypeProps {
     onAddNewRoomType: () => void;
+    onRefetch: () => void;
 }
 
-const AddNewRoomType = ({ onAddNewRoomType }: AddNewRoomTypeProps) => {
+const AddNewRoomType = ({ onAddNewRoomType, onRefetch }: AddNewRoomTypeProps) => {
     const [typeName, setTypeName] = React.useState<string>('');
     const [basePrice, setBasePrice] = React.useState('');
     const [guestAmount, setGuestAmount] = React.useState('');
@@ -83,6 +84,7 @@ const AddNewRoomType = ({ onAddNewRoomType }: AddNewRoomTypeProps) => {
             await postRoomType(data).unwrap();
             toast.success('Add new room type successfully');
             onAddNewRoomType();
+            onRefetch();
         } catch {
             toast.error('Add new room type failed');
         }

@@ -4,15 +4,29 @@ import React from 'react'
 import CustomInputForm from '../../../components/CustomInputForm';
 import { useCreateServiceTypeMutation } from '../../../apis/serviceTypeApi';
 import toast from 'react-hot-toast';
+import CustomSelectingForm from '../../../components/CustomSelectingForm';
+import { IRoomTypeApiResponse } from '../../../types';
 
 interface AddNewServiceTypeModalProps {
     open: boolean;
     onClose: () => void;
+    roomTypesData: IRoomTypeApiResponse | undefined;
+    onRefetch: () => void;
 }
 
-export const AddNewServiceTypeModal = ({ open, onClose }: AddNewServiceTypeModalProps) => {
+
+
+export const AddNewServiceTypeModal = ({ open, onClose, roomTypesData, onRefetch }: AddNewServiceTypeModalProps) => {
     const [serviceTypeName, setServiceTypeName] = React.useState('');
     const [description, setDescription] = React.useState('');
+    const [selectedRoomType, setSelectedRoomType] = React.useState('');
+    const options = React.useMemo(() => {
+        if (!roomTypesData?.docs) return [];
+        return roomTypesData.docs.map((roomType) => ({
+            label: roomType.typeName,
+            value: roomType.id,
+        }));
+    }, [roomTypesData]);
 
     const [createServiceType, { isLoading }] = useCreateServiceTypeMutation();
 
@@ -31,12 +45,21 @@ export const AddNewServiceTypeModal = ({ open, onClose }: AddNewServiceTypeModal
 
     const handleCreateServiceType = async () => {
         if (!validateForm()) return;
+
+        const roomTypeId = roomTypesData?.docs.find((roomType) => roomType.typeName === selectedRoomType)?.id;
+
+        if (!roomTypeId) {
+            toast.error('Room type is required');
+            return;
+        }
+
         try {
-            await createServiceType({ typeName: serviceTypeName, description });
+            await createServiceType({ typeName: serviceTypeName, description, roomTypeId });
             toast.success('Service type created successfully');
             onClose();
             resetForm();
-        } catch (error) {
+            onRefetch();
+        } catch {
             toast.error('Failed to create service type');
         }
     }
@@ -69,13 +92,22 @@ export const AddNewServiceTypeModal = ({ open, onClose }: AddNewServiceTypeModal
                 </Box>
 
                 <Box sx={{ padding: 2, borderRadius: 2, border: '1px solid #D2D3D7', marginTop: 2 }}>
-                    <CustomInputForm
-                        label="Service type name"
-                        placeholder="Enter service type name"
-                        value={serviceTypeName}
-                        onChange={(e) => setServiceTypeName(e.target.value)}
-                        type="text"
-                    />
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                        <CustomInputForm
+                            label="Service type name"
+                            placeholder="Enter service type name"
+                            value={serviceTypeName}
+                            onChange={(e) => setServiceTypeName(e.target.value)}
+                            type="text"
+                        />
+                        <CustomSelectingForm
+                            label="Room type"
+                            placeholder="Select room type"
+                            value={selectedRoomType}
+                            onChange={(e) => setSelectedRoomType(e.target.value)}
+                            options={options.map((option) => (option.label))}
+                        />
+                    </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
                         <Typography sx={{ color: 'black.900', fontSize: 16, fontWeight: 500 }}>
                             Description

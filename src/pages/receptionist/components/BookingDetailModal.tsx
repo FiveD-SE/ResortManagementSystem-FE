@@ -1,11 +1,14 @@
 import React from 'react';
 import { Box, Modal, Typography, IconButton, Divider, Button } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close, AddRounded } from '@mui/icons-material';
 import { IBooking } from '../../../types/booking';
 import { formatPrice } from '../../../utils';
 import { useConfirmCheckInMutation, useConfirmCheckOutMutation } from '../../../apis/bookingApi';
 import toast from 'react-hot-toast';
-
+import { useGetRoomServicesQuery } from '../../../apis/roomServiceApi';
+import AddRoomServiceModal from './AddRoomServiceModal';
+import { IRoomService } from '../../../types/roomService';
+import dayjs from 'dayjs';
 interface BookingDetailModalProps {
     open: boolean;
     onClose: () => void;
@@ -13,9 +16,9 @@ interface BookingDetailModalProps {
 }
 
 const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailModalProps) => {
-    console.log(selectedBooking);
     const [confirmCheckIn, { isLoading: confirmCheckInLoading }] = useConfirmCheckInMutation();
     const [confirmCheckOut, { isLoading: confirmCheckOutLoading }] = useConfirmCheckOutMutation();
+    const isToday = dayjs().isBetween(dayjs(selectedBooking?.checkinDate), dayjs(selectedBooking?.checkoutDate));
     const isLoading = confirmCheckInLoading || confirmCheckOutLoading;
     const disabled = isLoading || !selectedBooking;
     const [formattedData, setFormattedData] = React.useState({
@@ -36,6 +39,10 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
         nights: 0,
         images: [] as string[],
     });
+
+    const [openAddRoomServiceModal, setOpenAddRoomServiceModal] = React.useState(false);
+    const [selectedRoomServices, setSelectedRoomServices] = React.useState<IRoomService[]>([]);
+    const { data } = useGetRoomServicesQuery({ page: 1, limit: 100, sortBy: 'serviceName', sortOrder: 'asc' });
 
     React.useEffect(() => {
         if (!selectedBooking) return;
@@ -112,6 +119,19 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
             nights,
             images,
         });
+
+        setSelectedRoomServices(
+            selectedBooking.roomServices.map((service) => ({
+                _id: service.roomServiceId,
+                id: service.roomServiceId,
+                name: service.name,
+                roomServiceId: service.roomServiceId,
+                serviceName: service.serviceName,
+                quantity: service.quantity,
+                description: service.description || '',
+                price: service.price || 0
+            }))
+        );
     }, [selectedBooking]);
 
     const handleForwardStatus = async () => {
@@ -120,16 +140,17 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
         if (selectedBooking.status === 'Pending') {
             await confirmCheckIn(selectedBooking._id).unwrap();
             toast.success('Check in successfully');
-        } else if (selectedBooking.status === 'Checked In') {
+        } else if (selectedBooking.status === 'Checked in') {
             await confirmCheckOut(selectedBooking._id).unwrap();
             toast.success('Check out successfully');
         }
+        onClose();
     }
 
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={() => { onClose(); setSelectedRoomServices([]) }}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -150,7 +171,7 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
                     <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
                         Booking Detail
                     </Typography>
-                    <IconButton onClick={onClose}>
+                    <IconButton onClick={() => { onClose(); setSelectedRoomServices([]) }}>
                         <Close fontSize="small" />
                     </IconButton>
                 </Box>
@@ -284,6 +305,26 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
                                     </Box>
                                 ))}
                             </Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Typography sx={{ fontSize: 16, color: 'black.900', fontWeight: 600 }}>
+                                    Room Services
+                                </Typography>
+                                {selectedBooking?.status === 'Checked in' && <IconButton sx={{ padding: 0, margin: 0, color: 'primary.600', width: 10, height: 10 }} onClick={() => setOpenAddRoomServiceModal(true)}>
+                                    <AddRounded />
+                                </IconButton>}
+                            </Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                {selectedRoomServices.map((service, index) => (
+                                    <Box key={index} sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+                                        <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400 }}>
+                                            {service.name || service.serviceName}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 14, color: 'black.300', fontWeight: 400, textAlign: 'right' }}>
+                                            {service.quantity}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Box>
                         </Box>
                     </Box>
                     {/* Booking Summary */}
@@ -344,10 +385,10 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
                         </Box>
 
                         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, mt: 2, justifyContent: 'flex-end' }}>
-                            <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'rgb(190, 190, 190)' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={disabled}>
+                            <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'rgb(190, 190, 190)' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={() => { onClose(); setSelectedRoomServices([]) }} disabled={disabled}>
                                 Close
                             </Button>
-                            <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleForwardStatus} disabled={disabled}>
+                            <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleForwardStatus} disabled={disabled || (selectedBooking.status === 'Pending' && !isToday)}>
                                 {selectedBooking?.status === 'Pending' ?
                                     'Check In' :
                                     selectedBooking?.status === 'Checked in' ?
@@ -358,8 +399,17 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
                         </Box>
                     </Box>
                 </Box>
+                <AddRoomServiceModal
+                    open={openAddRoomServiceModal}
+                    onClose={() => setOpenAddRoomServiceModal(false)}
+                    selectedRoomServices={selectedRoomServices}
+                    setSelectedRoomServices={setSelectedRoomServices}
+                    roomServices={data}
+                    selectedBooking={selectedBooking}
+                    setOpenAddRoomServiceModal={setOpenAddRoomServiceModal}
+                />
             </Box>
-        </Modal>
+        </Modal >
     );
 };
 

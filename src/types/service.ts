@@ -12,6 +12,7 @@ export interface IServiceType {
   id: string;
   typeName: string;
   description: string | null;
+  roomTypeId: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -56,7 +57,7 @@ export interface IBookingService {
   };
   _id: string;
   id: string;
-  serviceTypeName: string;
+  serviceName: string;
   roomNumber: string;
   checkinDate: string;
   checkoutDate: string;

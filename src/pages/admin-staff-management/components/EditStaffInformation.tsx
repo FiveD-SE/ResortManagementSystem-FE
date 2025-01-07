@@ -13,16 +13,19 @@ interface EditStaffInformationProps {
     onClose: () => void;
     selectedStaffId: string;
     serviceTypeData: IServiceTypeApiResponse | undefined;
+    onRefresh: () => void;
 }
 
 const Roles = ['Receptionist', 'Service Staff'];
 
-const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData }: EditStaffInformationProps) => {
+const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData, onRefresh }: EditStaffInformationProps) => {
     const [name, setName] = React.useState('');
     const [role, setRole] = React.useState('');
     const [serviceType, setServiceType] = React.useState('');
 
     const { data } = useGetUserByIdQuery(selectedStaffId, { skip: !open });
+
+    console.log('data', data);
 
     const [updateUser, { isLoading }] = useUpdateUserMutation();
 
@@ -35,7 +38,7 @@ const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData 
                 setServiceType(serviceTypeName || '');
             }
         }
-    }, [data]);
+    }, [data, serviceTypeData?.docs]);
 
     const handleRoleChange = (newRole: string) => {
         setRole(newRole);
@@ -85,7 +88,6 @@ const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData 
             lastName: name.split(' ').slice(1).join(' '),
             role: selectedRole,
             serviceTypeId: serviceTypeId || '',
-            phone: data?.phone || '',
         };
 
         try {
@@ -93,6 +95,7 @@ const EditStaffInformation = ({ open, onClose, selectedStaffId, serviceTypeData 
             toast.success('User updated successfully');
             onClose();
             resetForm();
+            onRefresh();
         } catch {
             toast.error('Failed to update user');
         }

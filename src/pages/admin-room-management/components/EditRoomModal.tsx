@@ -13,9 +13,10 @@ interface EditRoomModalProps {
     selectedRoom: IRoom | undefined;
     open: boolean;
     onClose: () => void;
+    onRefetch: () => void;
 }
 
-const EditRoomModal = ({ roomTypesData, selectedRoom, open, onClose }: EditRoomModalProps) => {
+const EditRoomModal = ({ roomTypesData, selectedRoom, open, onClose, onRefetch }: EditRoomModalProps) => {
     const [roomNumber, setRoomNumber] = React.useState('');
     const [pricePerNight, setPricePerNight] = React.useState('');
     const [roomType, setRoomType] = React.useState('');
@@ -108,6 +109,7 @@ const EditRoomModal = ({ roomTypesData, selectedRoom, open, onClose }: EditRoomM
             toast.success('Room updated successfully');
             resetForm();
             onClose();
+            onRefetch();
         } catch {
             toast.error('Failed to update room');
         }

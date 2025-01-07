@@ -12,9 +12,10 @@ interface EditServiceModalProps {
     serviceTypeData: IServiceTypeApiResponse | undefined;
     open: boolean;
     onClose: () => void;
+    onRefetch: () => void;
 }
 
-const EditServiceModal = ({ selectedService, serviceTypeData, open, onClose }: EditServiceModalProps) => {
+const EditServiceModal = ({ selectedService, serviceTypeData, open, onClose, onRefetch }: EditServiceModalProps) => {
     const [serviceName, setServiceName] = React.useState('');
     const [price, setPrice] = React.useState('');
     const [serviceType, setServiceType] = React.useState('');
@@ -86,7 +87,8 @@ const EditServiceModal = ({ selectedService, serviceTypeData, open, onClose }: E
             toast.success('Update service successfully');
             onClose();
             resetForm();
-        } catch (error) {
+            onRefetch();
+        } catch {
             toast.error('Update service failed');
         }
     }

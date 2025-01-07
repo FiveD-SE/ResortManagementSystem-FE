@@ -11,11 +11,12 @@ interface AddNewStaffModalProps {
     open: boolean;
     onClose: () => void;
     serviceTypeData: IServiceTypeApiResponse | undefined;
+    onRefresh: () => void;
 }
 
 const Roles = ['Receptionist', 'Service Staff'];
 
-const AddNewStaffModal = ({ open, onClose, serviceTypeData }: AddNewStaffModalProps) => {
+const AddNewStaffModal = ({ open, onClose, serviceTypeData, onRefresh }: AddNewStaffModalProps) => {
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [role, setRole] = React.useState('');
@@ -83,8 +84,9 @@ const AddNewStaffModal = ({ open, onClose, serviceTypeData }: AddNewStaffModalPr
                 toast.success('Staff added successfully');
                 resetForm();
                 onClose();
+                onRefresh();
             }
-        } catch (error) {
+        } catch {
             toast.error('Add staff failed');
         }
     };

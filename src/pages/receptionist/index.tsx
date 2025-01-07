@@ -30,6 +30,7 @@ const Receptionist = () => {
     refetchCheckedOut();
     refetchCount();
   };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 4 }}>
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 2 }}>

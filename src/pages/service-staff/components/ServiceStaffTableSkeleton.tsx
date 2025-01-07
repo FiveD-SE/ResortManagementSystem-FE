@@ -8,7 +8,6 @@ import {
     TableHead,
     TableRow,
     Pagination,
-    FormControl,
     InputAdornment,
     TextField,
 } from "@mui/material";
@@ -28,25 +27,17 @@ const ServiceStaffTableSkeleton = () => {
             >
                 {/* Search and Filter Skeleton */}
                 <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-                    <FormControl variant="outlined" size="small">
-                        <Skeleton
-                            variant="rectangular"
-                            width={180}
-                            height={40}
-                            sx={{ borderRadius: 2 }}
-                        />
-                    </FormControl>
                     <TextField
                         variant="outlined"
                         size="small"
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <Skeleton variant="circular" width={24} height={24} />
+                                    <Skeleton variant="text" width={60} height={32} />
                                 </InputAdornment>
                             ),
                         }}
-                        sx={{ bgcolor: "white" }}
+                        sx={{ bgcolor: "white", width: 200 }}
                         disabled
                     />
                 </Box>

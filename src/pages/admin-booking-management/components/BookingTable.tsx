@@ -74,6 +74,7 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
         checkedIn: 0,
         checkedOut: 0
     });
+
     const rowsPerPage = 10;
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -139,6 +140,15 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
             ...(checkedOutBookings || []),
         ];
     }, [pendingBookingData, checkedInBookingData, checkedOutBookingData]);
+
+    React.useEffect(() => {
+        setCount({
+            all: allBookings.length,
+            pending: pendingBooking.length,
+            checkedIn: checkedInBooking.length,
+            checkedOut: checkedOutBooking.length,
+        });
+    }, [allBookings, pendingBooking, checkedInBooking, checkedOutBooking]);
 
     const getFilteredRows = React.useCallback(() => {
         const docsInCurrentPage = allBookings;
@@ -245,15 +255,6 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
         return Math.ceil(totalResults / rowsPerPage);
     }, [count, tabSelected]);
 
-    React.useEffect(() => {
-        setCount({
-            all: allBookings.length,
-            pending: pendingBooking.length,
-            checkedIn: checkedInBooking.length,
-            checkedOut: checkedOutBooking.length,
-        });
-    }, [allBookings, pendingBooking, checkedInBooking, checkedOutBooking]);
-
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', paddingX: 2, gap: 2 }}>
@@ -273,14 +274,14 @@ const BookingTable = ({ pendingBookingData, checkedInBookingData, checkedOutBook
                             endIcon={<CalendarMonth />}
                             onClick={(event) => handleCalendarOpen('daily', event)}
                         >
-                            Daily
+                            Date Range
                         </Button>
                         <Button
                             sx={getButtonStyles(bookingDate === 'monthly')}
                             endIcon={<CalendarMonth />}
                             onClick={(event) => handleCalendarOpen('monthly', event)}
                         >
-                            Monthly
+                            Month View
                         </Button>
                     </Box>
                 </Box>

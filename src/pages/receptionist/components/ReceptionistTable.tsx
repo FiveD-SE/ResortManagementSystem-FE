@@ -13,6 +13,7 @@ import {
   MenuItem,
   IconButton,
   Menu,
+  TextField,
 } from '@mui/material';
 import { Apps, PaidRounded, PendingActionsRounded } from '@mui/icons-material';
 import BookingDetailModal from './BookingDetailModal';
@@ -69,16 +70,11 @@ const ReceptionistTable = ({
   const [anchorEl, setAnchorEl] = React.useState<{ [key: string]: HTMLElement | null }>({});
   const [tabSelected, setTabSelected] = React.useState(0);
   const [selectedBooking, setSelectedBooking] = React.useState<IBooking>();
-  const [count, setCount] = React.useState({
-    all: 0,
-    pending: 0,
-    checkedIn: 0,
-    checkedOut: 0,
-  });
   const [currentPage, setCurrentPage] = React.useState<number>(1);
   const [pendingBooking, setPendingBooking] = React.useState<IBookingRow[]>([]);
   const [checkedInBooking, setCheckedInBooking] = React.useState<IBookingRow[]>([]);
   const [checkedOutBooking, setCheckedOutBooking] = React.useState<IBookingRow[]>([]);
+  const [search, setSearch] = React.useState('');
 
   const handleSelectBooking = (id: string, status: string) => {
     if (status === 'Pending') {
@@ -132,26 +128,41 @@ const ReceptionistTable = ({
 
     setCheckedOutBooking(checkedOutBookings || []);
 
-    const totalAll = (pendingBookings?.length || 0) + (checkedInBookings?.length || 0) + (checkedOutBookings?.length || 0);
-    const totalPending = pendingBookings?.length || 0;
-    const totalCheckedIn = checkedInBookings?.length || 0;
-    const totalCheckedOut = checkedOutBookings?.length || 0;
-
-    setCount({
-      all: Math.ceil(totalAll / 10),
-      pending: Math.ceil(totalPending / 10),
-      checkedIn: Math.ceil(totalCheckedIn / 10),
-      checkedOut: Math.ceil(totalCheckedOut / 10),
-    });
-
     return [...(pendingBookings || []), ...(checkedInBookings || []), ...(checkedOutBookings || [])];
   }, [pendingBookingData, checkedInBookingData, checkedOutBookingData]);
 
   const getFilteredRows = React.useCallback(() => {
-    const docsInCurrentPage = allBookings.slice((currentPage - 1) * 10, currentPage * 10);
-    const pendingBookingsInCurrentPage = pendingBooking.slice((currentPage - 1) * 10, currentPage * 10);
-    const checkedInBookingsInCurrentPage = checkedInBooking.slice((currentPage - 1) * 10, currentPage * 10);
-    const checkedOutBookingsInCurrentPage = checkedOutBooking?.slice((currentPage - 1) * 10, currentPage * 10);
+    const lowerCaseSearch = search.toLowerCase();
+
+    const filteredBookings = allBookings.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    );
+
+    const docsInCurrentPage = filteredBookings.slice((currentPage - 1) * 10, currentPage * 10);
+
+    const filteredPending = pendingBooking.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    );
+    const pendingBookingsInCurrentPage = filteredPending.slice((currentPage - 1) * 10, currentPage * 10);
+
+    const filteredCheckedIn = checkedInBooking.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    );
+    const checkedInBookingsInCurrentPage = filteredCheckedIn.slice((currentPage - 1) * 10, currentPage * 10);
+
+    const filteredCheckedOut = checkedOutBooking.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    );
+    const checkedOutBookingsInCurrentPage = filteredCheckedOut.slice((currentPage - 1) * 10, currentPage * 10);
+
     return tabSelected === 0
       ? docsInCurrentPage
       : tabSelected === 1
@@ -159,7 +170,7 @@ const ReceptionistTable = ({
         : tabSelected === 2
           ? checkedInBookingsInCurrentPage
           : checkedOutBookingsInCurrentPage;
-  }, [allBookings, currentPage, tabSelected, pendingBooking, checkedInBooking, checkedOutBooking]);
+  }, [allBookings, pendingBooking, checkedInBooking, checkedOutBooking, currentPage, tabSelected, search]);
 
   const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
 
@@ -201,23 +212,24 @@ const ReceptionistTable = ({
           console.error('Checkout failed:', error);
         });
     } else if (action === 'View Detail') {
-      setSelectedBooking(
+      const selectedBooking =
         tabSelected === 0
           ? allBookings.find((booking) => booking.id === row.id)
           : tabSelected === 1
             ? pendingBookingData?.docs.find((booking) => booking.id === row.id)
             : tabSelected === 2
               ? checkedInBookingData?.docs.find((booking) => booking.id === row.id)
-              : checkedOutBookingData?.docs.find((booking) => booking.id === row.id),
-      );
+              : checkedOutBookingData?.docs.find((booking) => booking.id === row.id);
+      setSelectedBooking(selectedBooking as IBooking);
       setOpen(true);
     }
     handleMenuClose(row.id);
   };
 
   const getMenuItems = (status: string) => {
+    const isToday = dayjs().isBetween(dayjs(selectedBooking?.checkinDate), dayjs(selectedBooking?.checkoutDate));
     if (status === 'Pending') {
-      return ['View Detail', 'Check In'];
+      return isToday ? ['View Detail', 'Check In'] : ['View Detail'];
     } else if (status === 'Checked in') {
       return ['View Detail', 'Check Out'];
     } else if (status === 'Checked out') {
@@ -225,6 +237,54 @@ const ReceptionistTable = ({
     }
     return [];
   };
+
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
+
+  const filteredCounts = React.useMemo(() => {
+    const lowerCaseSearch = search.toLowerCase();
+
+    const totalFiltered = allBookings.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    ).length;
+
+    const totalPendingFiltered = pendingBooking.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    ).length;
+
+    const totalCheckedInFiltered = checkedInBooking.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    ).length;
+
+    const totalCheckedOutFiltered = checkedOutBooking.filter((booking) =>
+      booking.customerName.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomNumber.toLowerCase().includes(lowerCaseSearch) ||
+      booking.roomType.toLowerCase().includes(lowerCaseSearch)
+    ).length;
+
+    return {
+      all: Math.ceil(totalFiltered / 10),
+      pending: Math.ceil(totalPendingFiltered / 10),
+      checkedIn: Math.ceil(totalCheckedInFiltered / 10),
+      checkedOut: Math.ceil(totalCheckedOutFiltered / 10),
+    };
+  }, [allBookings, pendingBooking, checkedInBooking, checkedOutBooking, search]);
+
+  const count = tabSelected === 0
+    ? filteredCounts.all
+    : tabSelected === 1
+      ? filteredCounts.pending
+      : tabSelected === 2
+        ? filteredCounts.checkedIn
+        : filteredCounts.checkedOut;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -272,6 +332,41 @@ const ReceptionistTable = ({
             disableRipple
           />
         </Tabs>
+
+        {/* Search and Button */}
+        <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+          {/* Search */}
+          <TextField
+            id="search"
+            label="Search"
+            variant="outlined"
+            size="small"
+            value={search}
+            onChange={handleSearchChange}
+            sx={{
+              bgcolor: "white",
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 2,
+                "& fieldset": {
+                  borderColor: "gray.200",
+                },
+                "&:hover fieldset": {
+                  borderColor: "gray.200",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.500",
+                  borderWidth: 1.5,
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "gray.500",
+                "&.Mui-focused": {
+                  color: "primary.500",
+                },
+              },
+            }}
+          />
+        </Box>
       </Box>
 
       <Box sx={{ minHeight: '85vh', borderRadius: 2, border: '1px solid rgb(222, 222, 222)' }}>
@@ -361,15 +456,7 @@ const ReceptionistTable = ({
       </Box>
 
       <Pagination
-        count={
-          tabSelected === 0
-            ? count.all
-            : tabSelected === 1
-              ? count.pending
-              : tabSelected === 2
-                ? count.checkedIn
-                : count.checkedOut
-        }
+        count={count}
         variant="outlined"
         shape="rounded"
         sx={{ marginTop: 2, alignSelf: 'flex-end' }}

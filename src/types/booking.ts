@@ -2,6 +2,7 @@ import { ICustomer } from './customer';
 import { PaymentMethod } from './enums';
 import { IPromotion } from './promotion';
 import { IBookingRoom } from './room';
+import { IRoomService } from './roomService';
 import { IBookingService } from './service';
 
 export interface IBooking {
@@ -27,6 +28,7 @@ export interface IBooking {
   updatedAt: Date;
   __v: number;
   id: string;
+  roomServices: IRoomService[];
 }
 
 export interface IBookingApiRequest {

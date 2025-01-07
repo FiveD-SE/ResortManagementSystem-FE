@@ -8,7 +8,6 @@ import {
     TableHead,
     TableRow,
     Pagination,
-    FormControl,
     InputAdornment,
     TextField,
 } from "@mui/material";
@@ -28,14 +27,6 @@ const ReceptionistTableSkeleton = () => {
             >
                 {/* Search and Filter Skeleton */}
                 <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-                    <FormControl variant="outlined" size="small">
-                        <Skeleton
-                            variant="rectangular"
-                            width={180}
-                            height={40}
-                            sx={{ borderRadius: 2 }}
-                        />
-                    </FormControl>
                     <TextField
                         variant="outlined"
                         size="small"

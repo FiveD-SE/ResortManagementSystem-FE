@@ -3,7 +3,7 @@ import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, T
 import React from 'react';
 import { AddNewServiceTypeModal } from './AddNewServiceTypeModal';
 import { EditServiceTypeModal } from './EditServiceTypeModal';
-import { IServiceApiResponse, IServiceType, IServiceTypeApiResponse } from '../../../types';
+import { IRoomTypeApiResponse, IServiceApiResponse, IServiceType, IServiceTypeApiResponse } from '../../../types';
 import PopupModal from '../../../components/PopupModal';
 import { useDeleteServiceTypeMutation } from '../../../apis/serviceTypeApi';
 import toast from 'react-hot-toast';
@@ -13,44 +13,49 @@ interface ServiceTypeManagementProps {
     serviceData: IServiceApiResponse | undefined;
     serviceTypeData: IServiceTypeApiResponse | undefined;
     onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
+    roomTypesData: IRoomTypeApiResponse | undefined;
+    onRefetch: () => void;
 }
 
-const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageChange }: ServiceTypeManagementProps) => {
+const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageChange, roomTypesData, onRefetch }: ServiceTypeManagementProps) => {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
     const [openAddNewServiceType, setOpenAddNewServiceType] = React.useState(false);
     const [openEditServiceType, setOpenEditServiceType] = React.useState(false);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [selectedServiceType, setSelectedServiceType] = React.useState<IServiceType>();
-    const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
-    const [search, setSearch] = React.useState<string>('');
+    const [searchServiceType, setSearchServiceType] = React.useState<string>('');
+    const [openDeleteServiceTypeModal, setOpenDeleteServiceTypeModal] = React.useState(false);
 
-    const [deleteServiceType, { isLoading }] = useDeleteServiceTypeMutation();
+    const [deleteServiceType, { isLoading: deleServiceTypeLoading }] = useDeleteServiceTypeMutation();
 
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: any) => {
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, row: unknown) => {
         setAnchorEl(event.currentTarget);
-        setSelectedServiceType(row);
+        setSelectedServiceType(row as IServiceType);
     }
+
 
     const filterServiceTypes = React.useMemo(() => {
         if (!serviceTypeData?.docs) return [];
-        const searchLower = search.toLowerCase();
+        const searchLower = searchServiceType.toLowerCase();
         return serviceTypeData.docs.filter(
             (row) =>
                 row.typeName.toLowerCase().includes(searchLower) ||
                 (row.description?.toLowerCase().includes(searchLower) || '')
         );
-    }, [serviceTypeData, search]);
+    }, [serviceTypeData, searchServiceType]);
 
     const handleDeleteServiceType = async () => {
         if (!selectedServiceType) return;
         try {
             await deleteServiceType(selectedServiceType.id).unwrap();
             toast.success('Service type deleted successfully');
-            setOpenDeleteModal(false);
-        } catch (error) {
+            setOpenDeleteServiceTypeModal(false);
+            onRefetch();
+        } catch {
             toast.error('Failed to delete service type');
         }
     }
@@ -78,7 +83,7 @@ const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageCha
             </Typography>
 
             {/* Search and Button */}
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: 2 }}>
                 {/* Search */}
                 <TextField
                     id="search"
@@ -106,9 +111,10 @@ const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageCha
                                 color: 'primary.500',
                             },
                         },
+                        width: '40%',
                     }}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    value={searchServiceType}
+                    onChange={(e) => setSearchServiceType(e.target.value)}
                 />
                 {/* Button */}
                 <Button
@@ -189,7 +195,7 @@ const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageCha
                                     Edit
                                 </MenuItem>
                                 <MenuItem onClick={() => {
-                                    setOpenDeleteModal(true);
+                                    setOpenDeleteServiceTypeModal(true);
                                     handleMenuClose();
                                 }}>
                                     Delete
@@ -208,17 +214,17 @@ const ServiceTypeManagement = ({ serviceTypeData, onManageServiceType, onPageCha
                 onChange={onPageChange}
             />
 
-            <AddNewServiceTypeModal open={openAddNewServiceType} onClose={() => setOpenAddNewServiceType(false)} />
-            <EditServiceTypeModal open={openEditServiceType} onClose={() => setOpenEditServiceType(false)} selectedServiceType={selectedServiceType} />
+            <AddNewServiceTypeModal open={openAddNewServiceType} onClose={() => setOpenAddNewServiceType(false)} roomTypesData={roomTypesData} onRefetch={onRefetch} />
+            <EditServiceTypeModal open={openEditServiceType} onClose={() => setOpenEditServiceType(false)} selectedServiceType={selectedServiceType} roomTypesData={roomTypesData} onRefetch={onRefetch} />
 
             <PopupModal
                 type='delete'
-                open={openDeleteModal}
-                onClose={() => setOpenDeleteModal(false)}
+                open={openDeleteServiceTypeModal}
+                onClose={() => setOpenDeleteServiceTypeModal(false)}
                 title='Delete Service Type'
                 message='Are you sure you want to delete this service type?'
                 onConfirm={handleDeleteServiceType}
-                isLoading={isLoading}
+                isLoading={deleServiceTypeLoading}
             />
         </Box>
     )

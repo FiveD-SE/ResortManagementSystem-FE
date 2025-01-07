@@ -2,86 +2,56 @@ import { Close } from '@mui/icons-material';
 import { Box, IconButton, Modal, Typography, TextField, Button, CircularProgress } from '@mui/material';
 import React from 'react'
 import CustomInputForm from '../../../components/CustomInputForm';
-import { IRoomTypeApiResponse, IServiceType } from '../../../types';
-import { useUpdateServiceTypeMutation } from '../../../apis/serviceTypeApi';
 import toast from 'react-hot-toast';
-import CustomSelectingForm from '../../../components/CustomSelectingForm';
+import { useCreateRoomServiceMutation } from '../../../apis/roomServiceApi';
 
-interface EditServiceTypeModalProps {
-    selectedServiceType: IServiceType | undefined;
+interface AddNewRoomServiceModalProps {
     open: boolean;
     onClose: () => void;
-    roomTypesData: IRoomTypeApiResponse | undefined;
     onRefetch: () => void;
 }
 
-export const EditServiceTypeModal = ({ selectedServiceType, open, onClose, roomTypesData, onRefetch }: EditServiceTypeModalProps) => {
-    const [typeName, setTypeName] = React.useState<string>('');
-    const [description, setDescription] = React.useState<string>('');
-    const [selectedRoomType, setSelectedRoomType] = React.useState<string>('');
-    const options = React.useMemo(() => {
-        if (!roomTypesData?.docs) return [];
-        return roomTypesData.docs.map((roomType) => ({
-            label: roomType.typeName,
-            value: roomType.id,
-        }));
-    }, [roomTypesData]);
-
-    React.useEffect(() => {
-        if (selectedServiceType) {
-            setTypeName(selectedServiceType.typeName);
-            setDescription(selectedServiceType.description || '');
-            const roomType = roomTypesData?.docs.find((roomType) => roomType.id === selectedServiceType.roomTypeId);
-            setSelectedRoomType(roomType?.typeName || '');
-        }
-    }, [roomTypesData?.docs, selectedServiceType]);
-
-    const [updateServiceTypeMutation, { isLoading }] = useUpdateServiceTypeMutation();
+export const AddNewRoomServiceModal = ({ open, onClose, onRefetch }: AddNewRoomServiceModalProps) => {
+    const [price, setPrice] = React.useState('');
+    const [description, setDescription] = React.useState('');
+    const [roomServiceName, setRoomServiceName] = React.useState('');
+    const [createRoomService, { isLoading }] = useCreateRoomServiceMutation();
 
     const validateForm = () => {
-        if (typeName === '') {
-            toast.error('Service type name is required');
+        if (!roomServiceName) {
+            toast.error('Room service name is required');
+            return false;
+        }
+        if (!price) {
+            toast.error('Price is required');
             return false;
         }
         return true;
     }
 
     const resetForm = () => {
-        setTypeName('');
+        setPrice('');
         setDescription('');
     }
 
-    const handleUpdateServiceType = async () => {
+    const handleCreateRoomService = async () => {
         if (!validateForm()) return;
 
-        const roomTypeId = roomTypesData?.docs.find((roomType) => roomType.typeName === selectedRoomType)?.id;
-
-        if (!roomTypeId) {
-            toast.error('Room type is required');
-            return;
-        }
-
         try {
-            const data = {
-                id: selectedServiceType?.id || '',
-                typeName: typeName,
-                description: description,
-                roomTypeId: roomTypeId,
-            }
-            await updateServiceTypeMutation(data).unwrap();
-            toast.success('Service type updated successfully');
+            await createRoomService({ serviceName: roomServiceName, description, price: parseFloat(price) });
+            toast.success('Room service created successfully');
             onClose();
             resetForm();
             onRefetch();
         } catch {
-            toast.error('Failed to update service type');
+            toast.error('Failed to create room service');
         }
     }
 
     return (
         <Modal
             open={open}
-            onClose={onClose}
+            onClose={() => { onClose(); resetForm() }}
         >
             <Box
                 sx={{
@@ -98,7 +68,7 @@ export const EditServiceTypeModal = ({ selectedServiceType, open, onClose, roomT
             >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography sx={{ fontSize: 18, fontWeight: 600, color: 'black.900' }}>
-                        Update service type
+                        Add new room service
                     </Typography>
                     <IconButton onClick={onClose}>
                         <Close fontSize="small" />
@@ -108,18 +78,18 @@ export const EditServiceTypeModal = ({ selectedServiceType, open, onClose, roomT
                 <Box sx={{ padding: 2, borderRadius: 2, border: '1px solid #D2D3D7', marginTop: 2 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                         <CustomInputForm
-                            label="Service type name"
-                            placeholder="Enter service type name"
-                            value={typeName}
-                            onChange={(e) => setTypeName(e.target.value)}
+                            label="Room service name"
+                            placeholder="Enter room service name"
+                            value={roomServiceName}
+                            onChange={(e) => setRoomServiceName(e.target.value)}
                             type="text"
                         />
-                        <CustomSelectingForm
-                            label="Room type"
-                            placeholder="Select room type"
-                            value={selectedRoomType}
-                            onChange={(e) => setSelectedRoomType(e.target.value)}
-                            options={options.map((option) => (option.label))}
+                        <CustomInputForm
+                            label="Price"
+                            placeholder="Enter price"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            type="number"
                         />
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
@@ -159,8 +129,8 @@ export const EditServiceTypeModal = ({ selectedServiceType, open, onClose, roomT
                     <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'black.900' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={onClose} disabled={isLoading}>
                         Cancel
                     </Button>
-                    <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleUpdateServiceType} disabled={isLoading}>
-                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Save'}
+                    <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleCreateRoomService} disabled={isLoading}>
+                        {isLoading ? <CircularProgress size={24} sx={{ color: 'white.50' }} /> : 'Add Room Service'}
                     </Button>
                 </Box>
             </Box>

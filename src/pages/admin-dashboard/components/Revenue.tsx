@@ -9,6 +9,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { IYearlyRevenue } from "../../../types/statistic";
+import { formatPrice } from "../../../utils";
 
 interface RevenueData {
     month: string;
@@ -36,11 +37,11 @@ const Revenue = ({ yearlyRevenue }: RevenueProps) => {
 
     const formatValue = (value: number): string => {
         if (value >= 1_000_000_000) {
-            return `${(value / 1_000_000_000)} billion`;
+            return `${(value / 1_000_000_000)}B`;
         } else if (value >= 1_000_000) {
-            return `${(value / 1_000_000)} million`;
+            return `${(value / 1_000_000)}M`;
         } else if (value >= 1_000) {
-            return `${(value / 1_000)} thousand`;
+            return `${(value / 1_000)}K`;
         }
         return `${value}`;
     };
@@ -105,7 +106,7 @@ const Revenue = ({ yearlyRevenue }: RevenueProps) => {
                             fontWeight={500}
                             stroke="#000000"
                             tickLine={{ stroke: '#000000', strokeWidth: 1 }}
-                            tickFormatter={formatValue}
+                            tickFormatter={(value) => formatValue(value)}
                         />
                         <Tooltip
                             cursor={{ stroke: '#000000', strokeWidth: 1 }}
@@ -119,7 +120,7 @@ const Revenue = ({ yearlyRevenue }: RevenueProps) => {
                             labelFormatter={(value) =>
                                 `Revenue ${value.toLowerCase()}`
                             }
-                            formatter={(value: number) => formatValue(value)}
+                            formatter={(value: number) => formatPrice(value)}
                         />
                         <Legend
                             verticalAlign="middle"
@@ -154,7 +155,7 @@ const Revenue = ({ yearlyRevenue }: RevenueProps) => {
                                             />
 
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                <Typography variant="body1" color="#000000" fontWeight={600}>${formatValue(yearlyRevenue?.currentYearRevenue)}</Typography>
+                                                <Typography variant="body1" color="#000000" fontWeight={600}>{formatPrice(yearlyRevenue?.currentYearRevenue)}</Typography>
                                                 <Typography variant="body2" color="#C2C2C2">This year</Typography>
                                             </Box>
                                         </Box>
@@ -188,7 +189,7 @@ const Revenue = ({ yearlyRevenue }: RevenueProps) => {
                                                 }}
                                             />
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                <Typography variant="body1" color="#000000" fontWeight={600}>${formatValue(yearlyRevenue?.lastYearRevenue)}</Typography>
+                                                <Typography variant="body1" color="#000000" fontWeight={600}>{formatPrice(yearlyRevenue?.lastYearRevenue)}</Typography>
                                                 <Typography variant="body2" color="#C2C2C2">Last year</Typography>
                                             </Box>
                                         </Box>

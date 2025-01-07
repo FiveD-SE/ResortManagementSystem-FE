@@ -43,9 +43,10 @@ const tabIconStyle = {
 interface RoomTableProps {
   roomsData: IRoomApiResponse | undefined;
   roomTypesData: IRoomTypeApiResponse | undefined;
+  onRefetch: () => void;
 }
 
-const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
+const RoomTable = ({ roomsData, roomTypesData, onRefetch }: RoomTableProps) => {
   const [openAddNewRoomModal, setOpenAddNewRoomModal] = React.useState(false);
   const [openEditRoomModal, setOpenEditRoomModal] = React.useState(false);
   const [tabSelected, setTabSelected] = React.useState<number>(0);
@@ -115,6 +116,9 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
     try {
       await deleteRoomMutation(selectedRoom.id).unwrap();
       toast.success('Room deleted successfully');
+      onRefetch();
+      setOpenDeleteRoomModal(false);
+      setAnchorEl(null);
     } catch {
       toast.error('Failed to delete room');
     } finally {
@@ -328,12 +332,14 @@ const RoomTable = ({ roomsData, roomTypesData }: RoomTableProps) => {
         open={openAddNewRoomModal}
         onClose={() => setOpenAddNewRoomModal(false)}
         roomTypesData={roomTypesData}
+        onRefetch={onRefetch}
       />
       <EditRoomModal
         open={openEditRoomModal}
         onClose={() => setOpenEditRoomModal(false)}
         roomTypesData={roomTypesData}
         selectedRoom={selectedRoom}
+        onRefetch={onRefetch}
       />
 
       <PopupModal
