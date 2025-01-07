@@ -91,7 +91,24 @@ export const authApi = createApi({
         },
       }),
     }),
+    sendVerifyEmail: builder.mutation({
+      query: ({ email }) => ({
+        url: '/email/verify-account',
+        method: 'POST',
+        data: {
+          email,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useChangePasswordMutation, useMeQuery, useForgotPasswordMutation, useResetPasswordMutation } = authApi;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useChangePasswordMutation,
+  useMeQuery,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useSendVerifyEmailMutation,
+} = authApi;
