@@ -227,8 +227,9 @@ const ReceptionistTable = ({
   };
 
   const getMenuItems = (status: string) => {
+    const isToday = dayjs().isBetween(dayjs(selectedBooking?.checkinDate), dayjs(selectedBooking?.checkoutDate));
     if (status === 'Pending') {
-      return ['View Detail', 'Check In'];
+      return isToday ? ['View Detail', 'Check In'] : ['View Detail'];
     } else if (status === 'Checked in') {
       return ['View Detail', 'Check Out'];
     } else if (status === 'Checked out') {
@@ -236,6 +237,7 @@ const ReceptionistTable = ({
     }
     return [];
   };
+
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);

@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { useGetRoomServicesQuery } from '../../../apis/roomServiceApi';
 import AddRoomServiceModal from './AddRoomServiceModal';
 import { IRoomService } from '../../../types/roomService';
+import dayjs from 'dayjs';
 interface BookingDetailModalProps {
     open: boolean;
     onClose: () => void;
@@ -17,6 +18,7 @@ interface BookingDetailModalProps {
 const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailModalProps) => {
     const [confirmCheckIn, { isLoading: confirmCheckInLoading }] = useConfirmCheckInMutation();
     const [confirmCheckOut, { isLoading: confirmCheckOutLoading }] = useConfirmCheckOutMutation();
+    const isToday = dayjs().isBetween(dayjs(selectedBooking?.checkinDate), dayjs(selectedBooking?.checkoutDate));
     const isLoading = confirmCheckInLoading || confirmCheckOutLoading;
     const disabled = isLoading || !selectedBooking;
     const [formattedData, setFormattedData] = React.useState({
@@ -41,7 +43,6 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
     const [openAddRoomServiceModal, setOpenAddRoomServiceModal] = React.useState(false);
     const [selectedRoomServices, setSelectedRoomServices] = React.useState<IRoomService[]>([]);
     const { data } = useGetRoomServicesQuery({ page: 1, limit: 100, sortBy: 'serviceName', sortOrder: 'asc' });
-
 
     React.useEffect(() => {
         if (!selectedBooking) return;
@@ -387,7 +388,7 @@ const BookingDetailModal = ({ open, onClose, selectedBooking }: BookingDetailMod
                             <Button sx={{ width: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'white.50', color: '#5C5C5C', border: '1px solid #E0E0E0', ":hover": { borderColor: 'rgb(190, 190, 190)' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100' } }} onClick={() => { onClose(); setSelectedRoomServices([]) }} disabled={disabled}>
                                 Close
                             </Button>
-                            <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleForwardStatus} disabled={disabled}>
+                            <Button sx={{ minWidth: 100, fontSize: 14, fontWeight: 600, textTransform: 'none', padding: '8px 24px', bgcolor: 'primary.500', color: 'white.50', border: '1px solid #FF385C', ":hover": { bgcolor: 'primary.600' }, borderRadius: 2, ":disabled": { color: 'gray.200', bgcolor: 'gray.100', borderColor: 'gray.100' } }} onClick={handleForwardStatus} disabled={disabled || (selectedBooking.status === 'Pending' && !isToday)}>
                                 {selectedBooking?.status === 'Pending' ?
                                     'Check In' :
                                     selectedBooking?.status === 'Checked in' ?
