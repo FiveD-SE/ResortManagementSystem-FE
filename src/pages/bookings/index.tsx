@@ -253,7 +253,7 @@ const Bookings = () => {
               checkInDate={checkInDate}
               checkOutDate={checkOutDate}
               discount={selectedPromotion?.discount || 0}
-              services={selectedServices.map((service) => service.service)}
+              services={selectedServices}
             />
           </Grid>
         </Grid>
