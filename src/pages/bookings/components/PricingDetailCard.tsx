@@ -9,7 +9,7 @@ interface PricingDetailCardProps {
   checkInDate: Dayjs | null;
   checkOutDate: Dayjs | null;
   discount: number;
-  services: IService[];
+  services: { service: IService; quantity: number }[];
 }
 
 const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, services }: PricingDetailCardProps) => {
@@ -20,7 +20,7 @@ const PricingDetailCard = ({ roomDetail, checkInDate, checkOutDate, discount, se
   const nights = checkInDate && checkOutDate ? dayjs(checkOutDate).diff(dayjs(checkInDate), 'day') : 0;
 
   const roomPrice = roomDetail ? roomDetail.room.pricePerNight * nights : 0;
-  const serviceFee = services.reduce((acc, service) => acc + service.price, 0);
+  const serviceFee = services.reduce((acc, service) => acc + service.service.price * service.quantity, 0);
   const discountAmount = roomPrice * (discount / 100);
   const totalPrice = roomPrice - discountAmount + serviceFee;
 

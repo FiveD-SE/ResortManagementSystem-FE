@@ -1,7 +1,6 @@
 import { Avatar, Box, Divider, Stack, Typography } from '@mui/material';
 import { IBooking } from '../../../../types/booking';
 import { formatPrice } from '../../../../utils';
-import dayjs from 'dayjs';
 
 interface IProps {
   data: IBooking | null;
@@ -10,7 +9,10 @@ interface IProps {
 const PricingCard = (props: IProps) => {
   const { data } = props;
   const roomPrice = data?.roomId.pricePerNight || 0;
-  const nights = data?.checkinDate && data?.checkoutDate ? dayjs(data.checkoutDate).diff(dayjs(data.checkinDate), 'day') : 0;
+  const checkinDate = data?.checkinDate ? new Date(data.checkinDate) : null;
+  const checkoutDate = data?.checkoutDate ? new Date(data.checkoutDate) : null;
+  const nights =
+    checkinDate && checkoutDate ? Math.ceil((checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
   const totalServiceFee = data?.services?.reduce((acc, service) => acc + service.serviceId.price * service.quantity, 0) || 0;
   const totalDiscount = data?.promotionId?.discount ? (((roomPrice ?? 0) * data?.promotionId?.discount) / 100) * nights : 0;
   const totalAmount = (roomPrice ?? 0) * nights + totalServiceFee - totalDiscount;
