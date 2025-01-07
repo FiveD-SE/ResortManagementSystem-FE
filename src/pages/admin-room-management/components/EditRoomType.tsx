@@ -11,9 +11,10 @@ import { usePatchRoomTypeMutation } from '../../../apis/roomTypeApi';
 interface EditRoomTypeProps {
     onEditRoomType: () => void;
     roomType: IRoomType | undefined;
+    onRefetch: () => void;
 }
 
-const EditRoomType = ({ onEditRoomType, roomType }: EditRoomTypeProps) => {
+const EditRoomType = ({ onEditRoomType, roomType, onRefetch }: EditRoomTypeProps) => {
     const [typeName, setTypeName] = React.useState<string>(roomType?.typeName || '');
     const [basePrice, setBasePrice] = React.useState(roomType?.basePrice.toString() || '');
     const [guestAmount, setGuestAmount] = React.useState(roomType?.guestAmount.toString() || '');
@@ -86,6 +87,7 @@ const EditRoomType = ({ onEditRoomType, roomType }: EditRoomTypeProps) => {
         if (res) {
             toast.success('Edit room type successfully');
             onEditRoomType();
+            onRefetch();
         }
     }
 

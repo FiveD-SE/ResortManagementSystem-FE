@@ -11,21 +11,51 @@ import ServiceTableSkeleton from "./components/ServiceTableSkeleton"
 import { useGetServiceCountByServiceTypeQuery } from "../../apis/adminDashboardApi"
 import { useExportServiceExcelMutation } from "../../apis/exportApi"
 import toast from "react-hot-toast"
+import { useGetRoomTypesQuery } from "../../apis/roomTypeApi"
+import { useGetRoomServicesQuery } from "../../apis/roomServiceApi"
 
 const ServiceManagement = () => {
     const [disable, setDisable] = React.useState(false);
     const [servicePage, setServicePage] = React.useState(1);
     const [serviceTypePage, setServiceTypePage] = React.useState(1);
-    const { data: serviceData, isLoading: serviceLoading } = useGetServicesQuery({
+    const {
+        data: serviceData,
+        isLoading: serviceLoading,
+        refetch: refetchService
+    } = useGetServicesQuery({
         page: servicePage,
         limit: 10,
         sort: 'asc'
     });
-    const { data: serviceTypeData } = useGetServiceTypesQuery({
+    const {
+        data: serviceTypeData,
+        refetch: refetchServiceType
+    } = useGetServiceTypesQuery({
         page: serviceTypePage,
         limit: 10,
         sort: 'asc'
     });
+    const {
+        data: roomTypesData,
+        refetch: refetchRoomTypes
+    } = useGetRoomTypesQuery({
+        page: 1,
+        limit: 100
+    });
+    const {
+        data: roomServicesData,
+        refetch: refetchRoomServices
+    } = useGetRoomServicesQuery({
+        page: 1,
+        limit: 100
+    });
+
+    const handleRefetch = () => {
+        refetchService();
+        refetchServiceType();
+        refetchRoomTypes();
+        refetchRoomServices();
+    }
 
     const handleServicePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         setServicePage(value);
@@ -97,6 +127,8 @@ const ServiceManagement = () => {
                             serviceData={serviceData}
                             serviceTypeData={serviceTypeData}
                             onPageChange={handleServicePageChange}
+                            roomServicesData={roomServicesData}
+                            onRefetch={handleRefetch}
                         />
                     ) : (
                         <ServiceTableSkeleton />
@@ -108,6 +140,8 @@ const ServiceManagement = () => {
                     serviceData={serviceData}
                     serviceTypeData={serviceTypeData}
                     onPageChange={handleServiceTypePageChange}
+                    roomTypesData={roomTypesData}
+                    onRefetch={handleRefetch}
                 />
             )}
         </Box>

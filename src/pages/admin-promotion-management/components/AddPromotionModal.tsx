@@ -8,9 +8,10 @@ import toast from 'react-hot-toast';
 interface AddPromotionModalProps {
     open: boolean;
     onClose: () => void;
+    onRefetch: () => void;
 }
 
-const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
+const AddPromotionModal = ({ open, onClose, onRefetch }: AddPromotionModalProps) => {
     const [promotionName, setPromotionName] = React.useState('');
     const [description, setDescription] = React.useState('');
     const [discount, setDiscount] = React.useState('');
@@ -66,6 +67,7 @@ const AddPromotionModal = ({ open, onClose }: AddPromotionModalProps) => {
             toast.success('Create promotion successfully');
             onClose();
             resetForm();
+            onRefetch();
         } catch {
             toast.error('Create promotion failed');
         }

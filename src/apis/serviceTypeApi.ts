@@ -24,7 +24,11 @@ export const serviceTypeApi = createApi({
             query: (data) => ({
                 url: '/',
                 method: 'POST',
-                data,
+                data: {
+                    typeName: data.typeName,
+                    description: data.description,
+                    roomTypeId: data.roomTypeId,
+                },
             }),
         }),
         updateServiceType: builder.mutation<IServiceType, Omit<IServiceType, 'createdAt' | 'updatedAt'>>({
@@ -33,7 +37,8 @@ export const serviceTypeApi = createApi({
                 method: 'PATCH',
                 data: {
                     typeName: data.typeName,
-                    description: data.description
+                    description: data.description,
+                    roomTypeId: data.roomTypeId,
                 },
             }),
         }),

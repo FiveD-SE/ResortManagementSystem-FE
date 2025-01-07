@@ -11,10 +11,22 @@ import { useExportStaffExcelMutation } from "../../apis/exportApi"
 
 const StaffManagement = () => {
     const [page, setPage] = React.useState<number>(1)
-    const { data: ReceptionistData, isLoading: isLoadingReceptionist } = useAdminGetUsersByRoleQuery({ role: Role.Receptionist, sortOrder: 'asc', sortBy: UserSortBy.FirstName, page: page, limit: 10 })
-    const { data: ServiceStaffData, isLoading: isLoadingServiceStaff } = useAdminGetUsersByRoleQuery({ role: Role.ServiceStaff, sortOrder: 'asc', sortBy: UserSortBy.FirstName, page: page, limit: 10 })
+    const {
+        data: ReceptionistData,
+        isLoading: isLoadingReceptionist,
+        refetch: refetchReceptionist
+    } = useAdminGetUsersByRoleQuery({ role: Role.Receptionist, sortOrder: 'asc', sortBy: UserSortBy.FirstName, page: page, limit: 10 })
+    const {
+        data: ServiceStaffData,
+        isLoading: isLoadingServiceStaff,
+        refetch: refetchServiceStaff
+    } = useAdminGetUsersByRoleQuery({ role: Role.ServiceStaff, sortOrder: 'asc', sortBy: UserSortBy.FirstName, page: page, limit: 10 })
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value)
+    }
+    const handleRefresh = () => {
+        refetchReceptionist()
+        refetchServiceStaff()
     }
 
     const [exportExcel] = useExportStaffExcelMutation();
@@ -71,6 +83,7 @@ const StaffManagement = () => {
                     ReceptionistData={ReceptionistData}
                     ServiceStaffData={ServiceStaffData}
                     onChangePage={handlePageChange}
+                    onRefresh={handleRefresh}
                 />
             )}
         </Box>

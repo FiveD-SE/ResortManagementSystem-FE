@@ -18,11 +18,29 @@ import toast from "react-hot-toast"
 const RoomManagement = () => {
     const [viewMode, setViewMode] = React.useState<'default' | 'roomManagement' | 'addRoomType' | 'editRoomType'>('default');
     const [selectedRoomType, setSelectedRoomType] = React.useState<IRoomType>();
-    const { data: roomsData, isLoading: roomLoading } = useGetRoomsQuery({ page: 1, limit: 100 });
-    const { data: roomTypesData } = useGetRoomTypesQuery({ page: 1, limit: 100 });
-    const { data: roomTypesStatistic, isLoading: roomTypesStatisticLoading } = useGetRoomCountByRoomTypeQuery();
+    const {
+        data: roomsData,
+        isLoading: roomLoading,
+        refetch: refetchRooms
+    } = useGetRoomsQuery({ page: 1, limit: 100 });
+    const {
+        data: roomTypesData,
+        isLoading: roomTypesLoading,
+        refetch: refetchRoomTypes
+    } = useGetRoomTypesQuery({ page: 1, limit: 100 });
+    const {
+        data: roomTypesStatistic,
+        isLoading: roomTypesStatisticLoading,
+        refetch: refetchRoomTypesStatistic
+    } = useGetRoomCountByRoomTypeQuery();
 
     const [exportExcel] = useExportRoomExcelMutation();
+
+    const handleRefetch = () => {
+        refetchRooms();
+        refetchRoomTypes();
+        refetchRoomTypesStatistic();
+    }
 
     const handleExportExcel = async () => {
         try {
@@ -74,10 +92,10 @@ const RoomManagement = () => {
                     ) : (
                         <StatisticRoomType onManageRoomType={() => setViewMode('roomManagement')} roomTypesStatistic={roomTypesStatistic} />
                     )}
-                    {roomLoading ? (
+                    {roomLoading || roomTypesLoading ? (
                         <RoomTableSkeleton />
                     ) : (
-                        <RoomTable roomsData={roomsData} roomTypesData={roomTypesData} />
+                        <RoomTable roomsData={roomsData} roomTypesData={roomTypesData} onRefetch={handleRefetch} />
                     )}
                 </>
             )}
@@ -91,6 +109,7 @@ const RoomManagement = () => {
                         setViewMode('editRoomType');
                     }}
                     roomTypesData={roomTypesData}
+                    onRefetch={handleRefetch}
                 />
             )}
 
@@ -98,12 +117,13 @@ const RoomManagement = () => {
                 <EditRoomType
                     roomType={selectedRoomType}
                     onEditRoomType={() => setViewMode('roomManagement')}
+                    onRefetch={handleRefetch}
                 />
             )}
 
 
             {viewMode === 'addRoomType' && (
-                <AddNewRoomType onAddNewRoomType={() => setViewMode('roomManagement')} />
+                <AddNewRoomType onAddNewRoomType={() => setViewMode('roomManagement')} onRefetch={handleRefetch} />
             )}
         </Box>
     );

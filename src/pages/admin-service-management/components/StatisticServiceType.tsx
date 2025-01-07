@@ -42,7 +42,7 @@ const StatisticServiceType = ({ onManageServiceType, serviceTypesStatistic }: St
                     startIcon={<Settings />}
                     onClick={onManageServiceType}
                 >
-                    Manage Service Type
+                    Manage Service
                 </Button>
             </Box>
             <Box

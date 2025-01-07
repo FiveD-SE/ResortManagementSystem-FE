@@ -27,9 +27,10 @@ interface StaffTableProps {
     ReceptionistData: IUserApiResponse | undefined;
     ServiceStaffData: IUserApiResponse | undefined;
     onChangePage?: (_event: React.ChangeEvent<unknown>, value: number) => void;
+    onRefresh: () => void;
 }
 
-const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffTableProps) => {
+const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage, onRefresh }: StaffTableProps) => {
     const [openAddStaffModal, setOpenAddStaffModal] = React.useState<boolean>(false);
     const [openEditStaffModal, setOpenEditStaffModal] = React.useState<boolean>(false);
     const [tabSelected, setTabSelected] = React.useState<number>(0);
@@ -51,7 +52,7 @@ const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffT
         } else {
             setTotalPage(ServiceStaffData?.totalPages ?? 0);
         }
-    }, [tabSelected]);
+    }, [ReceptionistData?.docs?.length, ReceptionistData?.totalPages, ServiceStaffData?.docs?.length, ServiceStaffData?.totalPages, tabSelected]);
 
     const [deleteUser, { isLoading }] = useDeleteUserMutation();
 
@@ -104,7 +105,7 @@ const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffT
 
     const filteredRows = React.useMemo(() => getFilteredRows(), [getFilteredRows]);
 
-    const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+    const handleTabChange = (_event: React.ChangeEvent<unknown>, newValue: number) => {
         setTabSelected(newValue);
     };
 
@@ -117,7 +118,8 @@ const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffT
             await deleteUser(selectedStaffId);
             toast.success('Staff deleted successfully');
             setOpenDeleteModal(false);
-        } catch (error) {
+            onRefresh();
+        } catch {
             toast.error('Failed to delete staff');
         }
     }
@@ -327,8 +329,8 @@ const StaffTable = ({ ReceptionistData, ServiceStaffData, onChangePage }: StaffT
                 onChange={onChangePage}
             />
 
-            <AddNewStaffModal open={openAddStaffModal} onClose={() => setOpenAddStaffModal(false)} serviceTypeData={serviceTypeData} />
-            <EditStaffInformation open={openEditStaffModal} onClose={() => setOpenEditStaffModal(false)} serviceTypeData={serviceTypeData} selectedStaffId={selectedStaffId} />
+            <AddNewStaffModal open={openAddStaffModal} onClose={() => setOpenAddStaffModal(false)} serviceTypeData={serviceTypeData} onRefresh={onRefresh} />
+            <EditStaffInformation open={openEditStaffModal} onClose={() => setOpenEditStaffModal(false)} serviceTypeData={serviceTypeData} selectedStaffId={selectedStaffId} onRefresh={onRefresh} />
 
             <PopupModal
                 open={openDeleteModal}

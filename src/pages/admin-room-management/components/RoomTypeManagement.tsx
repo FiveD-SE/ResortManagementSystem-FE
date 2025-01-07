@@ -27,6 +27,7 @@ interface RoomTypeManagementProps {
   onAddNewRoomType: () => void;
   onEditRoomType: (roomType: IRoomType | undefined) => void;
   roomTypesData: IRoomTypeApiResponse | undefined;
+  onRefetch: () => void;
 }
 
 const RoomTypeManagement = ({
@@ -34,6 +35,7 @@ const RoomTypeManagement = ({
   onAddNewRoomType,
   onEditRoomType,
   roomTypesData,
+  onRefetch,
 }: RoomTypeManagementProps) => {
   const [search, setSearch] = React.useState<string>('');
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -64,6 +66,7 @@ const RoomTypeManagement = ({
     } catch {
       toast.error('Failed to delete room type');
     } finally {
+      onRefetch();
       setOpenDeleteModal(false);
     }
   };

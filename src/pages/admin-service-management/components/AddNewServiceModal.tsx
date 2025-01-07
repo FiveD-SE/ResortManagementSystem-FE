@@ -11,9 +11,10 @@ interface AddNewServiceModalProps {
     serviceTypeData: IServiceTypeApiResponse | undefined;
     open: boolean;
     onClose: () => void;
+    onRefetch: () => void;
 }
 
-const AddNewServiceModal = ({ serviceTypeData, open, onClose }: AddNewServiceModalProps) => {
+const AddNewServiceModal = ({ serviceTypeData, open, onClose, onRefetch }: AddNewServiceModalProps) => {
     const [serviceName, setServiceName] = React.useState('');
     const [price, setPrice] = React.useState('');
     const [serviceType, setServiceType] = React.useState('');
@@ -76,6 +77,7 @@ const AddNewServiceModal = ({ serviceTypeData, open, onClose }: AddNewServiceMod
         } finally {
             onClose();
             resetForm();
+            onRefetch();
         }
     };
 

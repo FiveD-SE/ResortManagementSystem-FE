@@ -10,6 +10,7 @@ import {
   ITripRequest,
   ITripResponse,
 } from '../types/booking';
+import { IRoomService } from '../types/roomService';
 
 export const bookingApi = createApi({
   reducerPath: 'bookingApi',
@@ -119,6 +120,20 @@ export const bookingApi = createApi({
         data,
       }),
     }),
+    addRoomServicesInBooking: builder.mutation<IBooking, { bookingId: string; data: Omit<IRoomService, 'serviceName' | 'description' | 'price' | '_id' | 'name' | 'roomServiceId'>[] }>({
+      query: ({ bookingId, data }) => ({
+        url: `/${bookingId}/room-services`,
+        method: 'POST',
+        data: {
+          roomServicesWithQuantities: [
+            ...data.map((service) => ({
+              roomServiceId: service.id,
+              quantity: service.quantity,
+            })),
+          ]
+        },
+      }),
+    }),
   }),
 });
 
@@ -136,4 +151,5 @@ export const {
   useConfirmCheckOutMutation,
   useForwardBookingServiceStatusMutation,
   useAddServicesToBookingMutation,
+  useAddRoomServicesInBookingMutation,
 } = bookingApi;

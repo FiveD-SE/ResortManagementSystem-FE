@@ -73,7 +73,7 @@ export const adminUserApi = createApi({
     }),
     updateUser: builder.mutation<
       IUser,
-      Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email'> & { id: string }
+      Omit<IUser, 'avatar' | 'dob' | 'gender' | 'isVerified' | 'isActive' | 'email' | 'phoneNumber'> & { id: string }
     >({
       query: (data) => ({
         url: `/${data.id}`,

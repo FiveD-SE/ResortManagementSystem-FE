@@ -3,6 +3,8 @@ import { Download } from "@mui/icons-material";
 import StatisticBox from "./StatisticBox";
 import toast from "react-hot-toast";
 import { useExportExcelMutation } from "../../../apis/exportApi";
+import DateRangePickerModal from "./DateRangePickerModal";
+import React from "react";
 
 interface StatisticProps {
     dailyRevenue: { revenue: number; growth: number };
@@ -11,12 +13,13 @@ interface StatisticProps {
 }
 
 const Statistic = ({ dailyRevenue, customerGrowth, roomAvailability }: StatisticProps) => {
-
+    const [open, setOpen] = React.useState(false);
+    const [selectedDateRange, setSelectedDateRange] = React.useState({ startDate: new Date(), endDate: new Date(), key: 'selection' });
     const [exportExcel, { isLoading }] = useExportExcelMutation();
 
     const handleExportExcel = async () => {
         try {
-            const response = await exportExcel();
+            const response = await exportExcel({ startDate: selectedDateRange.startDate, endDate: selectedDateRange.endDate });
 
             if (response && response.data) {
                 const blob = new Blob([response.data], {
@@ -42,12 +45,12 @@ const Statistic = ({ dailyRevenue, customerGrowth, roomAvailability }: Statistic
             } else {
                 toast.error('Error exporting file');
             }
+            setOpen(false);
         } catch (error) {
             console.error('Excel export error:', error);
             toast.error('Error exporting file');
         }
     };
-
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -75,7 +78,7 @@ const Statistic = ({ dailyRevenue, customerGrowth, roomAvailability }: Statistic
                         },
                     }}
                     startIcon={<Download />}
-                    onClick={handleExportExcel}
+                    onClick={() => setOpen(true)}
                     disabled={isLoading}
                 >
                     {isLoading ? 'Exporting' : 'Export'}
@@ -91,6 +94,13 @@ const Statistic = ({ dailyRevenue, customerGrowth, roomAvailability }: Statistic
                     comparison={`${roomAvailability?.bookedRooms}/${roomAvailability?.totalRooms}`}
                 />
             </Box>
+            <DateRangePickerModal
+                open={open}
+                onClose={() => setOpen(false)}
+                selectedDateRange={selectedDateRange}
+                setSelectedDateRange={setSelectedDateRange}
+                onConfirm={handleExportExcel}
+            />
         </Box>
     );
 };

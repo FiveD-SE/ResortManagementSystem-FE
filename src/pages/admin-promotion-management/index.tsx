@@ -10,9 +10,13 @@ import toast from "react-hot-toast"
 
 const PromotionManagement = () => {
     const [page, setPage] = React.useState(1)
-    const { data: promotionData, isLoading } = useGetPromotionsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' })
+    const { data: promotionData, isLoading, refetch: onRefetchPromotions } = useGetPromotionsQuery({ page: page, limit: 10, sortBy: 'createdAt', sortOrder: 'desc' })
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value)
+    }
+
+    const handleRefetchPromotions = () => {
+        onRefetchPromotions()
     }
 
     const [exportExcel] = useExportPromotionExcelMutation();
@@ -65,7 +69,7 @@ const PromotionManagement = () => {
 
             {/* Promotion Table */}
             {!isLoading ? (
-                <PromotionTable promotionData={promotionData} onPageChange={handlePageChange} />
+                <PromotionTable promotionData={promotionData} onPageChange={handlePageChange} onRefetch={handleRefetchPromotions} />
             ) : (
                 <PromotionTableSkeleton />
             )}

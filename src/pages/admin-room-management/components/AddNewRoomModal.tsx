@@ -12,9 +12,10 @@ interface AddNewRoomModalProps {
     roomTypesData: IRoomTypeApiResponse | undefined;
     open: boolean;
     onClose: () => void;
+    onRefetch: () => void;
 }
 
-const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps) => {
+const AddNewRoomModal = ({ roomTypesData, open, onClose, onRefetch }: AddNewRoomModalProps) => {
     const [roomNumber, setRoomNumber] = React.useState('');
     const [pricePerNight, setPricePerNight] = React.useState('');
     const [roomType, setRoomType] = React.useState('');
@@ -84,6 +85,7 @@ const AddNewRoomModal = ({ roomTypesData, open, onClose }: AddNewRoomModalProps)
             toast.success('Room added successfully');
             resetForm();
             onClose();
+            onRefetch();
         } catch {
             toast.error('Failed to add room');
         }
